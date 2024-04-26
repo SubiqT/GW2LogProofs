@@ -1,0 +1,9 @@
+[submodule "src/nexus"]
+	path = src/nexus
+	url = https://github.com/RaidcoreGG/RCGG-lib-nexus-api
+[submodule "src/imgui"]
+	path = src/imgui
+	url = https://github.com/RaidcoreGG/imgui
+[submodule "src/unofficial_extras"]
+	path = src/unofficial_extras
+	url = https://github.com/Krappa322/arcdps_unofficial_extras_releases
