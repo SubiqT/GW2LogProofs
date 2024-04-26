@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\entry.cpp" />
+    <ClCompile Include="src\gui.cpp" />
+    <ClCompile Include="src\shared.cpp" />
+    <ClCompile Include="src\proofs.cpp" />
+    <ClCompile Include="src\unofficial_extras\KeyBindsTranslation.cpp">
+      <Filter>submodules\unofficial_extras</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unofficial_extras\KeyBindHelper.cpp">
+      <Filter>submodules\unofficial_extras</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\gui.h" />
+    <ClInclude Include="src\shared.h" />
+    <ClInclude Include="src\proofs.h" />
+    <ClInclude Include="src\nexus\Nexus.h">
+      <Filter>submodules</Filter>
+    </ClInclude>
+    <ClInclude Include="src\unofficial_extras\KeyBindStructs.h">
+      <Filter>submodules\unofficial_extras</Filter>
+    </ClInclude>
+    <ClInclude Include="src\unofficial_extras\KeyBindsTranslation.h">
+      <Filter>submodules\unofficial_extras</Filter>
+    </ClInclude>
+    <ClInclude Include="src\unofficial_extras\KeyBindHelper.h">
+      <Filter>submodules\unofficial_extras</Filter>
+    </ClInclude>
+    <ClInclude Include="src\unofficial_extras\Definitions.h">
+      <Filter>submodules\unofficial_extras</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="submodules">
+      <UniqueIdentifier>{558a6c31-9cbd-4037-a869-d0a728a40350}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="submodules\unofficial_extras">
+      <UniqueIdentifier>{95dfa634-1dd2-44bb-9f9d-673b928b8bb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="submodules\imgui">
+      <UniqueIdentifier>{9c73d157-a8f0-467c-a51e-5cc964a1fc86}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include=".gitmodules" />
+  </ItemGroup>
+</Project>
