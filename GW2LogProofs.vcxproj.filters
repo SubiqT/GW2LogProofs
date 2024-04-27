@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\entry.cpp" />
-    <ClCompile Include="src\gui.cpp" />
-    <ClCompile Include="src\shared.cpp" />
-    <ClCompile Include="src\proofs.cpp" />
     <ClCompile Include="src\unofficial_extras\KeyBindsTranslation.cpp">
       <Filter>submodules\unofficial_extras</Filter>
     </ClCompile>
@@ -26,11 +22,12 @@
     <ClCompile Include="src\imgui\imgui_widgets.cpp">
       <Filter>submodules\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="src\entry.cpp" />
+    <ClCompile Include="src\gui.cpp" />
+    <ClCompile Include="src\proofs.cpp" />
+    <ClCompile Include="src\shared.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\gui.h" />
-    <ClInclude Include="src\shared.h" />
-    <ClInclude Include="src\proofs.h" />
     <ClInclude Include="src\nexus\Nexus.h">
       <Filter>submodules</Filter>
     </ClInclude>
@@ -64,6 +61,12 @@
     <ClInclude Include="src\imgui\imstb_truetype.h">
       <Filter>submodules\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="src\httplib\httplib.h">
+      <Filter>submodules</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui.h" />
+    <ClInclude Include="src\proofs.h" />
+    <ClInclude Include="src\shared.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="submodules">

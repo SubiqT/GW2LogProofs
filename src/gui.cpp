@@ -2,8 +2,9 @@
 #include "shared.h"
 #include "proofs.h"
 
+
 BOOL showProofsWindow = true;
-const char* proofsTable;
+int proofsTable;
 
 void RenderProofs() {
 	if (!showProofsWindow) {
@@ -11,7 +12,7 @@ void RenderProofs() {
 	}
 
 	if (ImGui::Begin("Log Proofs")) {
-		ImGui::Text(proofsTable ? proofsTable : "Not loaded.");
+		ImGui::Text("Response: %i", proofsTable ? proofsTable : 0);
 	}
 	ImGui::End();
 }
@@ -23,7 +24,7 @@ void RenderSettings() {
 		showProofsWindow = ImGui::Button("Show Proofs Window");
 	}
 	if (ImGui::Button("Refresh")) {
-		proofsTable = GetProof();
+		proofsTable = GetProof("Subi.8014");
 	}
 
 }
