@@ -3,6 +3,6 @@
 
 #include "shared.h"
 
-void UpdateProofs(void);
+const char* GetProof(void);
 
 #endif

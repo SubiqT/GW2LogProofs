@@ -11,6 +11,21 @@
     <ClCompile Include="src\unofficial_extras\KeyBindHelper.cpp">
       <Filter>submodules\unofficial_extras</Filter>
     </ClCompile>
+    <ClCompile Include="src\imgui\imgui.cpp">
+      <Filter>submodules\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui\imgui_demo.cpp">
+      <Filter>submodules\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui\imgui_draw.cpp">
+      <Filter>submodules\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui\imgui_tables.cpp">
+      <Filter>submodules\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui\imgui_widgets.cpp">
+      <Filter>submodules\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gui.h" />
@@ -31,6 +46,24 @@
     <ClInclude Include="src\unofficial_extras\Definitions.h">
       <Filter>submodules\unofficial_extras</Filter>
     </ClInclude>
+    <ClInclude Include="src\imgui\imconfig.h">
+      <Filter>submodules\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imgui.h">
+      <Filter>submodules\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imgui_internal.h">
+      <Filter>submodules\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imstb_rectpack.h">
+      <Filter>submodules\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imstb_textedit.h">
+      <Filter>submodules\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui\imstb_truetype.h">
+      <Filter>submodules\imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="submodules">
@@ -42,9 +75,5 @@
     <Filter Include="submodules\imgui">
       <UniqueIdentifier>{9c73d157-a8f0-467c-a51e-5cc964a1fc86}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include=".gitignore" />
-    <None Include=".gitmodules" />
   </ItemGroup>
 </Project>

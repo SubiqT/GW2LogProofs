@@ -1,6 +1,5 @@
 #include <Windows.h>
 #include <chrono>
-#include <fstream>
 
 #include "nexus/Nexus.h"
 #include "imgui/imgui.h"
@@ -18,7 +17,6 @@ void AddonOptions() {
 }
 
 void AddonRender() {
-	UpdateProofs();
 	RenderProofs();
 }
 
@@ -43,7 +41,7 @@ void AddonUnload() {
 }
 
 extern "C" __declspec(dllexport) AddonDefinition * GetAddonDef() {
-	AddonDef.Signature = -541372;
+	AddonDef.Signature = -104905;
 	AddonDef.APIVersion = NEXUS_API_VERSION;
 	AddonDef.Name = "Log Proofs";
 	AddonDef.Version.Major = 1;

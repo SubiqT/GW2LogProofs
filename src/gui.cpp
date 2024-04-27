@@ -3,6 +3,7 @@
 #include "proofs.h"
 
 BOOL showProofsWindow = true;
+const char* proofsTable;
 
 void RenderProofs() {
 	if (!showProofsWindow) {
@@ -10,10 +11,7 @@ void RenderProofs() {
 	}
 
 	if (ImGui::Begin("Log Proofs")) {
-		unsigned int kills = 0;
-		ImGui::Text("Kills: %u",
-			kills
-		);
+		ImGui::Text(proofsTable ? proofsTable : "Not loaded.");
 	}
 	ImGui::End();
 }
@@ -24,4 +22,8 @@ void RenderSettings() {
 	} else {
 		showProofsWindow = ImGui::Button("Show Proofs Window");
 	}
+	if (ImGui::Button("Refresh")) {
+		proofsTable = GetProof();
+	}
+
 }
