@@ -64,6 +64,9 @@
     <ClInclude Include="src\gui.h" />
     <ClInclude Include="src\proofs.h" />
     <ClInclude Include="src\shared.h" />
+    <ClInclude Include="src\json\single_include\nlohmann\json.hpp">
+      <Filter>submodules\nlohmann</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="submodules">
@@ -74,6 +77,9 @@
     </Filter>
     <Filter Include="submodules\imgui">
       <UniqueIdentifier>{9c73d157-a8f0-467c-a51e-5cc964a1fc86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="submodules\nlohmann">
+      <UniqueIdentifier>{50de2c13-cd6a-4935-a57a-6a9d88ca4f48}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

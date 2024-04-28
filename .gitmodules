@@ -7,3 +7,6 @@
 [submodule "src/unofficial_extras"]
 	path = src/unofficial_extras
 	url = https://github.com/Krappa322/arcdps_unofficial_extras_releases
+[submodule "src/json"]
+	path = src/json
+	url = https://github.com/nlohmann/json

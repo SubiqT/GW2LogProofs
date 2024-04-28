@@ -3,6 +3,7 @@
 #include <urlmon.h>
 #include <sstream>
 #include <format>
+#include <nlohmann/json.hpp>
 
 #include "shared.h"
 
