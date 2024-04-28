@@ -1,16 +1,36 @@
-#define CPPHTTPLIB_OPENSSL_SUPPORT
+#pragma comment(lib, "urlmon.lib")
 
-#include "httplib/httplib.h"
+#include <urlmon.h>
+#include <sstream>
 #include <format>
 
 #include "shared.h"
 
-const std::string wingmanUrl  = "gw2wingman.nevermindcreations.de";
+const char* GetProof(const char* account) {
+    std::string urlString = std::format("https://gw2wingman.nevermindcreations.de/api/kp?account={}", account);
+    const char* url = urlString.c_str();
+    std::wstring wUrl(url, url + strlen(url));
 
-int GetProof(const char* account) {
-	std::string path = std::format("/api/kp?account={}", account);
-	httplib::SSLClient cli(wingmanUrl);
-	auto res = cli.Get(path);
-	cli.stop();
-	return res->status;
+    IStream* stream;
+    HRESULT result = URLOpenBlockingStream(0, wUrl.c_str(), &stream, 0, 0);
+    if (result != 0)
+    {
+        return "An error occured.";
+    }
+
+    const unsigned long chunkSize = 128;
+    char buffer[chunkSize];
+    unsigned long bytesRead;
+    std::stringstream strStream;
+
+    stream->Read(buffer, chunkSize, &bytesRead);
+    while (bytesRead > 0)
+    {
+        strStream.write(buffer, (long long)bytesRead);
+        stream->Read(buffer, chunkSize, &bytesRead);
+    }
+    stream->Release();
+    std::string proof = strStream.str();
+    APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("Response: {}", proof).c_str());
+    return proof.c_str();
 }

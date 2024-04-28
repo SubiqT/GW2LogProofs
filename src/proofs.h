@@ -3,6 +3,6 @@
 
 #include "shared.h"
 
-int GetProof(const char* account);
+const char* GetProof(const char* account);
 
 #endif

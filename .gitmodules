@@ -7,6 +7,3 @@
 [submodule "src/unofficial_extras"]
 	path = src/unofficial_extras
 	url = https://github.com/Krappa322/arcdps_unofficial_extras_releases
-[submodule "src/httplib"]
-	path = src/httplib
-	url = https://github.com/yhirose/cpp-httplib

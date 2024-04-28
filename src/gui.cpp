@@ -4,7 +4,7 @@
 
 
 BOOL showProofsWindow = true;
-int proofsTable;
+const char* proofsTable;
 
 void RenderProofs() {
 	if (!showProofsWindow) {
@@ -12,7 +12,10 @@ void RenderProofs() {
 	}
 
 	if (ImGui::Begin("Log Proofs")) {
-		ImGui::Text("Response: %i", proofsTable ? proofsTable : 0);
+		ImGui::Text("Response: %s", proofsTable ? proofsTable : "");
+		if (ImGui::Button("Refresh")) {
+			proofsTable = GetProof("Subi.8014");
+		}
 	}
 	ImGui::End();
 }
@@ -23,8 +26,4 @@ void RenderSettings() {
 	} else {
 		showProofsWindow = ImGui::Button("Show Proofs Window");
 	}
-	if (ImGui::Button("Refresh")) {
-		proofsTable = GetProof("Subi.8014");
-	}
-
 }
