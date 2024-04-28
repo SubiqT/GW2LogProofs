@@ -5,9 +5,25 @@
 #include <format>
 #include <nlohmann/json.hpp>
 
+using json = nlohmann::json;
+
 #include "shared.h"
 
-const char* GetProof(const char* account) {
+struct Player {
+    std::string account;
+    std::vector<std::string> characters;
+    std::vector<std::string> groups;
+    std::map<std::string, std::map<std::string, int>> kp;
+};
+
+void from_json(const json& j, Player& p) {
+    j.at("account").get_to(p.account);
+    j.at("chars").get_to<std::vector<std::string>>(p.characters);
+    j.at("groups").get_to<std::vector<std::string>>(p.groups);
+    j.at("kp").get_to<std::map<std::string, std::map<std::string, int>>>(p.kp);
+}
+
+std::string DownloadProof(const char* account) {
     std::string urlString = std::format("https://gw2wingman.nevermindcreations.de/api/kp?account={}", account);
     const char* url = urlString.c_str();
     std::wstring wUrl(url, url + strlen(url));
@@ -34,4 +50,19 @@ const char* GetProof(const char* account) {
     std::string proof = strStream.str();
     APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("Response: {}", proof).c_str());
     return proof.c_str();
+}
+
+char* GetProof(const char* account) {
+    std::string proof = DownloadProof(account);
+    json j = json::parse(proof);
+    APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("Dump: {}", j.dump(4)).c_str());
+    Player p = j.template get<Player>();
+    char* result = p.account.data();
+    APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", result);
+    for (const auto& [key1, value1] : p.kp) {
+        for (const auto& [key2, value2] : value1) {
+            APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("{}:{}:{}", key1, key2, value2).c_str());
+        }
+    }
+    return result;
 }

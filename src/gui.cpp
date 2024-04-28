@@ -4,7 +4,7 @@
 
 
 BOOL showProofsWindow = true;
-const char* proofsTable;
+char* player;
 
 void RenderProofs() {
 	if (!showProofsWindow) {
@@ -12,9 +12,9 @@ void RenderProofs() {
 	}
 
 	if (ImGui::Begin("Log Proofs")) {
-		ImGui::Text("Response: %s", proofsTable ? proofsTable : "");
+		ImGui::Text(player ? player : "");
 		if (ImGui::Button("Refresh")) {
-			proofsTable = GetProof("Subi.8014");
+			player = GetProof("Subi.8014");
 		}
 	}
 	ImGui::End();
