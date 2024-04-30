@@ -4,7 +4,7 @@
 
 
 BOOL showProofsWindow = true;
-char* player;
+std::vector<Player> players;
 
 void RenderProofs() {
 	if (!showProofsWindow) {
@@ -12,9 +12,21 @@ void RenderProofs() {
 	}
 
 	if (ImGui::Begin("Log Proofs")) {
-		ImGui::Text(player ? player : "");
+		if (players.size() > 0) {
+			for (Player player : players) {
+				ImGui::Text(player.account.c_str());
+				for (const auto& [boss_id, boss_kp] : player.kp) {
+					for (const auto& [spec, kills] : boss_kp) {
+						if (spec == "total") {
+							ImGui::Text("%s: %i", boss_id.c_str(), kills);
+						}
+					}
+				}
+			}
+		}
+		
 		if (ImGui::Button("Refresh")) {
-			player = GetProof("Subi.8014");
+			players.push_back(GetProof("Subi.8014"));
 		}
 	}
 	ImGui::End();

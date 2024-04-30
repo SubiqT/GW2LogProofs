@@ -9,13 +9,6 @@ using json = nlohmann::json;
 
 #include "shared.h"
 
-struct Player {
-    std::string account;
-    std::vector<std::string> characters;
-    std::vector<std::string> groups;
-    std::map<std::string, std::map<std::string, int>> kp;
-};
-
 void from_json(const json& j, Player& p) {
     j.at("account").get_to(p.account);
     j.at("chars").get_to<std::vector<std::string>>(p.characters);
@@ -52,17 +45,17 @@ std::string DownloadProof(const char* account) {
     return proof.c_str();
 }
 
-char* GetProof(const char* account) {
+Player GetProof(const char* account) {
     std::string proof = DownloadProof(account);
     json j = json::parse(proof);
     APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("Dump: {}", j.dump(4)).c_str());
     Player p = j.template get<Player>();
     char* result = p.account.data();
     APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", result);
-    for (const auto& [key1, value1] : p.kp) {
-        for (const auto& [key2, value2] : value1) {
-            APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("{}:{}:{}", key1, key2, value2).c_str());
-        }
-    }
-    return result;
+    //for (const auto& [key1, value1] : p.kp) {
+    //    for (const auto& [key2, value2] : value1) {
+    //        APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("{}:{}:{}", key1, key2, value2).c_str());
+    //    }
+    //}
+    return p;
 }
