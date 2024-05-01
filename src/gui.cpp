@@ -89,6 +89,13 @@ void RenderProofs() {
 		}
 		
 		if (ImGui::Button("Refresh")) {
+			std::string account = "Subi.8014";
+			for (Player& player : players) {
+				if (player.account == account) {
+					long long index = std::addressof(player) - std::addressof(players[0]);
+					players.erase(players.begin() + index);
+				}
+			}
 			players.push_back(GetProof("Subi.8014"));
 		}
 	}
