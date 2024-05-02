@@ -7,6 +7,12 @@
 
 #include "nexus/Nexus.h"
 
+typedef struct AddonConfig {
+    bool showWindow;
+} AddonConfig;
+
+extern AddonConfig Config;
+
 extern AddonAPI* APIDefs;
 extern NexusLinkData* NexusLink;
 

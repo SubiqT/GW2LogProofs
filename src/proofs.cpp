@@ -1,7 +1,6 @@
 #pragma comment(lib, "urlmon.lib")
 
 #include <urlmon.h>
-#include <sstream>
 #include <format>
 #include <nlohmann/json.hpp>
 
@@ -52,10 +51,5 @@ Player GetProof(const char* account) {
     Player p = j.template get<Player>();
     char* result = p.account.data();
     APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", result);
-    //for (const auto& [key1, value1] : p.kp) {
-    //    for (const auto& [key2, value2] : value1) {
-    //        APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("{}:{}:{}", key1, key2, value2).c_str());
-    //    }
-    //}
     return p;
 }

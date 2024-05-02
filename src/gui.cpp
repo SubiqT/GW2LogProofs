@@ -1,9 +1,9 @@
+#include <format>
+
 #include "imgui/imgui.h"
 #include "shared.h"
 #include "proofs.h"
 
-
-BOOL showProofsWindow = true;
 std::vector<Player> players;
 
 const char* GetBossName(std::string boss_id) {
@@ -67,7 +67,7 @@ const char* GetBossName(std::string boss_id) {
 }
 
 void RenderProofs() {
-	if (!showProofsWindow) {
+	if (!Config.showWindow) {
 		return;
 	}
 
@@ -103,9 +103,7 @@ void RenderProofs() {
 }
 
 void RenderSettings() {
-	if (showProofsWindow) {
-		showProofsWindow = !ImGui::Button("Hide Proofs Window");
-	} else {
-		showProofsWindow = ImGui::Button("Show Proofs Window");
+	if (ImGui::Button(Config.showWindow ? "Hide Window" : "Show Window")) {
+		Config.showWindow = !Config.showWindow;
 	}
 }
