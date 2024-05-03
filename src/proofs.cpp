@@ -26,8 +26,7 @@ std::string DownloadProof(const char* account) {
 
     IStream* stream;
     HRESULT result = URLOpenBlockingStream(0, wUrl.c_str(), &stream, 0, 0);
-    if (result != 0)
-    {
+    if (result != 0) {
         return "An error occured.";
     }
 
@@ -37,8 +36,7 @@ std::string DownloadProof(const char* account) {
     std::stringstream strStream;
 
     stream->Read(buffer, chunkSize, &bytesRead);
-    while (bytesRead > 0)
-    {
+    while (bytesRead > 0) {
         strStream.write(buffer, (long long)bytesRead);
         stream->Read(buffer, chunkSize, &bytesRead);
     }
@@ -80,8 +78,7 @@ void UpdatePlayers() {
             Player newPlayer = GetProof(shouldAddPlayer.c_str());
             if (shouldAddPlayer == selfName) {
                 self = newPlayer;
-            }
-            else {
+            } else {
                 players.push_back(newPlayer);
             }
         } catch (const std::exception& e) {
@@ -100,8 +97,7 @@ void SquadEventHandler(void* eventArgs) {
         if (role == 5) {
             shouldClearAllPlayers = true;
         }
-    }
-    else {
+    } else {
         shouldRemovePlayer = account;
         if (role <= 2) {
             shouldAddPlayer = account;
