@@ -71,54 +71,121 @@ void RenderProofs() {
 		return;
 	}
 
-	if (players.size() > 0) {
-		if (ImGui::BeginTable("table", 27, ImGuiTableFlags_BordersInnerV)) {
-			// Header
-			ImGui::TableNextColumn();
-			ImGui::Text("Account");
-			for (const auto& [boss_id, boss_kp] : players[0].kp) {
-				const char* bossName = GetBossName(boss_id);
-				if (bossName != "Unknown") {
-					ImGui::TableNextColumn();
-					ImGui::Text("%s", bossName);
-				}
-			}
-			// Records
-			for (Player player : players) {
-				ImGui::TableNextColumn();
-				ImGui::Text(player.account.c_str());
-				for (const auto& [boss_id, boss_kp] : player.kp) {
-					for (const auto& [spec, kills] : boss_kp) {
-						if (spec == "total") {
-							if (GetBossName(boss_id) != "Unknown") {
-								ImGui::TableNextColumn();
-								ImGui::Text("%i", kills);
-							}
-						}
-					}
-				}
-			}
-			ImGui::EndTable();
-		}
-	}
-
-
 	if (ImGui::Begin("Log Proofs")) {
-		/*if (players.size() > 0) {
-			for (Player player : players) {
-				ImGui::Text(player.account.c_str());
-				for (const auto& [boss_id, boss_kp] : player.kp) {
-					for (const auto& [spec, kills] : boss_kp) {
-						if (spec == "total") {
-							const char* boss_name = GetBossName(boss_id);
-							if (boss_name != "Unknown") {
-								ImGui::Text("%s: %i", GetBossName(boss_id), kills);
-							}
-						}
-					}
+		if (players.size() > 0) {
+			if (ImGui::BeginTable("table", 26, ImGuiTableFlags_BordersInnerV)) {
+				// Header
+				ImGui::TableNextColumn();
+				ImGui::Text("Account");
+				ImGui::TableNextColumn();
+				ImGui::Text("VG");
+				ImGui::TableNextColumn();
+				ImGui::Text("Gors");
+				ImGui::TableNextColumn();
+				ImGui::Text("Sab");
+				ImGui::TableNextColumn();
+				ImGui::Text("Sloth");
+				ImGui::TableNextColumn();
+				ImGui::Text("Trio");
+				ImGui::TableNextColumn();
+				ImGui::Text("Matt");
+				ImGui::TableNextColumn();
+				ImGui::Text("Escort");
+				ImGui::TableNextColumn();
+				ImGui::Text("KC");
+				ImGui::TableNextColumn();
+				ImGui::Text("Xera");
+				ImGui::TableNextColumn();
+				ImGui::Text("Carin");
+				ImGui::TableNextColumn();
+				ImGui::Text("MO");
+				ImGui::TableNextColumn();
+				ImGui::Text("Sama");
+				ImGui::TableNextColumn();
+				ImGui::Text("Deimos");
+				ImGui::TableNextColumn();
+				ImGui::Text("SH");
+				ImGui::TableNextColumn();
+				ImGui::Text("River");
+				ImGui::TableNextColumn();
+				ImGui::Text("BK");
+				ImGui::TableNextColumn();
+				ImGui::Text("Eater");
+				ImGui::TableNextColumn();
+				ImGui::Text("Eyes");
+				ImGui::TableNextColumn();
+				ImGui::Text("Dhuum");
+				ImGui::TableNextColumn();
+				ImGui::Text("CA");
+				ImGui::TableNextColumn();
+				ImGui::Text("Largos");
+				ImGui::TableNextColumn();
+				ImGui::Text("Qadim");
+				ImGui::TableNextColumn();
+				ImGui::Text("Adina");
+				ImGui::TableNextColumn();
+				ImGui::Text("Sabir");
+				ImGui::TableNextColumn();
+				ImGui::Text("QtP");
+
+				// Records
+				for (Player player : players) {
+					ImGui::TableNextColumn();
+					ImGui::Text(player.account.c_str());
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(ValeGuardian))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Gorseval))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Sabetha))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Slothasor))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(BanditTrio))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Matthias))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Escort))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(KeepConstruct))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Xera))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Cairn))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(MursaatOverseer))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Samarog))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Deimos))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(SoullessHorror))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(RiverOfSouls))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(BrokenKing))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(EaterOfSouls))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Eyes))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Dhuum))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(ConjuredAmalgamate))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(TwinLargos))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Qadim))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Adina))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(Sabir))][std::string("total")]);
+					ImGui::TableNextColumn();
+					ImGui::Text("%i", player.kp[std::format("{}", int(QadimThePeerless))][std::string("total")]);
 				}
+				ImGui::EndTable();
 			}
-		}*/
+		}
 		
 		if (ImGui::Button("Refresh")) {
 			std::string account = "Subi.8014";
