@@ -3,16 +3,18 @@
 
 #include "nexus/Nexus.h"
 #include "imgui/imgui.h"
+#include "unofficial_extras/Definitions.h"
 #include "shared.h"
 #include "proofs.h"
 #include "gui.h"
 
 AddonDefinition AddonDef = {};
 HMODULE hSelf = nullptr;
+const char* ADDON_NAME = "Log Proofs";
 
 void AddonOptions() {
 	ImGui::Separator();
-	ImGui::Text("Log Proofs");
+	ImGui::Text(ADDON_NAME);
 	RenderSettings();
 }
 
@@ -31,19 +33,19 @@ void AddonLoad(AddonAPI* addonApi) {
 	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
 	APIDefs->RegisterRender(ERenderType_OptionsRender, AddonOptions);
 
-	APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", "<c=#00ff00>Log Proofs</c> was loaded.");
+	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "<c=#00ff00>Log Proofs</c> was loaded.");
 }
 
 void AddonUnload() {
 	APIDefs->DeregisterRender(AddonRender);
 	APIDefs->DeregisterRender(AddonOptions);
-	APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", "<c=#ff0000>Log Proofs</c> was unloaded.");
+	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "<c=#ff0000>Log Proofs</c> was unloaded.");
 }
 
 extern "C" __declspec(dllexport) AddonDefinition * GetAddonDef() {
 	AddonDef.Signature = -104905;
 	AddonDef.APIVersion = NEXUS_API_VERSION;
-	AddonDef.Name = "Log Proofs";
+	AddonDef.Name = ADDON_NAME;
 	AddonDef.Version.Major = 1;
 	AddonDef.Version.Minor = 0;
 	AddonDef.Version.Build = 0;
@@ -54,6 +56,28 @@ extern "C" __declspec(dllexport) AddonDefinition * GetAddonDef() {
 	AddonDef.Unload = AddonUnload;
 	AddonDef.Flags = EAddonFlags_None;
 	return &AddonDef;
+}
+
+extern "C" __declspec(dllexport) void arcdps_unofficial_extras_subscriber_init(const ExtrasAddonInfo * pExtrasInfo, void* pSubscriberInfo) {
+	if (pExtrasInfo->ApiVersion == 2) { // Only load if V2 of the unofficial extras API
+		extrasLoaded = true;
+		
+		ExtrasSubscriberInfoV2* extrasSubscriberInfo = static_cast<ExtrasSubscriberInfoV2*>(pSubscriberInfo);
+
+		std::string selfAccountName = pExtrasInfo->SelfAccountName;
+		if (selfAccountName.at(0) == ':')
+			AddPlayer(selfAccountName.erase(0, 1).c_str());
+
+		extrasSubscriberInfo->InfoVersion = 2;
+		extrasSubscriberInfo->SubscriberName = ADDON_NAME;
+		extrasSubscriberInfo->SquadUpdateCallback = SquadEventHandler;
+
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "<c=#00ff00>Log Proofs</c> subscribed to unofficial extras.");
+	}
+	else {
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "<c=#ff0000>Log Proofs</c> failed to subscribe to unofficial extras.");
+	}
+	
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) {

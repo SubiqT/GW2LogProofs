@@ -6,6 +6,7 @@
 
 using json = nlohmann::json;
 
+#include "unofficial_extras/Definitions.h"
 #include "shared.h"
 
 void from_json(const json& j, Player& p) {
@@ -40,16 +41,36 @@ std::string DownloadProof(const char* account) {
     }
     stream->Release();
     std::string proof = strStream.str();
-    APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("Response: {}", proof).c_str());
     return proof.c_str();
 }
 
 Player GetProof(const char* account) {
     std::string proof = DownloadProof(account);
     json j = json::parse(proof);
-    APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("Dump: {}", j.dump(4)).c_str());
     Player p = j.template get<Player>();
-    char* result = p.account.data();
-    APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", result);
     return p;
+}
+
+void RemovePlayer(const char* account) {
+    for (Player& player : players) {
+        if (player.account == account) {
+            long long index = std::addressof(player) - std::addressof(players[0]);
+            players.erase(players.begin() + index);
+        }
+    }
+}
+
+void AddPlayer(const char* account) {
+    RemovePlayer(account);
+    players.push_back(GetProof(account));
+}
+
+void SquadEventHandler(const UserInfo* updatedUsers, size_t updatedUsersCount) {
+    APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("Updated Users: {} -  {}", updatedUsers->AccountName, int(updatedUsers->Role)).c_str());
+    if (int(updatedUsers->Role) > 2) {
+        return;
+    }
+    std::string account = updatedUsers->AccountName;
+    if (account.at(0) == ':')
+        AddPlayer(account.erase(0, 1).c_str());
 }

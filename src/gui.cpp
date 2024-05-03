@@ -4,8 +4,6 @@
 #include "shared.h"
 #include "proofs.h"
 
-std::vector<Player> players;
-
 const char* GetBossName(std::string boss_id) {
 	Boss boss = Boss(std::stoi(boss_id));
 	switch (boss) {
@@ -185,17 +183,6 @@ void RenderProofs() {
 				}
 				ImGui::EndTable();
 			}
-		}
-		
-		if (ImGui::Button("Refresh")) {
-			std::string account = "Subi.8014";
-			for (Player& player : players) {
-				if (player.account == account) {
-					long long index = std::addressof(player) - std::addressof(players[0]);
-					players.erase(players.begin() + index);
-				}
-			}
-			players.push_back(GetProof("Subi.8014"));
 		}
 	}
 	ImGui::End();

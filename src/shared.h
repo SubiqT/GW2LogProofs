@@ -15,6 +15,7 @@ extern AddonConfig Config;
 
 extern AddonAPI* APIDefs;
 extern NexusLinkData* NexusLink;
+extern bool extrasLoaded;
 
 struct Player {
     std::string account;
@@ -22,6 +23,9 @@ struct Player {
     std::vector<std::string> groups;
     std::map<std::string, std::map<std::string, int>> kp;
 };
+
+extern std::vector<Player> players;
+extern std::string self;
 
 enum Boss {
     ValeGuardian = 15438,

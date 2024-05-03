@@ -9,3 +9,7 @@ AddonConfig Config = defaultConfig;
 
 AddonAPI* APIDefs = nullptr;
 NexusLinkData* NexusLink = nullptr;
+
+std::vector<Player> players;
+bool extrasLoaded;
+std::string self;
