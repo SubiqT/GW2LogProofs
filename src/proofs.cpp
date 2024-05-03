@@ -6,7 +6,6 @@
 
 using json = nlohmann::json;
 
-#include "unofficial_extras/Definitions.h"
 #include "shared.h"
 
 bool shouldClearAllPlayers = false;
@@ -55,58 +54,81 @@ Player GetProof(const char* account) {
     return p;
 }
 
-void RemovePlayer(std::string account) {
-    for (Player& player : players) {
-        if (player.account == account) {
-            long long index = std::addressof(player) - std::addressof(players[0]);
-            players.erase(players.begin() + index);
-        }
+std::string StripAccount(std::string account) {
+    if (account.at(0) == ':') {
+        account.erase(0, 1);
     }
-}
-
-void AddPlayer(std::string account) {
-    players.push_back(GetProof(account.c_str()));
-}
-
-void AddSelf() {
-    players.push_back(GetProof(self.c_str()));
+    return account;
 }
 
 void UpdatePlayers() {
     if (shouldClearAllPlayers) {
         players.clear();
-        AddSelf();
         shouldClearAllPlayers = false;
     }
     if (!shouldRemovePlayer.empty()) {
-        RemovePlayer(shouldRemovePlayer);
+        for (Player& player : players) {
+            if (player.account == shouldRemovePlayer) {
+                long long index = std::addressof(player) - std::addressof(players[0]);
+                players.erase(players.begin() + index);
+            }
+        }
         shouldRemovePlayer.clear();
     }
     if (!shouldAddPlayer.empty()) {
-        AddPlayer(shouldAddPlayer);
+        if (shouldAddPlayer == selfName) {
+            self = GetProof(shouldAddPlayer.c_str());
+        } else {
+            players.push_back(GetProof(shouldAddPlayer.c_str()));
+        }
         shouldAddPlayer.clear();
     }
 }
 
 void SquadEventHandler(void* eventArgs) {
     SquadUpdate* squadUpdate = (SquadUpdate*)eventArgs;
-    APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("Updated Users: {} -  {}", squadUpdate->UserInfo->AccountName, int(squadUpdate->UserInfo->Role)).c_str());
-    std::string account = squadUpdate->UserInfo->AccountName;
-    if (account.at(0) == ':') {
-        account.erase(0, 1);
-    }
-    if (self == account) {
-        if (int(squadUpdate->UserInfo->Role) == 5) {
+    std::string account = StripAccount(squadUpdate->UserInfo->AccountName);
+    int role = int(squadUpdate->UserInfo->Role);
+    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("updated  user: {} -  {}", account, role).c_str());
+    if (selfName == account) {
+        if (role == 5) {
             shouldClearAllPlayers = true;
         }
-        return;
     }
-
-    if (int(squadUpdate->UserInfo->Role) > 2) {
+    else {
         shouldRemovePlayer = account;
+        if (role <= 2) {
+            shouldAddPlayer = account;
+        }
+    }
+    
+}
+
+void CombatEventHandler(void* eventArgs) {
+    EvCombatData* cbtEvent = (EvCombatData*)eventArgs;
+    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "combat meme");
+    if (!selfName.empty()) {
         return;
     }
-
-    shouldRemovePlayer = account;
-    shouldAddPlayer = account;
+    if (cbtEvent->ev) {
+        return;
+    }
+    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "no event meme");
+    if (cbtEvent->src->elite) {
+        return;
+    }
+    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "elite spec meme");
+    if (!cbtEvent->src->prof) {
+        return;
+    }
+    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "prof meme");
+    if (cbtEvent->src->name == nullptr || cbtEvent->src->name[0] == '\0' || cbtEvent->dst->name == nullptr || cbtEvent->dst->name[0] == '\0') {
+        return;
+    }
+    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "src / dst meme");
+    if (cbtEvent->dst->self) { // Should only occur on map change
+        selfName = StripAccount(std::string(cbtEvent->dst->name));
+        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("self: {}", selfName).c_str());
+        self = GetProof(selfName.c_str());
+    }
 }

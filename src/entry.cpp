@@ -3,14 +3,12 @@
 
 #include "nexus/Nexus.h"
 #include "imgui/imgui.h"
-#include "unofficial_extras/Definitions.h"
 #include "shared.h"
 #include "proofs.h"
 #include "gui.h"
 
 AddonDefinition AddonDef = {};
 HMODULE hSelf = nullptr;
-const char* ADDON_NAME = "Log Proofs";
 
 void AddonOptions() {
 	ImGui::Separator();
@@ -20,7 +18,7 @@ void AddonOptions() {
 
 void AddonRender() {
 	UpdatePlayers();
-	RenderProofs();
+	RenderWindow();
 }
 
 void AddonLoad(AddonAPI* addonApi) {
@@ -34,14 +32,16 @@ void AddonLoad(AddonAPI* addonApi) {
 	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
 	APIDefs->RegisterRender(ERenderType_OptionsRender, AddonOptions);
 	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", SquadEventHandler);
+	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", CombatEventHandler);
 
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "<c=#00ff00>Log Proofs</c> was loaded.");
 }
 
 void AddonUnload() {
+	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", CombatEventHandler);
 	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", SquadEventHandler);
-	APIDefs->DeregisterRender(AddonRender);
 	APIDefs->DeregisterRender(AddonOptions);
+	APIDefs->DeregisterRender(AddonRender);
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "<c=#ff0000>Log Proofs</c> was unloaded.");
 }
 

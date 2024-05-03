@@ -9,6 +9,8 @@
 #include "unofficial_extras/Definitions.h"
 #include "arcdps/arcdps.h"
 
+extern const char* ADDON_NAME;
+
 typedef struct AddonConfig {
     bool showWindow;
 } AddonConfig;
@@ -24,7 +26,8 @@ struct Player {
     std::map<std::string, std::map<std::string, int>> kp;
 };
 extern std::vector<Player> players;
-extern std::string self;
+extern std::string selfName;
+extern Player self;
 
 enum Boss {
     ValeGuardian = 15438,
