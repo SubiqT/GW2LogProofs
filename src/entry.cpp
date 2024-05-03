@@ -38,6 +38,12 @@ void AddonLoad(AddonAPI* addonApi) {
 }
 
 void AddonUnload() {
+	if (ExtrasSubscriberInfo) {
+		ExtrasSubscriberInfo->InfoVersion = 0;
+		ExtrasSubscriberInfo->SubscriberName = nullptr;
+		ExtrasSubscriberInfo->SquadUpdateCallback = nullptr;
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "<c=#ff0000>Log Proofs</c> unsubscribed to unofficial extras.");
+	}
 	APIDefs->DeregisterRender(AddonRender);
 	APIDefs->DeregisterRender(AddonOptions);
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "<c=#ff0000>Log Proofs</c> was unloaded.");
@@ -63,7 +69,7 @@ extern "C" __declspec(dllexport) void arcdps_unofficial_extras_subscriber_init(c
 	if (pExtrasInfo->ApiVersion == 2) { // Only load if V2 of the unofficial extras API
 		extrasLoaded = true;
 		
-		ExtrasSubscriberInfoV2* extrasSubscriberInfo = static_cast<ExtrasSubscriberInfoV2*>(pSubscriberInfo);
+		ExtrasSubscriberInfo = static_cast<ExtrasSubscriberInfoV2*>(pSubscriberInfo);
 
 		std::string account = pExtrasInfo->SelfAccountName;
 		if (account.at(0) == ':')
@@ -73,9 +79,9 @@ extern "C" __declspec(dllexport) void arcdps_unofficial_extras_subscriber_init(c
 			shouldAddPlayer = self;
 		}
 
-		extrasSubscriberInfo->InfoVersion = 2;
-		extrasSubscriberInfo->SubscriberName = ADDON_NAME;
-		extrasSubscriberInfo->SquadUpdateCallback = SquadEventHandler;
+		ExtrasSubscriberInfo->InfoVersion = 2;
+		ExtrasSubscriberInfo->SubscriberName = ADDON_NAME;
+		ExtrasSubscriberInfo->SquadUpdateCallback = SquadEventHandler;
 
 		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "<c=#00ff00>Log Proofs</c> subscribed to unofficial extras.");
 	}

@@ -1,15 +1,17 @@
 #include <chrono>
 
-#include "shared.h"
 #include "nexus/Nexus.h"
+#include "unofficial_extras/Definitions.h"
+#include "shared.h"
 
 AddonConfig defaultConfig = { true };
-
 AddonConfig Config = defaultConfig;
 
 AddonAPI* APIDefs = nullptr;
 NexusLinkData* NexusLink = nullptr;
 
-std::vector<Player> players;
+ExtrasSubscriberInfoV2* ExtrasSubscriberInfo;
 bool extrasLoaded;
+
+std::vector<Player> players;
 std::string self;

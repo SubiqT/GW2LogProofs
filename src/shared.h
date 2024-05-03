@@ -6,15 +6,17 @@
 #include <string>
 
 #include "nexus/Nexus.h"
+#include "unofficial_extras/Definitions.h"
 
 typedef struct AddonConfig {
     bool showWindow;
 } AddonConfig;
-
 extern AddonConfig Config;
 
 extern AddonAPI* APIDefs;
 extern NexusLinkData* NexusLink;
+
+extern ExtrasSubscriberInfoV2* ExtrasSubscriberInfo;
 extern bool extrasLoaded;
 
 struct Player {
@@ -23,7 +25,6 @@ struct Player {
     std::vector<std::string> groups;
     std::map<std::string, std::map<std::string, int>> kp;
 };
-
 extern std::vector<Player> players;
 extern std::string self;
 
