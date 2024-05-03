@@ -4,6 +4,9 @@
 #include "shared.h"
 #include "proofs.h"
 
+std::map<int, Texture*> bossTextures = {};
+static ImGuiTableFlags tableFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_SizingFixedFit;
+
 enum Boss {
 	ValeGuardian = 15438,
 	Gorseval = 15429,
@@ -43,209 +46,258 @@ enum RaidWing {
 	TheKeyOfAhdashim
 };
 
-const char* GetBossName(std::string boss_id) {
-	Boss boss = Boss(std::stoi(boss_id));
+const char* GetBossName(Boss boss) {
 	switch (boss) {
-		case ValeGuardian:
-			return "Vale Guardian";
-		case Gorseval:
-			return "Gorseval";
-		case Sabetha:
-			return "Sabetha";
-		case Slothasor:
-			return "Slothasor";
-		case BanditTrio:
-			return "Bandit Trio";
-		case Matthias:
-			return "Matthias";
-		case Escort:
-			return "Escort";
-		case KeepConstruct:
-			return "Keep Construct";
-		case TwistedCastle:
-			return "Twisted Castle";
-		case Xera:
-			return "Xera";
-		case Cairn:
-			return "Cairn";
-		case MursaatOverseer:
-			return "Mursaat Overseer";
-		case Samarog:
-			return "Samarog";
-		case Deimos:
-			return "Deimos";
-		case SoullessHorror:
-			return "Soulles Horror";
-		case RiverOfSouls:
-			return "River of Souls";
-		case BrokenKing:
-			return "Broken King";
-		case EaterOfSouls:
-			return "Eater of Souls";
-		case Eyes:
-			return "Eyes";
-		case Dhuum:
-			return "Dhuum";
-		case ConjuredAmalgamate:
-			return "Conjured Amalgamate";
-		case TwinLargos:
-			return "Twin Largos";
-		case Qadim:
-			return "Qadim";
-		case Adina:
-			return "Adina";
-		case Sabir:
-			return "Sabir";
-		case QadimThePeerless:
-			return "Qadim the Peerless";
-		default:
-			return "Unknown";
+	case ValeGuardian:
+		return "Vale Guardian";
+	case Gorseval:
+		return "Gorseval";
+	case Sabetha:
+		return "Sabetha";
+	case Slothasor:
+		return "Slothasor";
+	case BanditTrio:
+		return "Bandit Trio";
+	case Matthias:
+		return "Matthias";
+	case Escort:
+		return "Escort";
+	case KeepConstruct:
+		return "Keep Construct";
+	case TwistedCastle:
+		return "Twisted Castle";
+	case Xera:
+		return "Xera";
+	case Cairn:
+		return "Cairn";
+	case MursaatOverseer:
+		return "Mursaat Overseer";
+	case Samarog:
+		return "Samarog";
+	case Deimos:
+		return "Deimos";
+	case SoullessHorror:
+		return "Soulles Horror";
+	case RiverOfSouls:
+		return "River of Souls";
+	case BrokenKing:
+		return "Broken King";
+	case EaterOfSouls:
+		return "Eater of Souls";
+	case Eyes:
+		return "Eyes";
+	case Dhuum:
+		return "Dhuum";
+	case ConjuredAmalgamate:
+		return "Conjured Amalgamate";
+	case TwinLargos:
+		return "Twin Largos";
+	case Qadim:
+		return "Qadim";
+	case Adina:
+		return "Adina";
+	case Sabir:
+		return "Sabir";
+	case QadimThePeerless:
+		return "Qadim the Peerless";
+	default:
+		return "Unknown";
 	}
+}
+
+Texture* GetBossTexture(Boss boss) {
+	int boss_id = int(boss);
+	if (bossTextures[boss_id] != nullptr) {
+		return bossTextures[boss_id];
+	}
+	switch (boss_id) {
+		case ValeGuardian:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("vale_guardian", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Vale_Guardian_Trophy.png");
+			return bossTextures[boss_id];
+		case Gorseval:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("gorseval", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Gorseval_Trophy.png");
+			return bossTextures[boss_id];
+		case Sabetha:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("sabetha", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Sabetha_Trophy.png");
+			return bossTextures[boss_id];
+		case Slothasor:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("slothasor", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Slothasor_Trophy.png");
+			return bossTextures[boss_id];
+		case BanditTrio:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("bandit_trio", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Narella.png");
+			return bossTextures[boss_id];
+		case Matthias:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("matthias", "https://gw2wingman.nevermindcreations.de", "/static/Silver_White_Mantle_Abomination_Trophy.png");
+			return bossTextures[boss_id];
+		case Escort:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("escort", "https://gw2wingman.nevermindcreations.de", "/static/Bloodstone_Turret_Fragment.png");
+			return bossTextures[boss_id];
+		case KeepConstruct:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("keep_construct", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Keep_Construct_Trophy.png");
+			return bossTextures[boss_id];
+		case TwistedCastle:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("twisted_castle", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Siege_the_Stronghold_Trophy.png");
+			return bossTextures[boss_id];
+		case Xera:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("xera", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Xera_Trophy.png");
+			return bossTextures[boss_id];
+		case Cairn:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("cairn", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cairn_the_Indomitable_Trophy.png");
+			return bossTextures[boss_id];
+		case MursaatOverseer:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("mursaat_overseer", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Mursaat_Overseer_Trophy.png");
+			return bossTextures[boss_id];
+		case Samarog:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("samarog", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Samarog_Trophy.png");
+			return bossTextures[boss_id];
+		case Deimos:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("deimos", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Deimos_Trophy.png");
+			return bossTextures[boss_id];
+		case SoullessHorror:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("soulless_horror", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Desmina_Trophy.png");
+			return bossTextures[boss_id];
+		case RiverOfSouls:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("river_of_souls", "https://gw2wingman.nevermindcreations.de", "/static/Silver_River_of_Souls_Trophy.png");
+			return bossTextures[boss_id];
+		case BrokenKing:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("broken_king", "https://gw2wingman.nevermindcreations.de", "/static/Icon_BrokenKing.png");
+			return bossTextures[boss_id];
+		case EaterOfSouls:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("eater_of_souls", "https://gw2wingman.nevermindcreations.de", "/static/Icon_EaterOfSouls.png");
+			return bossTextures[boss_id];
+		case Eyes:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("eyes", "https://gw2wingman.nevermindcreations.de", "/static/Icon_Eyes.png");
+			return bossTextures[boss_id];
+		case Dhuum:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("dhuum", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Dhuum_Trophy.png");
+			return bossTextures[boss_id];
+		case ConjuredAmalgamate:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("conjured_amalgamate", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Conjured_Amalgamate_Trophy.png");
+			return bossTextures[boss_id];
+		case TwinLargos:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("twin_largos", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Twin_Largos_Trophy.png");
+			return bossTextures[boss_id];
+		case Qadim:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("qadim", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Qadim_Trophy.png");
+			return bossTextures[boss_id];
+		case Adina:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("adina", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cardinal_Adina_Trophy.png");
+			return bossTextures[boss_id];
+		case Sabir:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("sabir", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cardinal_Sabir_Trophy.png");
+			return bossTextures[boss_id];
+		case QadimThePeerless:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("qadim_the_pearless", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Ether_Djinn_Trophy.png");
+			return bossTextures[boss_id];
+		default:
+			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("any", "https://wiki.guildwars2.com", "/images/a/a7/Mini_Eye_of_Janthir.png");
+			return bossTextures[boss_id];
+	}
+}
+
+void RenderBossHeader(Boss boss) {
+	ImGui::TableNextColumn();
+	Texture* texture = GetBossTexture(boss);
+	texture != nullptr
+		? ImGui::Image((void*)texture->Resource, ImVec2(32.f, 32.f))
+		: ImGui::Text(GetBossName(boss));
 }
 
 void RenderRaidsHeader(RaidWing wing) {
 	ImGui::TableNextColumn();
-	ImGui::Text("Account");
 	switch (wing) {
 		case SpiritVale:
-			ImGui::TableNextColumn();
-			ImGui::Text("VG");
-			ImGui::TableNextColumn();
-			ImGui::Text("Gors");
-			ImGui::TableNextColumn();
-			ImGui::Text("Sab");
+			RenderBossHeader(ValeGuardian);
+			RenderBossHeader(Gorseval);
+			RenderBossHeader(Sabetha);
 			return;
 		case SalvationPass:
-			ImGui::TableNextColumn();
-			ImGui::Text("Sloth");
-			ImGui::TableNextColumn();
-			ImGui::Text("Trio");
-			ImGui::TableNextColumn();
-			ImGui::Text("Matt");
+			RenderBossHeader(Slothasor);
+			RenderBossHeader(BanditTrio);
+			RenderBossHeader(Matthias);
 			return;
 		case StrongholdOfTheFaithful:
-			ImGui::TableNextColumn();
-			ImGui::Text("Escort");
-			ImGui::TableNextColumn();
-			ImGui::Text("KC");
-			ImGui::TableNextColumn();
-			ImGui::Text("TC");
-			ImGui::TableNextColumn();
-			ImGui::Text("Xera");
+			RenderBossHeader(Escort);
+			RenderBossHeader(KeepConstruct);
+			RenderBossHeader(TwistedCastle);
+			RenderBossHeader(Xera);
 			return;
 		case BastionOfThePenitent:
-			ImGui::TableNextColumn();
-			ImGui::Text("Carin");
-			ImGui::TableNextColumn();
-			ImGui::Text("MO");
-			ImGui::TableNextColumn();
-			ImGui::Text("Sama");
-			ImGui::TableNextColumn();
-			ImGui::Text("Deimos");
+			RenderBossHeader(Cairn);
+			RenderBossHeader(MursaatOverseer);
+			RenderBossHeader(Samarog);
+			RenderBossHeader(Deimos);
 			return;
 		case HallOfChains:
-			ImGui::TableNextColumn();
-			ImGui::Text("SH");
-			ImGui::TableNextColumn();
-			ImGui::Text("River");
-			ImGui::TableNextColumn();
-			ImGui::Text("BK");
-			ImGui::TableNextColumn();
-			ImGui::Text("Eater");
-			ImGui::TableNextColumn();
-			ImGui::Text("Eyes");
-			ImGui::TableNextColumn();
-			ImGui::Text("Dhuum");
+			RenderBossHeader(SoullessHorror);
+			RenderBossHeader(RiverOfSouls);
+			RenderBossHeader(BrokenKing);
+			RenderBossHeader(EaterOfSouls);
+			RenderBossHeader(Eyes);
+			RenderBossHeader(Dhuum);
 			return;
 		case MythwrightGambit:
-			ImGui::TableNextColumn();
-			ImGui::Text("CA");
-			ImGui::TableNextColumn();
-			ImGui::Text("Largos");
-			ImGui::TableNextColumn();
-			ImGui::Text("Qadim");
+			RenderBossHeader(ConjuredAmalgamate);
+			RenderBossHeader(TwinLargos);
+			RenderBossHeader(Qadim);
 			return;
 		case TheKeyOfAhdashim:
-			ImGui::TableNextColumn();
-			ImGui::Text("Adina");
-			ImGui::TableNextColumn();
-			ImGui::Text("Sabir");
-			ImGui::TableNextColumn();
-			ImGui::Text("QtP");
+			RenderBossHeader(Adina);
+			RenderBossHeader(Sabir);
+			RenderBossHeader(QadimThePeerless);
 			return;
 	}
 }
 
-void RenderRaidsRow(Player player, RaidWing wing) {
+void RenderBossRow(Player* player, Boss boss) {
 	ImGui::TableNextColumn();
-	ImGui::Text(player.account.c_str());
+	ImGui::Text("%i", player->kp[std::format("{}", int(boss))][std::string("total")]);
+}
+
+void RenderRaidsRow(Player* player, RaidWing wing) {
+	ImGui::TableNextColumn();
+	ImGui::Text(player->account.c_str());
 	switch (wing) {
-		case SpiritVale:
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(ValeGuardian))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Gorseval))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Sabetha))][std::string("total")]);
-			return;
-		case SalvationPass:
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Slothasor))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(BanditTrio))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Matthias))][std::string("total")]);
-			return;
-		case StrongholdOfTheFaithful:
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Escort))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(KeepConstruct))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(TwistedCastle))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Xera))][std::string("total")]);
-			return;
-		case BastionOfThePenitent:
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Cairn))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(MursaatOverseer))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Samarog))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Deimos))][std::string("total")]);
-			return;
-		case HallOfChains:
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(SoullessHorror))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(RiverOfSouls))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(BrokenKing))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(EaterOfSouls))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Eyes))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Dhuum))][std::string("total")]);
-			return;
-		case MythwrightGambit:
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(ConjuredAmalgamate))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(TwinLargos))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Qadim))][std::string("total")]);
-			return;
-		case TheKeyOfAhdashim:
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Adina))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(Sabir))][std::string("total")]);
-			ImGui::TableNextColumn();
-			ImGui::Text("%i", player.kp[std::format("{}", int(QadimThePeerless))][std::string("total")]);
-			return;
+	case SpiritVale:
+		RenderBossRow(player, ValeGuardian);
+		RenderBossRow(player, Gorseval);
+		RenderBossRow(player, Sabetha);
+		return;
+	case SalvationPass:
+		RenderBossRow(player, Slothasor);
+		RenderBossRow(player, BanditTrio);
+		RenderBossRow(player, Matthias);
+		return;
+	case StrongholdOfTheFaithful:
+		RenderBossRow(player, Escort);
+		RenderBossRow(player, KeepConstruct);
+		RenderBossRow(player, TwistedCastle);
+		RenderBossRow(player, Xera);
+		return;
+	case BastionOfThePenitent:
+		RenderBossRow(player, Cairn);
+		RenderBossRow(player, MursaatOverseer);
+		RenderBossRow(player, Samarog);
+		RenderBossRow(player, Deimos);
+		return;
+	case HallOfChains:
+		RenderBossRow(player, SoullessHorror);
+		RenderBossRow(player, RiverOfSouls);
+		RenderBossRow(player, BrokenKing);
+		RenderBossRow(player, EaterOfSouls);
+		RenderBossRow(player, Eyes);
+		RenderBossRow(player, Dhuum);
+		return;
+	case MythwrightGambit:
+		RenderBossRow(player, ConjuredAmalgamate);
+		RenderBossRow(player, TwinLargos);
+		RenderBossRow(player, Qadim);
+		return;
+	case TheKeyOfAhdashim:
+		RenderBossRow(player, Adina);
+		RenderBossRow(player, Sabir);
+		RenderBossRow(player, QadimThePeerless);
+		return;
 	}
 }
 
@@ -258,91 +310,91 @@ void RenderWindow() {
 		if (players.size() > 0 || !selfName.empty()) {
 			if (ImGui::BeginTabBar("##Wings", ImGuiTabBarFlags_None)) {
 				if (ImGui::BeginTabItem("Spirit Vale")) {
-					if (ImGui::BeginTable("table", 4, ImGuiTableFlags_BordersInnerV)) {
+					if (ImGui::BeginTable("table", 4, tableFlags)) {
 						RenderRaidsHeader(SpiritVale);
 						if (!selfName.empty()) {
-							RenderRaidsRow(self, SpiritVale);
+							RenderRaidsRow(&self, SpiritVale);
 						}
 						for (Player player : players) {
-							RenderRaidsRow(player, SpiritVale);
+							RenderRaidsRow(&player, SpiritVale);
 						}
 						ImGui::EndTable();
 					}
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Salvation Pass")) {
-					if (ImGui::BeginTable("table", 4, ImGuiTableFlags_BordersInnerV)) {
+					if (ImGui::BeginTable("table", 4, tableFlags)) {
 						RenderRaidsHeader(SalvationPass);
 						if (!selfName.empty()) {
-							RenderRaidsRow(self, SalvationPass);
+							RenderRaidsRow(&self, SalvationPass);
 						}
 						for (Player player : players) {
-							RenderRaidsRow(player, SalvationPass);
+							RenderRaidsRow(&player, SalvationPass);
 						}
 						ImGui::EndTable();
 					}
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Stronghold of the Faithful")) {
-					if (ImGui::BeginTable("table", 5, ImGuiTableFlags_BordersInnerV)) {
+					if (ImGui::BeginTable("table", 5, tableFlags)) {
 						RenderRaidsHeader(StrongholdOfTheFaithful);
 						if (!selfName.empty()) {
-							RenderRaidsRow(self, StrongholdOfTheFaithful);
+							RenderRaidsRow(&self, StrongholdOfTheFaithful);
 						}
 						for (Player player : players) {
-							RenderRaidsRow(player, StrongholdOfTheFaithful);
+							RenderRaidsRow(&player, StrongholdOfTheFaithful);
 						}
 						ImGui::EndTable();
 					}
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Bastion of the Penitent")) {
-					if (ImGui::BeginTable("table", 5, ImGuiTableFlags_BordersInnerV)) {
+					if (ImGui::BeginTable("table", 5, tableFlags)) {
 						RenderRaidsHeader(BastionOfThePenitent);
 						if (!selfName.empty()) {
-							RenderRaidsRow(self, BastionOfThePenitent);
+							RenderRaidsRow(&self, BastionOfThePenitent);
 						}
 						for (Player player : players) {
-							RenderRaidsRow(player, BastionOfThePenitent);
+							RenderRaidsRow(&player, BastionOfThePenitent);
 						}
 						ImGui::EndTable();
 					}
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Hall of Chains")) {
-					if (ImGui::BeginTable("table", 7, ImGuiTableFlags_BordersInnerV)) {
+					if (ImGui::BeginTable("table", 7, tableFlags)) {
 						RenderRaidsHeader(HallOfChains);
 						if (!selfName.empty()) {
-							RenderRaidsRow(self, HallOfChains);
+							RenderRaidsRow(&self, HallOfChains);
 						}
 						for (Player player : players) {
-							RenderRaidsRow(player, HallOfChains);
+							RenderRaidsRow(&player, HallOfChains);
 						}
 						ImGui::EndTable();
 					}
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Mythwright Gambit")) {
-					if (ImGui::BeginTable("table", 4, ImGuiTableFlags_BordersInnerV)) {
+					if (ImGui::BeginTable("table", 4, tableFlags)) {
 						RenderRaidsHeader(MythwrightGambit);
 						if (!selfName.empty()) {
-							RenderRaidsRow(self, MythwrightGambit);
+							RenderRaidsRow(&self, MythwrightGambit);
 						}
 						for (Player player : players) {
-							RenderRaidsRow(player, MythwrightGambit);
+							RenderRaidsRow(&player, MythwrightGambit);
 						}
 						ImGui::EndTable();
 					}
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("The Key  of Ahdashim")) {
-					if (ImGui::BeginTable("table", 4, ImGuiTableFlags_BordersInnerV)) {
+					if (ImGui::BeginTable("table", 4, tableFlags)) {
 						RenderRaidsHeader(TheKeyOfAhdashim);
 						if (!selfName.empty()) {
-							RenderRaidsRow(self, TheKeyOfAhdashim);
+							RenderRaidsRow(&self, TheKeyOfAhdashim);
 						}
 						for (Player player : players) {
-							RenderRaidsRow(player, TheKeyOfAhdashim);
+							RenderRaidsRow(&player, TheKeyOfAhdashim);
 						}
 						ImGui::EndTable();
 					}
