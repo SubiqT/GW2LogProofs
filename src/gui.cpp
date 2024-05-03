@@ -71,8 +71,40 @@ void RenderProofs() {
 		return;
 	}
 
+	if (players.size() > 0) {
+		if (ImGui::BeginTable("table", 27, ImGuiTableFlags_BordersInnerV)) {
+			// Header
+			ImGui::TableNextColumn();
+			ImGui::Text("Account");
+			for (const auto& [boss_id, boss_kp] : players[0].kp) {
+				const char* bossName = GetBossName(boss_id);
+				if (bossName != "Unknown") {
+					ImGui::TableNextColumn();
+					ImGui::Text("%s", bossName);
+				}
+			}
+			// Records
+			for (Player player : players) {
+				ImGui::TableNextColumn();
+				ImGui::Text(player.account.c_str());
+				for (const auto& [boss_id, boss_kp] : player.kp) {
+					for (const auto& [spec, kills] : boss_kp) {
+						if (spec == "total") {
+							if (GetBossName(boss_id) != "Unknown") {
+								ImGui::TableNextColumn();
+								ImGui::Text("%i", kills);
+							}
+						}
+					}
+				}
+			}
+			ImGui::EndTable();
+		}
+	}
+
+
 	if (ImGui::Begin("Log Proofs")) {
-		if (players.size() > 0) {
+		/*if (players.size() > 0) {
 			for (Player player : players) {
 				ImGui::Text(player.account.c_str());
 				for (const auto& [boss_id, boss_kp] : player.kp) {
@@ -86,7 +118,7 @@ void RenderProofs() {
 					}
 				}
 			}
-		}
+		}*/
 		
 		if (ImGui::Button("Refresh")) {
 			std::string account = "Subi.8014";
