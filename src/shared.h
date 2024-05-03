@@ -13,6 +13,7 @@ extern const char* ADDON_NAME;
 
 typedef struct AddonConfig {
     bool showWindow;
+    bool splitPerWing;
 } AddonConfig;
 extern AddonConfig Config;
 

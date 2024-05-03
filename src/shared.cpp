@@ -5,7 +5,7 @@
 
 const char* ADDON_NAME = "Log Proofs";
 
-AddonConfig defaultConfig = { true };
+AddonConfig defaultConfig = { true, false };
 AddonConfig Config = defaultConfig;
 
 AddonAPI* APIDefs = nullptr;

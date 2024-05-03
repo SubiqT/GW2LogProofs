@@ -203,7 +203,7 @@ void RenderBossHeader(Boss boss) {
 		: ImGui::Text(GetBossName(boss));
 }
 
-void RenderRaidsHeader(RaidWing wing) {
+void RenderRaidsHeaderPerWing(RaidWing wing) {
 	ImGui::TableNextColumn();
 	switch (wing) {
 		case SpiritVale:
@@ -249,12 +249,48 @@ void RenderRaidsHeader(RaidWing wing) {
 	}
 }
 
+void RenderRaidsHeaderAllWings() {
+	ImGui::TableNextColumn();
+	RenderBossHeader(ValeGuardian);
+	RenderBossHeader(Gorseval);
+	RenderBossHeader(Sabetha);
+
+	RenderBossHeader(Slothasor);
+	RenderBossHeader(BanditTrio);
+	RenderBossHeader(Matthias);
+
+	RenderBossHeader(Escort);
+	RenderBossHeader(KeepConstruct);
+	RenderBossHeader(TwistedCastle);
+	RenderBossHeader(Xera);
+
+	RenderBossHeader(Cairn);
+	RenderBossHeader(MursaatOverseer);
+	RenderBossHeader(Samarog);
+	RenderBossHeader(Deimos);
+
+	RenderBossHeader(SoullessHorror);
+	RenderBossHeader(RiverOfSouls);
+	RenderBossHeader(BrokenKing);
+	RenderBossHeader(EaterOfSouls);
+	RenderBossHeader(Eyes);
+	RenderBossHeader(Dhuum);
+
+	RenderBossHeader(ConjuredAmalgamate);
+	RenderBossHeader(TwinLargos);
+	RenderBossHeader(Qadim);
+
+	RenderBossHeader(Adina);
+	RenderBossHeader(Sabir);
+	RenderBossHeader(QadimThePeerless);
+}
+
 void RenderBossRow(Player* player, Boss boss) {
 	ImGui::TableNextColumn();
 	ImGui::Text("%i", player->kp[std::format("{}", int(boss))][std::string("total")]);
 }
 
-void RenderRaidsRow(Player* player, RaidWing wing) {
+void RenderRaidsRowPerWing(Player* player, RaidWing wing) {
 	ImGui::TableNextColumn();
 	ImGui::Text(player->account.c_str());
 	switch (wing) {
@@ -301,6 +337,43 @@ void RenderRaidsRow(Player* player, RaidWing wing) {
 	}
 }
 
+void RenderRaidsRowAllWings(Player* player) {
+	ImGui::TableNextColumn();
+	ImGui::Text(player->account.c_str());
+	RenderBossRow(player, ValeGuardian);
+	RenderBossRow(player, Gorseval);
+	RenderBossRow(player, Sabetha);
+
+	RenderBossRow(player, Slothasor);
+	RenderBossRow(player, BanditTrio);
+	RenderBossRow(player, Matthias);
+
+	RenderBossRow(player, Escort);
+	RenderBossRow(player, KeepConstruct);
+	RenderBossRow(player, TwistedCastle);
+	RenderBossRow(player, Xera);
+
+	RenderBossRow(player, Cairn);
+	RenderBossRow(player, MursaatOverseer);
+	RenderBossRow(player, Samarog);
+	RenderBossRow(player, Deimos);
+
+	RenderBossRow(player, SoullessHorror);
+	RenderBossRow(player, RiverOfSouls);
+	RenderBossRow(player, BrokenKing);
+	RenderBossRow(player, EaterOfSouls);
+	RenderBossRow(player, Eyes);
+	RenderBossRow(player, Dhuum);
+
+	RenderBossRow(player, ConjuredAmalgamate);
+	RenderBossRow(player, TwinLargos);
+	RenderBossRow(player, Qadim);
+
+	RenderBossRow(player, Adina);
+	RenderBossRow(player, Sabir);
+	RenderBossRow(player, QadimThePeerless);
+}
+
 void RenderWindow() {
 	if (!Config.showWindow) {
 		return;
@@ -308,99 +381,118 @@ void RenderWindow() {
 
 	if (ImGui::Begin("Log Proofs")) {
 		if (players.size() > 0 || !selfName.empty()) {
-			if (ImGui::BeginTabBar("##Wings", ImGuiTabBarFlags_None)) {
-				if (ImGui::BeginTabItem("Spirit Vale")) {
-					if (ImGui::BeginTable("table", 4, tableFlags)) {
-						RenderRaidsHeader(SpiritVale);
-						if (!selfName.empty()) {
-							RenderRaidsRow(&self, SpiritVale);
+			if (!Config.splitPerWing) {
+				if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
+					if (ImGui::BeginTabItem("Raids")) {
+						if (ImGui::BeginTable("raidsTable", 27, tableFlags)) {
+							RenderRaidsHeaderAllWings();
+							if (!selfName.empty()) {
+								RenderRaidsRowAllWings(&self);
+							}
+							for (Player player : players) {
+								RenderRaidsRowAllWings(&player);
+							}
+							ImGui::EndTable();
 						}
-						for (Player player : players) {
-							RenderRaidsRow(&player, SpiritVale);
-						}
-						ImGui::EndTable();
+						ImGui::EndTabItem();
 					}
-					ImGui::EndTabItem();
+					ImGui::EndTabBar();
 				}
-				if (ImGui::BeginTabItem("Salvation Pass")) {
-					if (ImGui::BeginTable("table", 4, tableFlags)) {
-						RenderRaidsHeader(SalvationPass);
-						if (!selfName.empty()) {
-							RenderRaidsRow(&self, SalvationPass);
+			} else {
+				if (ImGui::BeginTabBar("##Wings", ImGuiTabBarFlags_None)) {
+					if (ImGui::BeginTabItem("Spirit Vale")) {
+						if (ImGui::BeginTable("tableW1", 4, tableFlags)) {
+							RenderRaidsHeaderPerWing(SpiritVale);
+							if (!selfName.empty()) {
+								RenderRaidsRowPerWing(&self, SpiritVale);
+							}
+							for (Player player : players) {
+								RenderRaidsRowPerWing(&player, SpiritVale);
+							}
+							ImGui::EndTable();
 						}
-						for (Player player : players) {
-							RenderRaidsRow(&player, SalvationPass);
-						}
-						ImGui::EndTable();
+						ImGui::EndTabItem();
 					}
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Stronghold of the Faithful")) {
-					if (ImGui::BeginTable("table", 5, tableFlags)) {
-						RenderRaidsHeader(StrongholdOfTheFaithful);
-						if (!selfName.empty()) {
-							RenderRaidsRow(&self, StrongholdOfTheFaithful);
+					if (ImGui::BeginTabItem("Salvation Pass")) {
+						if (ImGui::BeginTable("tableW2", 4, tableFlags)) {
+							RenderRaidsHeaderPerWing(SalvationPass);
+							if (!selfName.empty()) {
+								RenderRaidsRowPerWing(&self, SalvationPass);
+							}
+							for (Player player : players) {
+								RenderRaidsRowPerWing(&player, SalvationPass);
+							}
+							ImGui::EndTable();
 						}
-						for (Player player : players) {
-							RenderRaidsRow(&player, StrongholdOfTheFaithful);
-						}
-						ImGui::EndTable();
+						ImGui::EndTabItem();
 					}
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Bastion of the Penitent")) {
-					if (ImGui::BeginTable("table", 5, tableFlags)) {
-						RenderRaidsHeader(BastionOfThePenitent);
-						if (!selfName.empty()) {
-							RenderRaidsRow(&self, BastionOfThePenitent);
+					if (ImGui::BeginTabItem("Stronghold of the Faithful")) {
+						if (ImGui::BeginTable("tableW3", 5, tableFlags)) {
+							RenderRaidsHeaderPerWing(StrongholdOfTheFaithful);
+							if (!selfName.empty()) {
+								RenderRaidsRowPerWing(&self, StrongholdOfTheFaithful);
+							}
+							for (Player player : players) {
+								RenderRaidsRowPerWing(&player, StrongholdOfTheFaithful);
+							}
+							ImGui::EndTable();
 						}
-						for (Player player : players) {
-							RenderRaidsRow(&player, BastionOfThePenitent);
-						}
-						ImGui::EndTable();
+						ImGui::EndTabItem();
 					}
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Hall of Chains")) {
-					if (ImGui::BeginTable("table", 7, tableFlags)) {
-						RenderRaidsHeader(HallOfChains);
-						if (!selfName.empty()) {
-							RenderRaidsRow(&self, HallOfChains);
+					if (ImGui::BeginTabItem("Bastion of the Penitent")) {
+						if (ImGui::BeginTable("tableW4", 5, tableFlags)) {
+							RenderRaidsHeaderPerWing(BastionOfThePenitent);
+							if (!selfName.empty()) {
+								RenderRaidsRowPerWing(&self, BastionOfThePenitent);
+							}
+							for (Player player : players) {
+								RenderRaidsRowPerWing(&player, BastionOfThePenitent);
+							}
+							ImGui::EndTable();
 						}
-						for (Player player : players) {
-							RenderRaidsRow(&player, HallOfChains);
-						}
-						ImGui::EndTable();
+						ImGui::EndTabItem();
 					}
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Mythwright Gambit")) {
-					if (ImGui::BeginTable("table", 4, tableFlags)) {
-						RenderRaidsHeader(MythwrightGambit);
-						if (!selfName.empty()) {
-							RenderRaidsRow(&self, MythwrightGambit);
+					if (ImGui::BeginTabItem("Hall of Chains")) {
+						if (ImGui::BeginTable("tableW6", 7, tableFlags)) {
+							RenderRaidsHeaderPerWing(HallOfChains);
+							if (!selfName.empty()) {
+								RenderRaidsRowPerWing(&self, HallOfChains);
+							}
+							for (Player player : players) {
+								RenderRaidsRowPerWing(&player, HallOfChains);
+							}
+							ImGui::EndTable();
 						}
-						for (Player player : players) {
-							RenderRaidsRow(&player, MythwrightGambit);
-						}
-						ImGui::EndTable();
+						ImGui::EndTabItem();
 					}
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("The Key  of Ahdashim")) {
-					if (ImGui::BeginTable("table", 4, tableFlags)) {
-						RenderRaidsHeader(TheKeyOfAhdashim);
-						if (!selfName.empty()) {
-							RenderRaidsRow(&self, TheKeyOfAhdashim);
+					if (ImGui::BeginTabItem("Mythwright Gambit")) {
+						if (ImGui::BeginTable("tableW7", 4, tableFlags)) {
+							RenderRaidsHeaderPerWing(MythwrightGambit);
+							if (!selfName.empty()) {
+								RenderRaidsRowPerWing(&self, MythwrightGambit);
+							}
+							for (Player player : players) {
+								RenderRaidsRowPerWing(&player, MythwrightGambit);
+							}
+							ImGui::EndTable();
 						}
-						for (Player player : players) {
-							RenderRaidsRow(&player, TheKeyOfAhdashim);
-						}
-						ImGui::EndTable();
+						ImGui::EndTabItem();
 					}
-					ImGui::EndTabItem();
+					if (ImGui::BeginTabItem("The Key  of Ahdashim")) {
+						if (ImGui::BeginTable("table", 4, tableFlags)) {
+							RenderRaidsHeaderPerWing(TheKeyOfAhdashim);
+							if (!selfName.empty()) {
+								RenderRaidsRowPerWing(&self, TheKeyOfAhdashim);
+							}
+							for (Player player : players) {
+								RenderRaidsRowPerWing(&player, TheKeyOfAhdashim);
+							}
+							ImGui::EndTable();
+						}
+						ImGui::EndTabItem();
+					}
+					ImGui::EndTabBar();
 				}
-				ImGui::EndTabBar();
 			}
 		}
 	}
@@ -410,5 +502,8 @@ void RenderWindow() {
 void RenderSettings() {
 	if (ImGui::Button(Config.showWindow ? "Hide Window" : "Show Window")) {
 		Config.showWindow = !Config.showWindow;
+	}
+	if (ImGui::Button(Config.splitPerWing ? "Show All Wings" : "Split Per Wing")) {
+		Config.splitPerWing = !Config.splitPerWing;
 	}
 }
