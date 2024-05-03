@@ -9,6 +9,10 @@ using json = nlohmann::json;
 #include "unofficial_extras/Definitions.h"
 #include "shared.h"
 
+bool shouldClearAllPlayers = false;
+std::string shouldRemovePlayer;
+std::string shouldAddPlayer;
+
 void from_json(const json& j, Player& p) {
     j.at("account").get_to(p.account);
     j.at("chars").get_to<std::vector<std::string>>(p.characters);
@@ -51,7 +55,7 @@ Player GetProof(const char* account) {
     return p;
 }
 
-void RemovePlayer(const char* account) {
+void RemovePlayer(std::string account) {
     for (Player& player : players) {
         if (player.account == account) {
             long long index = std::addressof(player) - std::addressof(players[0]);
@@ -60,17 +64,48 @@ void RemovePlayer(const char* account) {
     }
 }
 
-void AddPlayer(const char* account) {
-    RemovePlayer(account);
-    players.push_back(GetProof(account));
+void AddPlayer(std::string account) {
+    players.push_back(GetProof(account.c_str()));
+}
+
+void AddSelf() {
+    players.push_back(GetProof(self.c_str()));
 }
 
 void SquadEventHandler(const UserInfo* updatedUsers, size_t updatedUsersCount) {
     APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("Updated Users: {} -  {}", updatedUsers->AccountName, int(updatedUsers->Role)).c_str());
-    if (int(updatedUsers->Role) > 2) {
+    std::string account = updatedUsers->AccountName;
+    if (account.at(0) == ':') {
+        account.erase(0, 1);
+    }
+    if (self == account) {
+        if (int(updatedUsers->Role) == 5) {
+            shouldClearAllPlayers = true;
+        }
         return;
     }
-    std::string account = updatedUsers->AccountName;
-    if (account.at(0) == ':')
-        AddPlayer(account.erase(0, 1).c_str());
+
+    if (int(updatedUsers->Role) > 2) {
+        shouldRemovePlayer = account;
+        return;
+    }
+
+    shouldRemovePlayer = account;
+    shouldAddPlayer = account;
+}
+
+void UpdatePlayers() {
+    if (shouldClearAllPlayers) {
+        players.clear();
+        AddSelf();
+        shouldClearAllPlayers = false;
+    }
+    if (!shouldRemovePlayer.empty()) {
+        RemovePlayer(shouldRemovePlayer);
+        shouldRemovePlayer.clear();
+    }
+    if (!shouldAddPlayer.empty()) {
+        AddPlayer(shouldAddPlayer);
+        shouldAddPlayer.clear();
+    }
 }

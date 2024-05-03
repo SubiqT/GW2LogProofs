@@ -4,10 +4,11 @@
 #include "unofficial_extras/Definitions.h"
 #include "shared.h"
 
-Player GetProof(const char* account);
+extern bool shouldClearAllPlayers;
+extern std::string shouldRemovePlayer;
+extern std::string shouldAddPlayer;
 
-void AddPlayer(const char* account);
-void RemovePlayer(const char* account);
+void UpdatePlayers(void);
 
 void SquadEventHandler(const UserInfo* updatedUsers, size_t updatedUsersCount);
 

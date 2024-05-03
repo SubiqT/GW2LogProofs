@@ -19,6 +19,7 @@ void AddonOptions() {
 }
 
 void AddonRender() {
+	UpdatePlayers();
 	RenderProofs();
 }
 
@@ -64,9 +65,13 @@ extern "C" __declspec(dllexport) void arcdps_unofficial_extras_subscriber_init(c
 		
 		ExtrasSubscriberInfoV2* extrasSubscriberInfo = static_cast<ExtrasSubscriberInfoV2*>(pSubscriberInfo);
 
-		std::string selfAccountName = pExtrasInfo->SelfAccountName;
-		if (selfAccountName.at(0) == ':')
-			AddPlayer(selfAccountName.erase(0, 1).c_str());
+		std::string account = pExtrasInfo->SelfAccountName;
+		if (account.at(0) == ':')
+			account.erase(0, 1);
+		if (self.empty()) {
+			self = account;
+			shouldAddPlayer = self;
+		}
 
 		extrasSubscriberInfo->InfoVersion = 2;
 		extrasSubscriberInfo->SubscriberName = ADDON_NAME;
