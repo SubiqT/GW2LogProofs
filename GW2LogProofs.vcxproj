@@ -24,6 +24,7 @@
     <ClCompile Include="src\unofficial_extras\KeyBindsTranslation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\arcdps\arcdps.h" />
     <ClInclude Include="src\gui.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imgui.h" />

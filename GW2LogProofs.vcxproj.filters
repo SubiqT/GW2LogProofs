@@ -67,6 +67,9 @@
     <ClInclude Include="src\json\single_include\nlohmann\json.hpp">
       <Filter>submodules\nlohmann</Filter>
     </ClInclude>
+    <ClInclude Include="src\arcdps\arcdps.h">
+      <Filter>submodules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="submodules">
