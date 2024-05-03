@@ -76,10 +76,16 @@ void UpdatePlayers() {
         shouldRemovePlayer.clear();
     }
     if (!shouldAddPlayer.empty()) {
-        if (shouldAddPlayer == selfName) {
-            self = GetProof(shouldAddPlayer.c_str());
-        } else {
-            players.push_back(GetProof(shouldAddPlayer.c_str()));
+        try {
+            Player newPlayer = GetProof(shouldAddPlayer.c_str());
+            if (shouldAddPlayer == selfName) {
+                self = newPlayer;
+            }
+            else {
+                players.push_back(newPlayer);
+            }
+        } catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An unexpected exception occurred when trying to update proofs for {}. Exception details: {}", shouldAddPlayer, e.what()).c_str());
         }
         shouldAddPlayer.clear();
     }
@@ -106,26 +112,21 @@ void SquadEventHandler(void* eventArgs) {
 
 void CombatEventHandler(void* eventArgs) {
     EvCombatData* cbtEvent = (EvCombatData*)eventArgs;
-    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "combat meme");
     if (!selfName.empty()) {
         return;
     }
     if (cbtEvent->ev) {
         return;
     }
-    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "no event meme");
     if (cbtEvent->src->elite) {
         return;
     }
-    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "elite spec meme");
     if (!cbtEvent->src->prof) {
         return;
     }
-    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "prof meme");
     if (cbtEvent->src->name == nullptr || cbtEvent->src->name[0] == '\0' || cbtEvent->dst->name == nullptr || cbtEvent->dst->name[0] == '\0') {
         return;
     }
-    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "src / dst meme");
     if (cbtEvent->dst->self) { // Should only occur on map change
         selfName = StripAccount(std::string(cbtEvent->dst->name));
         APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("self: {}", selfName).c_str());
