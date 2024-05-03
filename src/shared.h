@@ -7,6 +7,7 @@
 
 #include "nexus/Nexus.h"
 #include "unofficial_extras/Definitions.h"
+#include "arcdps/arcdps.h"
 
 typedef struct AddonConfig {
     bool showWindow;
@@ -15,9 +16,6 @@ extern AddonConfig Config;
 
 extern AddonAPI* APIDefs;
 extern NexusLinkData* NexusLink;
-
-extern ExtrasSubscriberInfoV2* ExtrasSubscriberInfo;
-extern bool extrasLoaded;
 
 struct Player {
     std::string account;
@@ -55,6 +53,12 @@ enum Boss {
     Adina = 22006,
     Sabir = 21964,
     QadimThePeerless = 22000
+};
+
+struct SquadUpdate
+{
+    UserInfo* UserInfo;
+    uint64_t UsersCount;
 };
 
 #endif

@@ -10,6 +10,6 @@ extern std::string shouldAddPlayer;
 
 void UpdatePlayers(void);
 
-void SquadEventHandler(const UserInfo* updatedUsers, size_t updatedUsersCount);
+void SquadEventHandler(void* eventArgs);
 
 #endif

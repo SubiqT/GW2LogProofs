@@ -72,28 +72,6 @@ void AddSelf() {
     players.push_back(GetProof(self.c_str()));
 }
 
-void SquadEventHandler(const UserInfo* updatedUsers, size_t updatedUsersCount) {
-    APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("Updated Users: {} -  {}", updatedUsers->AccountName, int(updatedUsers->Role)).c_str());
-    std::string account = updatedUsers->AccountName;
-    if (account.at(0) == ':') {
-        account.erase(0, 1);
-    }
-    if (self == account) {
-        if (int(updatedUsers->Role) == 5) {
-            shouldClearAllPlayers = true;
-        }
-        return;
-    }
-
-    if (int(updatedUsers->Role) > 2) {
-        shouldRemovePlayer = account;
-        return;
-    }
-
-    shouldRemovePlayer = account;
-    shouldAddPlayer = account;
-}
-
 void UpdatePlayers() {
     if (shouldClearAllPlayers) {
         players.clear();
@@ -108,4 +86,27 @@ void UpdatePlayers() {
         AddPlayer(shouldAddPlayer);
         shouldAddPlayer.clear();
     }
+}
+
+void SquadEventHandler(void* eventArgs) {
+    SquadUpdate* squadUpdate = (SquadUpdate*)eventArgs;
+    APIDefs->Log(ELogLevel_DEBUG, "Log Proofs", std::format("Updated Users: {} -  {}", squadUpdate->UserInfo->AccountName, int(squadUpdate->UserInfo->Role)).c_str());
+    std::string account = squadUpdate->UserInfo->AccountName;
+    if (account.at(0) == ':') {
+        account.erase(0, 1);
+    }
+    if (self == account) {
+        if (int(squadUpdate->UserInfo->Role) == 5) {
+            shouldClearAllPlayers = true;
+        }
+        return;
+    }
+
+    if (int(squadUpdate->UserInfo->Role) > 2) {
+        shouldRemovePlayer = account;
+        return;
+    }
+
+    shouldRemovePlayer = account;
+    shouldAddPlayer = account;
 }
