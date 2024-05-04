@@ -336,9 +336,9 @@ void RenderWindow() {
 	}
 
 	if (ImGui::Begin("Log Proofs", &Config.showWindow, windowFlags)) {
-		if (players.size() > 0 || !selfName.empty()) {
-			if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
-				if (ImGui::BeginTabItem("Raids")) {
+		if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
+			if (ImGui::BeginTabItem("Raids")) {
+				if (players.size() > 0 || !selfName.empty()) {
 					if (ImGui::BeginTable("raidsTable", 27, tableFlags)) {
 						RenderRaidsHeaderAllWings();
 						if (!selfName.empty()) {
@@ -349,10 +349,12 @@ void RenderWindow() {
 						}
 						ImGui::EndTable();
 					}
-					ImGui::EndTabItem();
+				} else {
+					ImGui::Text("No players found...");
 				}
-				ImGui::EndTabBar();
+				ImGui::EndTabItem();
 			}
+			ImGui::EndTabBar();
 		}
 	}
 	ImGui::End();
