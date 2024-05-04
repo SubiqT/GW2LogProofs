@@ -548,6 +548,11 @@ void RenderWindow() {
 	ImGui::End();
 }
 
+void ToggleShowWindow(const char* aIdentifier) {
+	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Keybind {} was pressed.", aIdentifier).c_str());
+	Config.showWindow = !Config.showWindow;
+}
+
 void RenderSettings() {
 	if (ImGui::Button(Config.showWindow ? "Hide Window" : "Show Window")) {
 		Config.showWindow = !Config.showWindow;

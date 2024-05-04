@@ -4,6 +4,7 @@
 #include "shared.h"
 
 const char* ADDON_NAME = "Log Proofs";
+const char* SHOW_ADDON_KEYBIND = "Toggle Show Addon";
 
 AddonConfig defaultConfig = { true, false };
 AddonConfig Config = defaultConfig;

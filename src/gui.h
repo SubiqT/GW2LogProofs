@@ -1,7 +1,9 @@
 #ifndef GUI_H
 #define GUI_H
 
-extern void RenderWindow(void);
-extern void RenderSettings(void);
+void RenderWindow(void);
+void RenderSettings(void);
+
+void ToggleShowWindow(const char* aIdentifier);
 
 #endif

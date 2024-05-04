@@ -10,6 +10,7 @@
 #include "arcdps/arcdps.h"
 
 extern const char* ADDON_NAME;
+extern const char* SHOW_ADDON_KEYBIND;
 
 typedef struct AddonConfig {
     bool showWindow;
