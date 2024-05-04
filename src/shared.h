@@ -14,7 +14,6 @@ extern const char* SHOW_ADDON_KEYBIND;
 
 typedef struct AddonConfig {
     bool showWindow;
-    bool splitPerWing;
 } AddonConfig;
 extern AddonConfig Config;
 

@@ -6,7 +6,7 @@
 const char* ADDON_NAME = "Log Proofs";
 const char* SHOW_ADDON_KEYBIND = "Toggle Show Addon";
 
-AddonConfig defaultConfig = { true, false };
+AddonConfig defaultConfig = { true };
 AddonConfig Config = defaultConfig;
 
 AddonAPI* APIDefs = nullptr;
