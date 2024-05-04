@@ -5,7 +5,24 @@
 #include "proofs.h"
 
 std::map<int, Texture*> bossTextures = {};
-static ImGuiTableFlags tableFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_SizingFixedFit;
+static ImGuiWindowFlags windowFlags =  (
+	ImGuiWindowFlags_NoCollapse
+	| ImGuiWindowFlags_NoFocusOnAppearing
+	| ImGuiWindowFlags_NoNav
+	| ImGuiWindowFlags_NoNavFocus
+	| ImGuiWindowFlags_AlwaysAutoResize
+);
+static ImGuiTableFlags tableFlags = (
+	ImGuiTableFlags_Borders
+	| ImGuiTableFlags_ContextMenuInBody
+	| ImGuiTableFlags_NoSavedSettings
+	| ImGuiTableFlags_SizingFixedFit
+	| ImGuiTableFlags_Reorderable
+	| ImGuiTableFlags_Hideable
+	| ImGuiTableFlags_Sortable
+	| ImGuiTableFlags_RowBg
+	);
+
 
 enum Boss {
 	ValeGuardian = 15438,
@@ -195,6 +212,36 @@ Texture* GetBossTexture(Boss boss) {
 	}
 }
 
+void SetupColumnsAllWings() {
+	ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_NoHide);
+	ImGui::TableSetupColumn(GetBossName(ValeGuardian));
+	ImGui::TableSetupColumn(GetBossName(Gorseval));
+	ImGui::TableSetupColumn(GetBossName(Sabetha));
+	ImGui::TableSetupColumn(GetBossName(Slothasor));
+	ImGui::TableSetupColumn(GetBossName(BanditTrio));
+	ImGui::TableSetupColumn(GetBossName(Matthias));
+	ImGui::TableSetupColumn(GetBossName(Escort));
+	ImGui::TableSetupColumn(GetBossName(KeepConstruct));
+	ImGui::TableSetupColumn(GetBossName(TwistedCastle));
+	ImGui::TableSetupColumn(GetBossName(Xera));
+	ImGui::TableSetupColumn(GetBossName(Cairn));
+	ImGui::TableSetupColumn(GetBossName(MursaatOverseer));
+	ImGui::TableSetupColumn(GetBossName(Samarog));
+	ImGui::TableSetupColumn(GetBossName(Deimos));
+	ImGui::TableSetupColumn(GetBossName(SoullessHorror));
+	ImGui::TableSetupColumn(GetBossName(RiverOfSouls));
+	ImGui::TableSetupColumn(GetBossName(BrokenKing));
+	ImGui::TableSetupColumn(GetBossName(EaterOfSouls));
+	ImGui::TableSetupColumn(GetBossName(Eyes));
+	ImGui::TableSetupColumn(GetBossName(Dhuum));
+	ImGui::TableSetupColumn(GetBossName(ConjuredAmalgamate));
+	ImGui::TableSetupColumn(GetBossName(TwinLargos));
+	ImGui::TableSetupColumn(GetBossName(Qadim));
+	ImGui::TableSetupColumn(GetBossName(Adina));
+	ImGui::TableSetupColumn(GetBossName(Sabir));
+	ImGui::TableSetupColumn(GetBossName(QadimThePeerless));
+}
+
 void RenderBossHeader(Boss boss) {
 	ImGui::TableNextColumn();
 	Texture* texture = GetBossTexture(boss);
@@ -250,6 +297,8 @@ void RenderRaidsHeaderPerWing(RaidWing wing) {
 }
 
 void RenderRaidsHeaderAllWings() {
+	SetupColumnsAllWings();
+	ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 	ImGui::TableNextColumn();
 	RenderBossHeader(ValeGuardian);
 	RenderBossHeader(Gorseval);
@@ -379,7 +428,7 @@ void RenderWindow() {
 		return;
 	}
 
-	if (ImGui::Begin("Log Proofs")) {
+	if (ImGui::Begin("Log Proofs", &Config.showWindow, windowFlags)) {
 		if (players.size() > 0 || !selfName.empty()) {
 			if (!Config.splitPerWing) {
 				if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
