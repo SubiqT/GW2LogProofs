@@ -98,8 +98,12 @@ void SquadEventHandler(void* eventArgs) {
             shouldClearAllPlayers = true;
         }
     } else {
-        shouldRemovePlayer = account;
         if (role <= 2) {
+            for (Player player : players) {
+                if (player.account == account) {
+                    return;
+                }
+            }
             shouldAddPlayer = account;
         }
     }
