@@ -5,6 +5,7 @@
 #include "proofs.h"
 
 std::map<int, Texture*> bossTextures = {};
+bool calledLoadOnBossTextures = false;
 static ImGuiWindowFlags windowFlags =  (
 	ImGuiWindowFlags_NoCollapse
 	| ImGuiWindowFlags_NoFocusOnAppearing
@@ -122,94 +123,34 @@ const char* GetBossName(Boss boss) {
 	}
 }
 
-Texture* GetBossTexture(Boss boss) {
-	int boss_id = int(boss);
-	if (bossTextures[boss_id] != nullptr) {
-		return bossTextures[boss_id];
-	}
-	switch (boss_id) {
-		case ValeGuardian:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("vale_guardian", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Vale_Guardian_Trophy.png");
-			return bossTextures[boss_id];
-		case Gorseval:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("gorseval", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Gorseval_Trophy.png");
-			return bossTextures[boss_id];
-		case Sabetha:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("sabetha", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Sabetha_Trophy.png");
-			return bossTextures[boss_id];
-		case Slothasor:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("slothasor", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Slothasor_Trophy.png");
-			return bossTextures[boss_id];
-		case BanditTrio:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("bandit_trio", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Narella.png");
-			return bossTextures[boss_id];
-		case Matthias:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("matthias", "https://gw2wingman.nevermindcreations.de", "/static/Silver_White_Mantle_Abomination_Trophy.png");
-			return bossTextures[boss_id];
-		case Escort:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("escort", "https://gw2wingman.nevermindcreations.de", "/static/Bloodstone_Turret_Fragment.png");
-			return bossTextures[boss_id];
-		case KeepConstruct:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("keep_construct", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Keep_Construct_Trophy.png");
-			return bossTextures[boss_id];
-		case TwistedCastle:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("twisted_castle", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Siege_the_Stronghold_Trophy.png");
-			return bossTextures[boss_id];
-		case Xera:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("xera", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Xera_Trophy.png");
-			return bossTextures[boss_id];
-		case Cairn:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("cairn", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cairn_the_Indomitable_Trophy.png");
-			return bossTextures[boss_id];
-		case MursaatOverseer:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("mursaat_overseer", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Mursaat_Overseer_Trophy.png");
-			return bossTextures[boss_id];
-		case Samarog:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("samarog", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Samarog_Trophy.png");
-			return bossTextures[boss_id];
-		case Deimos:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("deimos", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Deimos_Trophy.png");
-			return bossTextures[boss_id];
-		case SoullessHorror:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("soulless_horror", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Desmina_Trophy.png");
-			return bossTextures[boss_id];
-		case RiverOfSouls:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("river_of_souls", "https://gw2wingman.nevermindcreations.de", "/static/Silver_River_of_Souls_Trophy.png");
-			return bossTextures[boss_id];
-		case BrokenKing:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("broken_king", "https://gw2wingman.nevermindcreations.de", "/static/Icon_BrokenKing.png");
-			return bossTextures[boss_id];
-		case EaterOfSouls:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("eater_of_souls", "https://gw2wingman.nevermindcreations.de", "/static/Icon_EaterOfSouls.png");
-			return bossTextures[boss_id];
-		case Eyes:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("eyes", "https://gw2wingman.nevermindcreations.de", "/static/Icon_Eyes.png");
-			return bossTextures[boss_id];
-		case Dhuum:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("dhuum", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Dhuum_Trophy.png");
-			return bossTextures[boss_id];
-		case ConjuredAmalgamate:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("conjured_amalgamate", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Conjured_Amalgamate_Trophy.png");
-			return bossTextures[boss_id];
-		case TwinLargos:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("twin_largos", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Twin_Largos_Trophy.png");
-			return bossTextures[boss_id];
-		case Qadim:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("qadim", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Qadim_Trophy.png");
-			return bossTextures[boss_id];
-		case Adina:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("adina", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cardinal_Adina_Trophy.png");
-			return bossTextures[boss_id];
-		case Sabir:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("sabir", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cardinal_Sabir_Trophy.png");
-			return bossTextures[boss_id];
-		case QadimThePeerless:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("qadim_the_pearless", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Ether_Djinn_Trophy.png");
-			return bossTextures[boss_id];
-		default:
-			bossTextures[boss_id] = APIDefs->GetTextureOrCreateFromURL("any", "https://wiki.guildwars2.com", "/images/a/a7/Mini_Eye_of_Janthir.png");
-			return bossTextures[boss_id];
-	}
+void LoadBossTextures() {
+	bossTextures[ValeGuardian] = APIDefs->GetTextureOrCreateFromURL("vale_guardian", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Vale_Guardian_Trophy.png");
+	bossTextures[Gorseval] = APIDefs->GetTextureOrCreateFromURL("gorseval", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Gorseval_Trophy.png");
+	bossTextures[Sabetha] = APIDefs->GetTextureOrCreateFromURL("sabetha", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Sabetha_Trophy.png");
+	bossTextures[Slothasor] = APIDefs->GetTextureOrCreateFromURL("slothasor", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Slothasor_Trophy.png");
+	bossTextures[BanditTrio] = APIDefs->GetTextureOrCreateFromURL("bandit_trio", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Narella.png");
+	bossTextures[Matthias] = APIDefs->GetTextureOrCreateFromURL("matthias", "https://gw2wingman.nevermindcreations.de", "/static/Silver_White_Mantle_Abomination_Trophy.png");
+	bossTextures[Escort] = APIDefs->GetTextureOrCreateFromURL("escort", "https://gw2wingman.nevermindcreations.de", "/static/Bloodstone_Turret_Fragment.png");
+	bossTextures[KeepConstruct] = APIDefs->GetTextureOrCreateFromURL("keep_construct", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Keep_Construct_Trophy.png");
+	bossTextures[TwistedCastle] = APIDefs->GetTextureOrCreateFromURL("twisted_castle", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Siege_the_Stronghold_Trophy.png");
+	bossTextures[Xera] = APIDefs->GetTextureOrCreateFromURL("xera", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Xera_Trophy.png");
+	bossTextures[Cairn] = APIDefs->GetTextureOrCreateFromURL("cairn", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cairn_the_Indomitable_Trophy.png");
+	bossTextures[MursaatOverseer] = APIDefs->GetTextureOrCreateFromURL("mursaat_overseer", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Mursaat_Overseer_Trophy.png");
+	bossTextures[Samarog] = APIDefs->GetTextureOrCreateFromURL("samarog", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Samarog_Trophy.png");
+	bossTextures[Deimos] = APIDefs->GetTextureOrCreateFromURL("deimos", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Deimos_Trophy.png");
+	bossTextures[SoullessHorror] = APIDefs->GetTextureOrCreateFromURL("soulless_horror", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Desmina_Trophy.png");
+	bossTextures[RiverOfSouls] = APIDefs->GetTextureOrCreateFromURL("river_of_souls", "https://gw2wingman.nevermindcreations.de", "/static/Silver_River_of_Souls_Trophy.png");
+	bossTextures[BrokenKing] = APIDefs->GetTextureOrCreateFromURL("broken_king", "https://gw2wingman.nevermindcreations.de", "/static/Icon_BrokenKing.png");
+	bossTextures[EaterOfSouls] = APIDefs->GetTextureOrCreateFromURL("eater_of_souls", "https://gw2wingman.nevermindcreations.de", "/static/Icon_EaterOfSouls.png");
+	bossTextures[Eyes] = APIDefs->GetTextureOrCreateFromURL("eyes", "https://gw2wingman.nevermindcreations.de", "/static/Icon_Eyes.png");
+	bossTextures[Dhuum] = APIDefs->GetTextureOrCreateFromURL("dhuum", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Dhuum_Trophy.png");
+	bossTextures[ConjuredAmalgamate] = APIDefs->GetTextureOrCreateFromURL("conjured_amalgamate", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Conjured_Amalgamate_Trophy.png");
+	bossTextures[TwinLargos] = APIDefs->GetTextureOrCreateFromURL("twin_largos", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Twin_Largos_Trophy.png");
+	bossTextures[Qadim] = APIDefs->GetTextureOrCreateFromURL("qadim", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Qadim_Trophy.png");
+	bossTextures[Adina] = APIDefs->GetTextureOrCreateFromURL("adina", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cardinal_Adina_Trophy.png");
+	bossTextures[Sabir] = APIDefs->GetTextureOrCreateFromURL("sabir", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cardinal_Sabir_Trophy.png");
+	bossTextures[QadimThePeerless] = APIDefs->GetTextureOrCreateFromURL("qadim_the_pearless", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Ether_Djinn_Trophy.png");
+	bossTextures[0] = APIDefs->GetTextureOrCreateFromURL("any", "https://wiki.guildwars2.com", "/images/a/a7/Mini_Eye_of_Janthir.png");
 }
 
 void SetupColumnsAllWings() {
@@ -244,7 +185,7 @@ void SetupColumnsAllWings() {
 
 void RenderBossHeader(Boss boss) {
 	ImGui::TableNextColumn();
-	Texture* texture = GetBossTexture(boss);
+	Texture* texture = bossTextures[boss];
 	texture != nullptr
 		? ImGui::Image((void*)texture->Resource, ImVec2(32.f, 32.f))
 		: ImGui::Text(GetBossName(boss));
@@ -333,6 +274,10 @@ void RenderRaidsRowAllWings(Player* player) {
 void RenderWindow() {
 	if (!Config.showWindow) {
 		return;
+	}
+
+	if (!calledLoadOnBossTextures) {
+		LoadBossTextures();
 	}
 
 	if (ImGui::Begin("Log Proofs", &Config.showWindow, windowFlags)) {
