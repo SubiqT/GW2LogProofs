@@ -5,7 +5,6 @@
 #include "shared.h"
 #include "proofs.h"
 
-std::map<int, Texture*> bossTextures = {};
 static ImGuiWindowFlags windowFlags =  (
 	ImGuiWindowFlags_NoCollapse
 	| ImGuiWindowFlags_NoFocusOnAppearing
@@ -18,10 +17,10 @@ static ImGuiTableFlags tableFlags = (
 	| ImGuiTableFlags_ContextMenuInBody
 	| ImGuiTableFlags_NoSavedSettings
 	| ImGuiTableFlags_SizingFixedFit
-	| ImGuiTableFlags_Reorderable
 	| ImGuiTableFlags_Hideable
 	| ImGuiTableFlags_Sortable
 	| ImGuiTableFlags_RowBg
+	| ImGuiTableFlags_Resizable
 	);
 
 
@@ -53,6 +52,15 @@ enum Boss {
 	Sabir = 21964,
 	QadimThePeerless = 22000
 };
+Boss sortedBosses[26] = {
+	ValeGuardian, Gorseval, Sabetha,
+	Slothasor, BanditTrio, Matthias,
+	Escort, KeepConstruct, TwistedCastle, Xera,
+	Cairn, MursaatOverseer, Samarog, Deimos,
+	SoullessHorror, RiverOfSouls, BrokenKing, EaterOfSouls, Eyes, Dhuum,
+	ConjuredAmalgamate, TwinLargos, Qadim,
+	Adina, Sabir, QadimThePeerless
+};
 
 enum RaidWing {
 	SpiritVale,
@@ -62,6 +70,10 @@ enum RaidWing {
 	HallOfChains,
 	MythwrightGambit,
 	TheKeyOfAhdashim
+};
+RaidWing sortedRaidWings[7] = {
+	SpiritVale, SalvationPass, StrongholdOfTheFaithful, BastionOfThePenitent,
+	HallOfChains, MythwrightGambit, TheKeyOfAhdashim
 };
 
 const char* GetBossName(Boss boss) {
@@ -123,152 +135,63 @@ const char* GetBossName(Boss boss) {
 	}
 }
 
-void LoadBossTextures() {
-	bossTextures[ValeGuardian] = APIDefs->GetTextureOrCreateFromURL("vale_guardian", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Vale_Guardian_Trophy.png");
-	bossTextures[Gorseval] = APIDefs->GetTextureOrCreateFromURL("gorseval", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Gorseval_Trophy.png");
-	bossTextures[Sabetha] = APIDefs->GetTextureOrCreateFromURL("sabetha", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Sabetha_Trophy.png");
-	bossTextures[Slothasor] = APIDefs->GetTextureOrCreateFromURL("slothasor", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Slothasor_Trophy.png");
-	bossTextures[BanditTrio] = APIDefs->GetTextureOrCreateFromURL("bandit_trio", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Narella.png");
-	bossTextures[Matthias] = APIDefs->GetTextureOrCreateFromURL("matthias", "https://gw2wingman.nevermindcreations.de", "/static/Silver_White_Mantle_Abomination_Trophy.png");
-	bossTextures[Escort] = APIDefs->GetTextureOrCreateFromURL("escort", "https://gw2wingman.nevermindcreations.de", "/static/Bloodstone_Turret_Fragment.png");
-	bossTextures[KeepConstruct] = APIDefs->GetTextureOrCreateFromURL("keep_construct", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Keep_Construct_Trophy.png");
-	bossTextures[TwistedCastle] = APIDefs->GetTextureOrCreateFromURL("twisted_castle", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Siege_the_Stronghold_Trophy.png");
-	bossTextures[Xera] = APIDefs->GetTextureOrCreateFromURL("xera", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Xera_Trophy.png");
-	bossTextures[Cairn] = APIDefs->GetTextureOrCreateFromURL("cairn", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cairn_the_Indomitable_Trophy.png");
-	bossTextures[MursaatOverseer] = APIDefs->GetTextureOrCreateFromURL("mursaat_overseer", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Mursaat_Overseer_Trophy.png");
-	bossTextures[Samarog] = APIDefs->GetTextureOrCreateFromURL("samarog", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Samarog_Trophy.png");
-	bossTextures[Deimos] = APIDefs->GetTextureOrCreateFromURL("deimos", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Deimos_Trophy.png");
-	bossTextures[SoullessHorror] = APIDefs->GetTextureOrCreateFromURL("soulless_horror", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Desmina_Trophy.png");
-	bossTextures[RiverOfSouls] = APIDefs->GetTextureOrCreateFromURL("river_of_souls", "https://gw2wingman.nevermindcreations.de", "/static/Silver_River_of_Souls_Trophy.png");
-	bossTextures[BrokenKing] = APIDefs->GetTextureOrCreateFromURL("broken_king", "https://gw2wingman.nevermindcreations.de", "/static/Icon_BrokenKing.png");
-	bossTextures[EaterOfSouls] = APIDefs->GetTextureOrCreateFromURL("eater_of_souls", "https://gw2wingman.nevermindcreations.de", "/static/Icon_EaterOfSouls.png");
-	bossTextures[Eyes] = APIDefs->GetTextureOrCreateFromURL("eyes", "https://gw2wingman.nevermindcreations.de", "/static/Icon_Eyes.png");
-	bossTextures[Dhuum] = APIDefs->GetTextureOrCreateFromURL("dhuum", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Dhuum_Trophy.png");
-	bossTextures[ConjuredAmalgamate] = APIDefs->GetTextureOrCreateFromURL("conjured_amalgamate", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Conjured_Amalgamate_Trophy.png");
-	bossTextures[TwinLargos] = APIDefs->GetTextureOrCreateFromURL("twin_largos", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Twin_Largos_Trophy.png");
-	bossTextures[Qadim] = APIDefs->GetTextureOrCreateFromURL("qadim", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Qadim_Trophy.png");
-	bossTextures[Adina] = APIDefs->GetTextureOrCreateFromURL("adina", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cardinal_Adina_Trophy.png");
-	bossTextures[Sabir] = APIDefs->GetTextureOrCreateFromURL("sabir", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cardinal_Sabir_Trophy.png");
-	bossTextures[QadimThePeerless] = APIDefs->GetTextureOrCreateFromURL("qadim_the_pearless", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Ether_Djinn_Trophy.png");
-	bossTextures[0] = APIDefs->GetTextureOrCreateFromURL("any", "https://wiki.guildwars2.com", "/images/a/a7/Mini_Eye_of_Janthir.png");
-}
-
-void SetupColumnsAllWings() {
-	ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_NoHide);
-	ImGui::TableSetupColumn(GetBossName(ValeGuardian));
-	ImGui::TableSetupColumn(GetBossName(Gorseval));
-	ImGui::TableSetupColumn(GetBossName(Sabetha));
-	ImGui::TableSetupColumn(GetBossName(Slothasor));
-	ImGui::TableSetupColumn(GetBossName(BanditTrio));
-	ImGui::TableSetupColumn(GetBossName(Matthias));
-	ImGui::TableSetupColumn(GetBossName(Escort));
-	ImGui::TableSetupColumn(GetBossName(KeepConstruct));
-	ImGui::TableSetupColumn(GetBossName(TwistedCastle));
-	ImGui::TableSetupColumn(GetBossName(Xera));
-	ImGui::TableSetupColumn(GetBossName(Cairn));
-	ImGui::TableSetupColumn(GetBossName(MursaatOverseer));
-	ImGui::TableSetupColumn(GetBossName(Samarog));
-	ImGui::TableSetupColumn(GetBossName(Deimos));
-	ImGui::TableSetupColumn(GetBossName(SoullessHorror));
-	ImGui::TableSetupColumn(GetBossName(RiverOfSouls));
-	ImGui::TableSetupColumn(GetBossName(BrokenKing));
-	ImGui::TableSetupColumn(GetBossName(EaterOfSouls));
-	ImGui::TableSetupColumn(GetBossName(Eyes));
-	ImGui::TableSetupColumn(GetBossName(Dhuum));
-	ImGui::TableSetupColumn(GetBossName(ConjuredAmalgamate));
-	ImGui::TableSetupColumn(GetBossName(TwinLargos));
-	ImGui::TableSetupColumn(GetBossName(Qadim));
-	ImGui::TableSetupColumn(GetBossName(Adina));
-	ImGui::TableSetupColumn(GetBossName(Sabir));
-	ImGui::TableSetupColumn(GetBossName(QadimThePeerless));
-}
-
-void RenderBossHeader(Boss boss) {
-	ImGui::TableNextColumn();
-	Texture* texture = bossTextures[boss];
-	texture != nullptr
-		? ImGui::Image((void*)texture->Resource, ImVec2(32.f, 32.f))
-		: ImGui::Text(GetBossName(boss));
-}
-
-void RenderRaidsHeaderAllWings() {
-	SetupColumnsAllWings();
-	ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
-	ImGui::TableNextColumn();
-	RenderBossHeader(ValeGuardian);
-	RenderBossHeader(Gorseval);
-	RenderBossHeader(Sabetha);
-
-	RenderBossHeader(Slothasor);
-	RenderBossHeader(BanditTrio);
-	RenderBossHeader(Matthias);
-
-	RenderBossHeader(Escort);
-	RenderBossHeader(KeepConstruct);
-	RenderBossHeader(TwistedCastle);
-	RenderBossHeader(Xera);
-
-	RenderBossHeader(Cairn);
-	RenderBossHeader(MursaatOverseer);
-	RenderBossHeader(Samarog);
-	RenderBossHeader(Deimos);
-
-	RenderBossHeader(SoullessHorror);
-	RenderBossHeader(RiverOfSouls);
-	RenderBossHeader(BrokenKing);
-	RenderBossHeader(EaterOfSouls);
-	RenderBossHeader(Eyes);
-	RenderBossHeader(Dhuum);
-
-	RenderBossHeader(ConjuredAmalgamate);
-	RenderBossHeader(TwinLargos);
-	RenderBossHeader(Qadim);
-
-	RenderBossHeader(Adina);
-	RenderBossHeader(Sabir);
-	RenderBossHeader(QadimThePeerless);
-}
-
-void RenderBossRow(Player* player, Boss boss) {
-	ImGui::TableNextColumn();
-	ImGui::Text("%i", player->kp[std::format("{}", int(boss))][std::string("total")]);
-}
-
-void RenderRaidsRowAllWings(Player* player) {
-	ImGui::TableNextColumn();
-	ImGui::Text(player->account.c_str());
-	RenderBossRow(player, ValeGuardian);
-	RenderBossRow(player, Gorseval);
-	RenderBossRow(player, Sabetha);
-
-	RenderBossRow(player, Slothasor);
-	RenderBossRow(player, BanditTrio);
-	RenderBossRow(player, Matthias);
-
-	RenderBossRow(player, Escort);
-	RenderBossRow(player, KeepConstruct);
-	RenderBossRow(player, TwistedCastle);
-	RenderBossRow(player, Xera);
-
-	RenderBossRow(player, Cairn);
-	RenderBossRow(player, MursaatOverseer);
-	RenderBossRow(player, Samarog);
-	RenderBossRow(player, Deimos);
-
-	RenderBossRow(player, SoullessHorror);
-	RenderBossRow(player, RiverOfSouls);
-	RenderBossRow(player, BrokenKing);
-	RenderBossRow(player, EaterOfSouls);
-	RenderBossRow(player, Eyes);
-	RenderBossRow(player, Dhuum);
-
-	RenderBossRow(player, ConjuredAmalgamate);
-	RenderBossRow(player, TwinLargos);
-	RenderBossRow(player, Qadim);
-
-	RenderBossRow(player, Adina);
-	RenderBossRow(player, Sabir);
-	RenderBossRow(player, QadimThePeerless);
+Texture* GetBossTexture(Boss boss) {
+	switch (boss) {
+	case ValeGuardian:
+		return APIDefs->GetTextureOrCreateFromURL("vale_guardian", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Vale_Guardian_Trophy.png");
+	case Gorseval:
+		return APIDefs->GetTextureOrCreateFromURL("gorseval", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Gorseval_Trophy.png");
+	case Sabetha:
+		return APIDefs->GetTextureOrCreateFromURL("sabetha", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Sabetha_Trophy.png");
+	case Slothasor:
+		return APIDefs->GetTextureOrCreateFromURL("slothasor", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Slothasor_Trophy.png");
+	case BanditTrio:
+		return APIDefs->GetTextureOrCreateFromURL("bandit_trio", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Narella.png");
+	case Matthias:
+		return APIDefs->GetTextureOrCreateFromURL("matthias", "https://gw2wingman.nevermindcreations.de", "/static/Silver_White_Mantle_Abomination_Trophy.png");
+	case Escort:
+		return APIDefs->GetTextureOrCreateFromURL("escort", "https://gw2wingman.nevermindcreations.de", "/static/Bloodstone_Turret_Fragment.png");
+	case KeepConstruct:
+		return APIDefs->GetTextureOrCreateFromURL("keep_construct", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Keep_Construct_Trophy.png");
+	case TwistedCastle:
+		return APIDefs->GetTextureOrCreateFromURL("twisted_castle", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Siege_the_Stronghold_Trophy.png");
+	case Xera:
+		return APIDefs->GetTextureOrCreateFromURL("xera", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Xera_Trophy.png");
+	case Cairn:
+		return APIDefs->GetTextureOrCreateFromURL("cairn", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cairn_the_Indomitable_Trophy.png");
+	case MursaatOverseer:
+		return APIDefs->GetTextureOrCreateFromURL("mursaat_overseer", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Mursaat_Overseer_Trophy.png");
+	case Samarog:
+		return APIDefs->GetTextureOrCreateFromURL("samarog", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Samarog_Trophy.png");
+	case Deimos:
+		return APIDefs->GetTextureOrCreateFromURL("deimos", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Deimos_Trophy.png");
+	case SoullessHorror:
+		return APIDefs->GetTextureOrCreateFromURL("soulless_horror", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Desmina_Trophy.png");
+	case RiverOfSouls:
+		return APIDefs->GetTextureOrCreateFromURL("river_of_souls", "https://gw2wingman.nevermindcreations.de", "/static/Silver_River_of_Souls_Trophy.png");
+	case BrokenKing:
+		return APIDefs->GetTextureOrCreateFromURL("broken_king", "https://gw2wingman.nevermindcreations.de", "/static/Icon_BrokenKing.png");
+	case EaterOfSouls:
+		return APIDefs->GetTextureOrCreateFromURL("eater_of_souls", "https://gw2wingman.nevermindcreations.de", "/static/Icon_EaterOfSouls.png");
+	case Eyes:
+		return APIDefs->GetTextureOrCreateFromURL("eyes", "https://gw2wingman.nevermindcreations.de", "/static/Icon_Eyes.png");
+	case Dhuum:
+		return APIDefs->GetTextureOrCreateFromURL("dhuum", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Dhuum_Trophy.png");
+	case ConjuredAmalgamate:
+		return APIDefs->GetTextureOrCreateFromURL("conjured_amalgamate", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Conjured_Amalgamate_Trophy.png");
+	case TwinLargos:
+		return APIDefs->GetTextureOrCreateFromURL("twin_largos", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Twin_Largos_Trophy.png");
+	case Qadim:
+		return APIDefs->GetTextureOrCreateFromURL("qadim", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Qadim_Trophy.png");
+	case Adina:
+		return APIDefs->GetTextureOrCreateFromURL("adina", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cardinal_Adina_Trophy.png");
+	case Sabir:
+		return APIDefs->GetTextureOrCreateFromURL("sabir", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cardinal_Sabir_Trophy.png");
+	case QadimThePeerless:
+		return APIDefs->GetTextureOrCreateFromURL("qadim_the_pearless", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Ether_Djinn_Trophy.png");
+	default:
+		return nullptr;
+	}
 }
 
 void RenderWindow() {
@@ -279,20 +202,38 @@ void RenderWindow() {
 	if (ImGui::Begin("Log Proofs", &Config.showWindow, windowFlags)) {
 		if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
 			if (ImGui::BeginTabItem("Raids")) {
-				if (players.size() > 0 || !selfName.empty()) {
-					if (ImGui::BeginTable("raidsTable", 27, tableFlags)) {
-						LoadBossTextures();
-						RenderRaidsHeaderAllWings();
-						if (!selfName.empty()) {
-							RenderRaidsRowAllWings(&self);
-						}
-						for (Player player : players) {
-							RenderRaidsRowAllWings(&player);
-						}
-						ImGui::EndTable();
+				if (ImGui::BeginTable("raidsTable", 27, tableFlags)) {
+					ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 32.f);
+					for (Boss& boss : sortedBosses) {
+						ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, 32.f);
 					}
-				} else {
-					ImGui::Text("No players found... ");
+					ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+					ImGui::TableNextColumn();
+					ImGui::Text("Account");
+					for (Boss& boss : sortedBosses) {
+						ImGui::TableNextColumn();
+						Texture* texture = GetBossTexture(boss);
+						if (texture != nullptr) {
+							ImGui::Image((void*)texture->Resource, ImVec2(32.f, 32.f));
+						}
+						else {
+							ImGui::Text(GetBossName(boss));
+						}
+					}
+					if (players.size() > 0) {
+						for (Player player : players) {
+							ImGui::TableNextColumn();
+							ImGui::Text(player.account.c_str());
+							for (Boss& boss : sortedBosses) {
+								ImGui::TableNextColumn();
+								ImGui::Text("%i", player.kp[std::format("{}", int(boss))][std::string("total")]);
+							}
+						}
+					}
+					ImGui::EndTable();
+					if (players.size() == 0) {
+						ImGui::Text("No players found... ");
+					}
 				}
 				ImGui::EndTabItem();
 			}

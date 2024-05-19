@@ -65,7 +65,25 @@ std::string StripAccount(std::string account) {
 void UpdatePlayers() {
     std::scoped_lock lck(mtx);
     if (shouldClearAllPlayers) {
-        players.clear();
+        if (selfName.empty()) {
+            players.clear();
+        }
+        else {
+            Player selfPlayer;
+            for (Player& player : players) {
+                if (player.account == selfName) {
+                    selfPlayer = player;
+                    break;
+                }
+            }
+            if (!selfPlayer.account.empty()) {
+                players.clear();
+                players.push_back(selfPlayer);
+            }
+            else {
+                players.clear();
+            }
+        }
         shouldClearAllPlayers = false;
     }
     if (!removePlayerQueue.empty()) {
@@ -81,12 +99,7 @@ void UpdatePlayers() {
     if (!addPlayerQueue.empty()) {
         Player addPlayer = addPlayerQueue.front();
         APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player: {}", addPlayer.account).c_str());
-        if (addPlayer.account == selfName) {
-            self = addPlayer;
-        }
-        else {
-            players.push_back(addPlayer);
-        }
+        players.push_back(addPlayer);
         addPlayerQueue.pop();
     }
 }

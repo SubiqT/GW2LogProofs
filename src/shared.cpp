@@ -13,7 +13,5 @@ AddonConfig Config = defaultConfig;
 AddonAPI* APIDefs = nullptr;
 NexusLinkData* NexusLink = nullptr;
 
-std::mutex playerMutex;
 std::vector<Player> players;
 std::string selfName;
-Player self;
