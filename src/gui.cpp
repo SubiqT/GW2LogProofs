@@ -1,11 +1,11 @@
 #include <format>
+#include <thread>
 
 #include "imgui/imgui.h"
 #include "shared.h"
 #include "proofs.h"
 
 std::map<int, Texture*> bossTextures = {};
-bool calledLoadOnBossTextures = false;
 static ImGuiWindowFlags windowFlags =  (
 	ImGuiWindowFlags_NoCollapse
 	| ImGuiWindowFlags_NoFocusOnAppearing
@@ -276,15 +276,12 @@ void RenderWindow() {
 		return;
 	}
 
-	if (!calledLoadOnBossTextures) {
-		LoadBossTextures();
-	}
-
 	if (ImGui::Begin("Log Proofs", &Config.showWindow, windowFlags)) {
 		if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
 			if (ImGui::BeginTabItem("Raids")) {
 				if (players.size() > 0 || !selfName.empty()) {
 					if (ImGui::BeginTable("raidsTable", 27, tableFlags)) {
+						LoadBossTextures();
 						RenderRaidsHeaderAllWings();
 						if (!selfName.empty()) {
 							RenderRaidsRowAllWings(&self);
@@ -295,7 +292,7 @@ void RenderWindow() {
 						ImGui::EndTable();
 					}
 				} else {
-					ImGui::Text("No players found...");
+					ImGui::Text("No players found... ");
 				}
 				ImGui::EndTabItem();
 			}
