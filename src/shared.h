@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <mutex>
 
 #include "nexus/Nexus.h"
 #include "unofficial_extras/Definitions.h"
@@ -26,6 +27,7 @@ struct Player {
     std::vector<std::string> groups;
     std::map<std::string, std::map<std::string, int>> kp;
 };
+extern std::mutex playerMutex;
 extern std::vector<Player> players;
 extern std::string selfName;
 extern Player self;

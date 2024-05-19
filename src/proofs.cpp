@@ -2,6 +2,8 @@
 
 #include <urlmon.h>
 #include <format>
+#include <thread>
+#include <queue>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -9,8 +11,8 @@ using json = nlohmann::json;
 #include "shared.h"
 
 bool shouldClearAllPlayers = false;
-std::string shouldRemovePlayer;
-std::string shouldAddPlayer;
+std::queue<std::string> removePlayerQueue;
+std::queue<Player> addPlayerQueue;
 
 void from_json(const json& j, Player& p) {
     j.at("account").get_to(p.account);
@@ -64,28 +66,25 @@ void UpdatePlayers() {
         players.clear();
         shouldClearAllPlayers = false;
     }
-    if (!shouldRemovePlayer.empty()) {
+    if (!removePlayerQueue.empty()) {
+        std::string removePlayer = removePlayerQueue.front();
         for (Player& player : players) {
-            if (player.account == shouldRemovePlayer) {
+            if (player.account == removePlayer) {
                 long long index = std::addressof(player) - std::addressof(players[0]);
                 players.erase(players.begin() + index);
             }
         }
-        shouldRemovePlayer.clear();
     }
-    if (!shouldAddPlayer.empty()) {
-        try {
-            Player newPlayer = GetProof(shouldAddPlayer.c_str());
-            if (shouldAddPlayer == selfName) {
-                self = newPlayer;
-            } else {
-                players.push_back(newPlayer);
-            }
-        } catch (const std::exception& e) {
-            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An unexpected exception occurred when trying to update proofs for {}. Exception details: {}", shouldAddPlayer, e.what()).c_str());
+    if (!addPlayerQueue.empty()) {
+        Player addPlayer = addPlayerQueue.front();
+        if (addPlayer.account == selfName) {
+            self = addPlayer;
         }
-        shouldAddPlayer.clear();
+        else {
+            players.push_back(addPlayer);
+        }
     }
+
 }
 
 void SquadEventHandler(void* eventArgs) {
@@ -93,21 +92,30 @@ void SquadEventHandler(void* eventArgs) {
     std::string account = StripAccount(squadUpdate->UserInfo->AccountName);
     int role = int(squadUpdate->UserInfo->Role);
     APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("updated  user: {} -  {}", account, role).c_str());
-    if (selfName == account) {
-        if (role == 5) {
+    if (role == 5) { // Left squad
+        if (selfName == account) {
             shouldClearAllPlayers = true;
+            return;
         }
-    } else {
-        if (role <= 2) {
-            for (Player player : players) {
-                if (player.account == account) {
-                    return;
-                }
-            }
-            shouldAddPlayer = account;
+        else {
+            removePlayerQueue.push(account);
         }
     }
-    
+    if (role <= 2) { // In squad
+        for (Player player : players) {
+            if (player.account == account) {
+                return;
+            }
+        }
+        std::thread([&] {
+            try {
+                addPlayerQueue.push(GetProof(account.c_str()));
+            }
+            catch (const std::exception& e) {
+                APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An unexpected exception occurred when trying to update proofs for {}. Exception details: {}", account, e.what()).c_str());
+            }
+        }).detach();
+    }
 }
 
 void CombatEventHandler(void* eventArgs) {
@@ -130,6 +138,14 @@ void CombatEventHandler(void* eventArgs) {
     if (cbtEvent->dst->self) { // Should only occur on map change
         selfName = StripAccount(std::string(cbtEvent->dst->name));
         APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("self: {}", selfName).c_str());
-        self = GetProof(selfName.c_str());
+        std::thread([&] {
+            try {
+                self = GetProof(selfName.c_str());
+            }
+            catch (const std::exception& e) {
+                APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An unexpected exception occurred when trying to update proofs for {}. Exception details: {}", selfName, e.what()).c_str());
+            }
+        }).detach();
+        
     }
 }
