@@ -13,6 +13,7 @@ using json = nlohmann::json;
 bool shouldClearAllPlayers = false;
 std::queue<std::string> removePlayerQueue;
 std::queue<Player> addPlayerQueue;
+std::mutex mtx;
 
 void from_json(const json& j, Player& p) {
     j.at("account").get_to(p.account);
@@ -62,6 +63,7 @@ std::string StripAccount(std::string account) {
 }
 
 void UpdatePlayers() {
+    std::scoped_lock lck(mtx);
     if (shouldClearAllPlayers) {
         players.clear();
         shouldClearAllPlayers = false;
@@ -74,47 +76,57 @@ void UpdatePlayers() {
                 players.erase(players.begin() + index);
             }
         }
+        removePlayerQueue.pop();
     }
     if (!addPlayerQueue.empty()) {
         Player addPlayer = addPlayerQueue.front();
+        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player: {}", addPlayer.account).c_str());
         if (addPlayer.account == selfName) {
             self = addPlayer;
         }
         else {
             players.push_back(addPlayer);
         }
+        addPlayerQueue.pop();
     }
+}
 
+void AsyncPushAccountToAddPlayerQueue(std::string account) {
+    std::thread([&] {
+        Player addPlayer;
+        try {
+            addPlayer = GetProof(account.c_str());
+        }
+        catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An unexpected exception occurred when trying to update proofs for {}. Exception details: {}", account, e.what()).c_str());
+        }
+        std::scoped_lock lck(mtx);
+        addPlayerQueue.push(addPlayer);
+    }).join();
 }
 
 void SquadEventHandler(void* eventArgs) {
     SquadUpdate* squadUpdate = (SquadUpdate*)eventArgs;
     std::string account = StripAccount(squadUpdate->UserInfo->AccountName);
     int role = int(squadUpdate->UserInfo->Role);
-    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("updated  user: {} -  {}", account, role).c_str());
+    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("squad event: {} -  {}", account, role).c_str());
     if (role == 5) { // Left squad
         if (selfName == account) {
             shouldClearAllPlayers = true;
             return;
         }
         else {
+            std::scoped_lock lck(mtx);
             removePlayerQueue.push(account);
         }
     }
     if (role <= 2) { // In squad
-        for (Player player : players) {
+        for (Player player : players) { // Already added
             if (player.account == account) {
                 return;
             }
         }
-        std::thread([&] {
-            try {
-                addPlayerQueue.push(GetProof(account.c_str()));
-            }
-            catch (const std::exception& e) {
-                APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An unexpected exception occurred when trying to update proofs for {}. Exception details: {}", account, e.what()).c_str());
-            }
-        }).detach();
+        AsyncPushAccountToAddPlayerQueue(account);
     }
 }
 
@@ -138,14 +150,6 @@ void CombatEventHandler(void* eventArgs) {
     if (cbtEvent->dst->self) { // Should only occur on map change
         selfName = StripAccount(std::string(cbtEvent->dst->name));
         APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("self: {}", selfName).c_str());
-        std::thread([&] {
-            try {
-                self = GetProof(selfName.c_str());
-            }
-            catch (const std::exception& e) {
-                APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An unexpected exception occurred when trying to update proofs for {}. Exception details: {}", selfName, e.what()).c_str());
-            }
-        }).detach();
-        
+        AsyncPushAccountToAddPlayerQueue(selfName);
     }
 }
