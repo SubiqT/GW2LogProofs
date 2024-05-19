@@ -29,12 +29,13 @@ void AddonLoad(AddonAPI* addonApi) {
 
 	NexusLink = (NexusLinkData*)APIDefs->GetResource("DL_NEXUS_LINK");
 
-	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
-	APIDefs->RegisterRender(ERenderType_OptionsRender, AddonOptions);
 	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", SquadEventHandler);
 	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW" , CombatEventHandler);
 	APIDefs->RegisterKeybindWithString(SHOW_ADDON_KEYBIND, ToggleShowWindow, "CTRL+P");
 	APIDefs->AddShortcut(ADDON_NAME, "meme", "meme", SHOW_ADDON_KEYBIND, "Log Proofs Table");
+
+	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
+	APIDefs->RegisterRender(ERenderType_OptionsRender, AddonOptions);
 
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "<c=#00ff00>Log Proofs</c> was loaded.");
 }
