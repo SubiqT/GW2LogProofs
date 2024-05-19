@@ -63,9 +63,29 @@ enum Boss {
 	Sabir = 21964,
 	SabirCM = -21964,
 	QadimThePeerless = 22000,
-	QadimThePeerlessCM = -22000
+	QadimThePeerlessCM = -22000,
+	MAMA = 17021,
+	MAMACM = -17021,
+	SiaxTheCorrupted = 17028,
+	SiaxTheCorruptedCM = -17028,
+	EnsolyssOfTheEndlessTorment = 16948,
+	EnsolyssOfTheEndlessTormentCM = -16948,
+	SkorvaldTheShattered = 17632,
+	SkorvaldTheShatteredCM = -17632,
+	Artsariiv = 17949,
+	ArtsariivCM = -17949,
+	Arkk = 17759,
+	ArkkCM = -17759,
+	ElementalAiKeeperOfThePeak = 23254,
+	ElementalAiKeeperOfThePeakCM = -23254,
+	DarkAiKeeperOfThePeak = 232542,
+	DarkAiKeeperOfThePeakCM = -232542,
+	ElementalAndDarkAiKeeperOfThePeak = 232543,
+	ElementalAndDarkAiKeeperOfThePeakCM = -232543,
+	KanaxaiScytheOfHouseAurkus = 25577,
+	KanaxaiScytheOfHouseAurkusCM = -25577
 };
-std::vector<Boss> sortedBosses {
+std::vector<Boss> sortedRaidBosses {
 	ValeGuardian, Gorseval, Sabetha,
 	Slothasor, BanditTrio, Matthias,
 	Escort, KeepConstruct, TwistedCastle, Xera,
@@ -74,12 +94,24 @@ std::vector<Boss> sortedBosses {
 	ConjuredAmalgamate, TwinLargos, Qadim,
 	Adina, Sabir, QadimThePeerless
 };
-std::vector<Boss> sortedCMBosses {
+std::vector<Boss> sortedRaidCmBosses {
 	KeepConstructCM,
 	CairnCM, MursaatOverseerCM, SamarogCM, DeimosCM,
 	SoullessHorrorCM, DhuumCM,
 	ConjuredAmalgamateCM, TwinLargosCM, QadimCM,
 	AdinaCM, SabirCM, QadimThePeerlessCM
+};
+std::vector<Boss> sortedFractalBosses {
+	MAMA, SiaxTheCorrupted, EnsolyssOfTheEndlessTorment,
+	SkorvaldTheShattered, Artsariiv, Arkk,
+	ElementalAiKeeperOfThePeak,
+	KanaxaiScytheOfHouseAurkus
+};
+std::vector<Boss> sortedFractalCMBosses {
+	MAMACM, SiaxTheCorruptedCM, EnsolyssOfTheEndlessTormentCM,
+	SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM,
+	ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM,
+	KanaxaiScytheOfHouseAurkusCM
 };
 
 enum RaidWing {
@@ -151,6 +183,26 @@ const char* GetBossName(Boss boss) {
 		return "Sabir";
 	case QadimThePeerless:
 		return "Qadim the Peerless";
+	case MAMA:
+		return "MAMA";
+	case SiaxTheCorrupted:
+		return "Siax";
+	case EnsolyssOfTheEndlessTorment:
+		return "Ensolyss";
+	case SkorvaldTheShattered:
+		return "Skorvald";
+	case Artsariiv:
+		return "Artsariiv";
+	case Arkk:
+		return "Arkk";
+	case ElementalAiKeeperOfThePeak:
+		return "Elemental Ai";
+	case DarkAiKeeperOfThePeak:
+		return "Dark Ai";
+	case ElementalAndDarkAiKeeperOfThePeak:
+		return "Full Ai";
+	case KanaxaiScytheOfHouseAurkus:
+		return "Kanaxai";
 	default:
 		return "Unknown";
 	}
@@ -211,6 +263,26 @@ Texture* GetBossTexture(Boss boss) {
 		return APIDefs->GetTextureOrCreateFromURL("sabir", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Cardinal_Sabir_Trophy.png");
 	case QadimThePeerless:
 		return APIDefs->GetTextureOrCreateFromURL("qadim_the_pearless", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Ether_Djinn_Trophy.png");
+	case MAMA:
+		return APIDefs->GetTextureOrCreateFromURL("mama", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Watchknight.png");
+	case SiaxTheCorrupted:
+		return APIDefs->GetTextureOrCreateFromURL("siax", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Toxic_Nimross.png");
+	case EnsolyssOfTheEndlessTorment:
+		return APIDefs->GetTextureOrCreateFromURL("ensolyss", "https://gw2wingman.nevermindcreations.de", "/static/EnsolyssIcon.png");
+	case SkorvaldTheShattered:
+		return APIDefs->GetTextureOrCreateFromURL("skorvald", "https://gw2wingman.nevermindcreations.de", "/static/Male_Norn_Holo-Dancer.png");
+	case Artsariiv:
+		return APIDefs->GetTextureOrCreateFromURL("artsariiv", "https://gw2wingman.nevermindcreations.de", "/static/Female_Norn_Holo-Dancer.png");
+	case Arkk:
+		return APIDefs->GetTextureOrCreateFromURL("arkk", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Inquest_Extinguisher.png");
+	case ElementalAiKeeperOfThePeak:
+		return APIDefs->GetTextureOrCreateFromURL("elemental_ai", "https://gw2wingman.nevermindcreations.de", "/static/ElementalAi.png");
+	case DarkAiKeeperOfThePeak:
+		return APIDefs->GetTextureOrCreateFromURL("dark_ai", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Liadri_the_Concealing_Dark.png");
+	case ElementalAndDarkAiKeeperOfThePeak:
+		return APIDefs->GetTextureOrCreateFromURL("full_ai", "https://gw2wingman.nevermindcreations.de", "/static/AiFullEncounter.png");
+	case KanaxaiScytheOfHouseAurkus:
+		return APIDefs->GetTextureOrCreateFromURL("kanaxai", "https://gw2wingman.nevermindcreations.de", "/static/Kanaxai.png");
 	default:
 		return nullptr;
 	}
@@ -218,7 +290,7 @@ Texture* GetBossTexture(Boss boss) {
 
 void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray) {
 	if (ImGui::BeginTabItem(tabName)) {
-		if (ImGui::BeginTable(tableName, bossesArray->size() + 1, tableFlags)) {
+		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 1, tableFlags)) {
 			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 32.f);
 			for (Boss& boss : *bossesArray) {
 				ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, 32.f);
@@ -262,8 +334,10 @@ void RenderWindow() {
 
 	if (ImGui::Begin("Log Proofs", &Config.showWindow, windowFlags)) {
 		if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
-			DrawBossesTab("Normal Raids", "normalRaidsTable", &sortedBosses);
-			DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedCMBosses);
+			DrawBossesTab("Normal Raids", "normalRaidsTable", &sortedRaidBosses);
+			DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses);
+			DrawBossesTab("Normal Fractals", "normalFractalsTable", &sortedFractalBosses);
+			DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses);
 			ImGui::EndTabBar();
 		}
 	}
