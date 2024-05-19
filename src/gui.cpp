@@ -65,7 +65,7 @@ enum Boss {
 	QadimThePeerless = 22000,
 	QadimThePeerlessCM = -22000
 };
-Boss sortedBosses[26] = {
+std::vector<Boss> sortedBosses {
 	ValeGuardian, Gorseval, Sabetha,
 	Slothasor, BanditTrio, Matthias,
 	Escort, KeepConstruct, TwistedCastle, Xera,
@@ -74,7 +74,7 @@ Boss sortedBosses[26] = {
 	ConjuredAmalgamate, TwinLargos, Qadim,
 	Adina, Sabir, QadimThePeerless
 };
-Boss sortedCMBosses[13] = {
+std::vector<Boss> sortedCMBosses {
 	KeepConstructCM,
 	CairnCM, MursaatOverseerCM, SamarogCM, DeimosCM,
 	SoullessHorrorCM, DhuumCM,
@@ -91,7 +91,7 @@ enum RaidWing {
 	MythwrightGambit,
 	TheKeyOfAhdashim
 };
-RaidWing sortedRaidWings[7] = {
+std::vector<RaidWing> sortedRaidWings {
 	SpiritVale, SalvationPass, StrongholdOfTheFaithful, BastionOfThePenitent,
 	HallOfChains, MythwrightGambit, TheKeyOfAhdashim
 };
@@ -216,6 +216,45 @@ Texture* GetBossTexture(Boss boss) {
 	}
 }
 
+void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray) {
+	if (ImGui::BeginTabItem(tabName)) {
+		if (ImGui::BeginTable(tableName, bossesArray->size() + 1, tableFlags)) {
+			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 32.f);
+			for (Boss& boss : *bossesArray) {
+				ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, 32.f);
+			}
+			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+			ImGui::TableNextColumn();
+			ImGui::Text("Account");
+			for (Boss& boss : *bossesArray) {
+				ImGui::TableNextColumn();
+				Texture* texture = GetBossTexture(boss);
+				if (texture != nullptr) {
+					ImGui::Image((void*)texture->Resource, ImVec2(32.f, 32.f));
+				}
+				else {
+					ImGui::Text(GetBossName(boss));
+				}
+			}
+			if (players.size() > 0) {
+				for (Player player : players) {
+					ImGui::TableNextColumn();
+					ImGui::Text(player.account.c_str());
+					for (Boss& boss : *bossesArray) {
+						ImGui::TableNextColumn();
+						ImGui::Text("%i", player.kp[std::format("{}", int(boss))][std::string("total")]);
+					}
+				}
+			}
+			ImGui::EndTable();
+			if (players.size() == 0) {
+				ImGui::Text("No players found... ");
+			}
+		}
+		ImGui::EndTabItem();
+	}
+}
+
 void RenderWindow() {
 	if (!Config.showWindow) {
 		return;
@@ -223,81 +262,8 @@ void RenderWindow() {
 
 	if (ImGui::Begin("Log Proofs", &Config.showWindow, windowFlags)) {
 		if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
-
-			if (ImGui::BeginTabItem("Normal Raids")) {
-				if (ImGui::BeginTable("normalRaidsTable", sizeof(sortedBosses) / sizeof(sortedBosses[0]) + 1, tableFlags)) {
-					ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 32.f);
-					for (Boss& boss : sortedBosses) {
-						ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, 32.f);
-					}
-					ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
-					ImGui::TableNextColumn();
-					ImGui::Text("Account");
-					for (Boss& boss : sortedBosses) {
-						ImGui::TableNextColumn();
-						Texture* texture = GetBossTexture(boss);
-						if (texture != nullptr) {
-							ImGui::Image((void*)texture->Resource, ImVec2(32.f, 32.f));
-						}
-						else {
-							ImGui::Text(GetBossName(boss));
-						}
-					}
-					if (players.size() > 0) {
-						for (Player player : players) {
-							ImGui::TableNextColumn();
-							ImGui::Text(player.account.c_str());
-							for (Boss& boss : sortedBosses) {
-								ImGui::TableNextColumn();
-								ImGui::Text("%i", player.kp[std::format("{}", int(boss))][std::string("total")]);
-							}
-						}
-					}
-					ImGui::EndTable();
-					if (players.size() == 0) {
-						ImGui::Text("No players found... ");
-					}
-				}
-				ImGui::EndTabItem();
-			}
-
-			if (ImGui::BeginTabItem("Raid CMs")) {
-				if (ImGui::BeginTable("CmRaidsTable", sizeof(sortedCMBosses) / sizeof(sortedCMBosses[0]) + 1, tableFlags)) {
-					ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 32.f);
-					for (Boss& boss : sortedCMBosses) {
-						ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, 32.f);
-					}
-					ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
-					ImGui::TableNextColumn();
-					ImGui::Text("Account");
-					for (Boss& boss : sortedCMBosses) {
-						ImGui::TableNextColumn();
-						Texture* texture = GetBossTexture(boss);
-						if (texture != nullptr) {
-							ImGui::Image((void*)texture->Resource, ImVec2(32.f, 32.f));
-						}
-						else {
-							ImGui::Text(GetBossName(boss));
-						}
-					}
-					if (players.size() > 0) {
-						for (Player player : players) {
-							ImGui::TableNextColumn();
-							ImGui::Text(player.account.c_str());
-							for (Boss& boss : sortedCMBosses) {
-								ImGui::TableNextColumn();
-								ImGui::Text("%i", player.kp[std::format("{}", int(boss))][std::string("total")]);
-							}
-						}
-					}
-					ImGui::EndTable();
-					if (players.size() == 0) {
-						ImGui::Text("No players found... ");
-					}
-				}
-				ImGui::EndTabItem();
-			}
-
+			DrawBossesTab("Normal Raids", "normalRaidsTable", &sortedBosses);
+			DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedCMBosses);
 			ImGui::EndTabBar();
 		}
 	}
