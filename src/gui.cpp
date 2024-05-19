@@ -33,24 +33,37 @@ enum Boss {
 	Matthias = 16115,
 	Escort = 16253,
 	KeepConstruct = 16235,
+	KeepConstructCM = -16235,
 	TwistedCastle = 16247,
 	Xera = 16246,
 	Cairn = 17194,
+	CairnCM = -17194,
 	MursaatOverseer = 17172,
+	MursaatOverseerCM = -17172,
 	Samarog = 17188,
+	SamarogCM = -17188,
 	Deimos = 17154,
+	DeimosCM = -17154,
 	SoullessHorror = 19767,
+	SoullessHorrorCM = -19767,
 	RiverOfSouls = 19828,
 	BrokenKing = 19691,
 	EaterOfSouls = 19536,
 	Eyes = 19651,
 	Dhuum = 19450,
+	DhuumCM = -19450,
 	ConjuredAmalgamate = 43974,
+	ConjuredAmalgamateCM = -43974,
 	TwinLargos = 21105,
+	TwinLargosCM = -21105,
 	Qadim = 20934,
+	QadimCM = -20934,
 	Adina = 22006,
+	AdinaCM = -22006,
 	Sabir = 21964,
-	QadimThePeerless = 22000
+	SabirCM = -21964,
+	QadimThePeerless = 22000,
+	QadimThePeerlessCM = -22000
 };
 Boss sortedBosses[26] = {
 	ValeGuardian, Gorseval, Sabetha,
@@ -60,6 +73,13 @@ Boss sortedBosses[26] = {
 	SoullessHorror, RiverOfSouls, BrokenKing, EaterOfSouls, Eyes, Dhuum,
 	ConjuredAmalgamate, TwinLargos, Qadim,
 	Adina, Sabir, QadimThePeerless
+};
+Boss sortedCMBosses[13] = {
+	KeepConstructCM,
+	CairnCM, MursaatOverseerCM, SamarogCM, DeimosCM,
+	SoullessHorrorCM, DhuumCM,
+	ConjuredAmalgamateCM, TwinLargosCM, QadimCM,
+	AdinaCM, SabirCM, QadimThePeerlessCM
 };
 
 enum RaidWing {
@@ -77,6 +97,7 @@ RaidWing sortedRaidWings[7] = {
 };
 
 const char* GetBossName(Boss boss) {
+	boss = Boss(abs(boss));
 	switch (boss) {
 	case ValeGuardian:
 		return "Vale Guardian";
@@ -136,6 +157,7 @@ const char* GetBossName(Boss boss) {
 }
 
 Texture* GetBossTexture(Boss boss) {
+	boss = Boss(abs(boss));
 	switch (boss) {
 	case ValeGuardian:
 		return APIDefs->GetTextureOrCreateFromURL("vale_guardian", "https://gw2wingman.nevermindcreations.de", "/static/Silver_Vale_Guardian_Trophy.png");
@@ -201,8 +223,9 @@ void RenderWindow() {
 
 	if (ImGui::Begin("Log Proofs", &Config.showWindow, windowFlags)) {
 		if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
-			if (ImGui::BeginTabItem("Raids")) {
-				if (ImGui::BeginTable("raidsTable", 27, tableFlags)) {
+
+			if (ImGui::BeginTabItem("Normal Raids")) {
+				if (ImGui::BeginTable("normalRaidsTable", sizeof(sortedBosses) / sizeof(sortedBosses[0]) + 1, tableFlags)) {
 					ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 32.f);
 					for (Boss& boss : sortedBosses) {
 						ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, 32.f);
@@ -237,6 +260,44 @@ void RenderWindow() {
 				}
 				ImGui::EndTabItem();
 			}
+
+			if (ImGui::BeginTabItem("Raid CMs")) {
+				if (ImGui::BeginTable("CmRaidsTable", sizeof(sortedCMBosses) / sizeof(sortedCMBosses[0]) + 1, tableFlags)) {
+					ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 32.f);
+					for (Boss& boss : sortedCMBosses) {
+						ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, 32.f);
+					}
+					ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+					ImGui::TableNextColumn();
+					ImGui::Text("Account");
+					for (Boss& boss : sortedCMBosses) {
+						ImGui::TableNextColumn();
+						Texture* texture = GetBossTexture(boss);
+						if (texture != nullptr) {
+							ImGui::Image((void*)texture->Resource, ImVec2(32.f, 32.f));
+						}
+						else {
+							ImGui::Text(GetBossName(boss));
+						}
+					}
+					if (players.size() > 0) {
+						for (Player player : players) {
+							ImGui::TableNextColumn();
+							ImGui::Text(player.account.c_str());
+							for (Boss& boss : sortedCMBosses) {
+								ImGui::TableNextColumn();
+								ImGui::Text("%i", player.kp[std::format("{}", int(boss))][std::string("total")]);
+							}
+						}
+					}
+					ImGui::EndTable();
+					if (players.size() == 0) {
+						ImGui::Text("No players found... ");
+					}
+				}
+				ImGui::EndTabItem();
+			}
+
 			ImGui::EndTabBar();
 		}
 	}
