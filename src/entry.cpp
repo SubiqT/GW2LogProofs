@@ -33,8 +33,8 @@ void AddonLoad(AddonAPI* addonApi) {
 	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW" , CombatEventHandler);
 	APIDefs->RegisterKeybindWithString(SHOW_ADDON_KEYBIND, ToggleShowWindow, "CTRL+P");
 
-	APIDefs->GetTextureOrCreateFromURL("log_icon_normal", "https://arekimirai.com", "/static/quick_access/log_normal_v3.png");
-	APIDefs->GetTextureOrCreateFromURL("log_icon_hover", "https://arekimirai.com", "/static/quick_access/log_hover_v3.png");
+	APIDefs->GetTextureOrCreateFromURL("log_icon_normal", "https://arekimirai.com", "/static/quick_access/log_normal.png");
+	APIDefs->GetTextureOrCreateFromURL("log_icon_hover", "https://arekimirai.com", "/static/quick_access/log_hover.png");
 	APIDefs->AddShortcut(ADDON_NAME, "log_icon_normal", "log_icon_hover", SHOW_ADDON_KEYBIND, "Log Proofs Table");
 
 	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
