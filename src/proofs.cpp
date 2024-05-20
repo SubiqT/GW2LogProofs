@@ -106,6 +106,11 @@ void UpdatePlayers() {
 
 void AsyncPushAccountToAddPlayerQueue(std::string account) {
     std::thread([&] {
+        for (Player player : players) { // Already added
+            if (player.account == account) {
+                return;
+            }
+        }
         Player addPlayer;
         try {
             addPlayer = GetProof(account.c_str());
@@ -134,11 +139,6 @@ void SquadEventHandler(void* eventArgs) {
         }
     }
     if (role <= 2) { // In squad
-        for (Player player : players) { // Already added
-            if (player.account == account) {
-                return;
-            }
-        }
         AsyncPushAccountToAddPlayerQueue(account);
     }
 }
