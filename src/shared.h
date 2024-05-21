@@ -5,18 +5,16 @@
 #include <map>
 #include <string>
 #include <mutex>
+#include <filesystem>
 
 #include "nexus/Nexus.h"
-#include "unofficial_extras/Definitions.h"
+
 #include "arcdps/arcdps.h"
 
 extern const char* ADDON_NAME;
-extern const char* SHOW_ADDON_KEYBIND;
 
-typedef struct AddonConfig {
-    bool showWindow;
-} AddonConfig;
-extern AddonConfig Config;
+extern std::filesystem::path AddonPath;
+extern std::filesystem::path SettingsPath;
 
 extern AddonAPI* APIDefs;
 extern NexusLinkData* NexusLink;
@@ -29,12 +27,5 @@ struct Player {
 };
 extern std::vector<Player> players;
 extern std::string selfName;
-
-
-struct SquadUpdate
-{
-    UserInfo* UserInfo;
-    uint64_t UsersCount;
-};
 
 #endif

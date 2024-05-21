@@ -4,6 +4,7 @@
 #include "imgui/imgui.h"
 #include "shared.h"
 #include "proofs.h"
+#include "settings.h"
 
 static ImGuiWindowFlags windowFlags =  (
 	ImGuiWindowFlags_NoCollapse
@@ -411,32 +412,72 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 	}
 }
 
-void RenderWindow() {
-	if (!Config.showWindow) {
+void RenderWindowLogProofs() {
+	if (!Settings::ShowWindowLogProofs) {
 		return;
 	}
-
-	if (ImGui::Begin("Log Proofs", &Config.showWindow, windowFlags)) {
+	if (ImGui::Begin("Log Proofs", &Settings::ShowWindowLogProofs, windowFlags)) {
 		if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
-			DrawBossesTab("Normal Raids", "normalRaidsTable", &sortedRaidBosses);
-			DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses);
-			DrawBossesTab("Normal Fractals", "normalFractalsTable", &sortedFractalBosses);
-			DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses);
-			DrawBossesTab("Normal Strikes", "normalStrikesTable", &sortedStrikeBosses);
-			DrawBossesTab("Strike CMs", "cmStrikesTable", &sortedStrikeCMBosses);
+			if (Settings::ShowTabRaidsNormal) {
+				DrawBossesTab("Normal Raids", "normalRaidsTable", &sortedRaidBosses);
+			}
+			if (Settings::ShowTabRaidsCM) {
+				DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses);
+			}
+			if (Settings::ShowTabFractalsNormal) {
+				DrawBossesTab("Normal Fractals", "normalFractalsTable", &sortedFractalBosses);
+			}
+			if (Settings::ShowTabFractalsCM) {
+				DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses);
+			}
+			if (Settings::ShowTabStrikesNormal) {
+				DrawBossesTab("Normal Strikes", "normalStrikesTable", &sortedStrikeBosses);
+			}
+			if (Settings::ShowTabStrikesCM) {
+				DrawBossesTab("Strike CMs", "cmStrikesTable", &sortedStrikeCMBosses);
+			}
 			ImGui::EndTabBar();
 		}
 	}
 	ImGui::End();
 }
 
-void ToggleShowWindow(const char* aIdentifier) {
-	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Keybind {} was pressed.", aIdentifier).c_str());
-	Config.showWindow = !Config.showWindow;
+void ToggleShowWindowLogProofs(const char* keybindIdentifier) {
+	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Keybind {} was pressed.", keybindIdentifier).c_str());
+	Settings::ShowWindowLogProofs = !Settings::ShowWindowLogProofs;
+	Settings::Settings[SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
+	Settings::Save(SettingsPath);
 }
 
-void RenderSettings() {
-	if (ImGui::Button(Config.showWindow ? "Hide Window" : "Show Window")) {
-		Config.showWindow = !Config.showWindow;
+void RenderWindowSettings() {
+	ImGui::TextDisabled("ShowTabRaidsNormal");
+	if (ImGui::Checkbox("Enabled##ShowTabRaidsNormal", &Settings::ShowTabRaidsNormal)) {
+		Settings::Settings[SHOW_TAB_RAIDS_NORMAL] = Settings::ShowTabRaidsNormal;
+		Settings::Save(SettingsPath);
+	}
+	ImGui::TextDisabled("ShowTabRaidsCM");
+	if (ImGui::Checkbox("Enabled##ShowTabRaidsCM", &Settings::ShowTabRaidsCM)) {
+		Settings::Settings[SHOW_TAB_RAIDS_CM] = Settings::ShowTabRaidsCM;
+		Settings::Save(SettingsPath);
+	}
+	ImGui::TextDisabled("ShowTabFractalsNormal");
+	if (ImGui::Checkbox("Enabled##ShowTabFractalsNormal", &Settings::ShowTabFractalsNormal)) {
+		Settings::Settings[SHOW_TAB_FRACTALS_NORMAL] = Settings::ShowTabRaidsNormal;
+		Settings::Save(SettingsPath);
+	}
+	ImGui::TextDisabled("ShowTabFractalsCM");
+	if (ImGui::Checkbox("Enabled##ShowTabFractalsCM", &Settings::ShowTabFractalsCM)) {
+		Settings::Settings[SHOW_TAB_FRACTALS_CM] = Settings::ShowTabRaidsCM;
+		Settings::Save(SettingsPath);
+	}
+	ImGui::TextDisabled("ShowTabStrikesNormal");
+	if (ImGui::Checkbox("Enabled##ShowTabStrikesNormal", &Settings::ShowTabStrikesNormal)) {
+		Settings::Settings[SHOW_TAB_STRIKES_NORMAL] = Settings::ShowTabRaidsNormal;
+		Settings::Save(SettingsPath);
+	}
+	ImGui::TextDisabled("ShowTabStrikesCM");
+	if (ImGui::Checkbox("Enabled##ShowTabStrikesCM", &Settings::ShowTabStrikesCM)) {
+		Settings::Settings[SHOW_TAB_STRIKES_CM] = Settings::ShowTabStrikesCM;
+		Settings::Save(SettingsPath);
 	}
 }

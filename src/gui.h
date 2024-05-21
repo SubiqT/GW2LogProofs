@@ -1,9 +1,9 @@
 #ifndef GUI_H
 #define GUI_H
 
-void RenderWindow(void);
-void RenderSettings(void);
+void RenderWindowLogProofs(void);
+void RenderWindowSettings(void);
 
-void ToggleShowWindow(const char* aIdentifier);
+void ToggleShowWindowLogProofs(const char* keybindIdentifier);
 
 #endif

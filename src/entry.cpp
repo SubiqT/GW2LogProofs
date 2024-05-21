@@ -6,6 +6,7 @@
 #include "shared.h"
 #include "proofs.h"
 #include "gui.h"
+#include "settings.h"
 
 AddonDefinition AddonDef = {};
 HMODULE hSelf = nullptr;
@@ -13,12 +14,12 @@ HMODULE hSelf = nullptr;
 void AddonOptions() {
 	ImGui::Separator();
 	ImGui::Text(ADDON_NAME);
-	RenderSettings();
+	RenderWindowSettings();
 }
 
 void AddonRender() {
 	UpdatePlayers();
-	RenderWindow();
+	RenderWindowLogProofs();
 }
 
 void AddonLoad(AddonAPI* addonApi) {
@@ -31,11 +32,16 @@ void AddonLoad(AddonAPI* addonApi) {
 
 	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", SquadEventHandler);
 	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW" , CombatEventHandler);
-	APIDefs->RegisterKeybindWithString(SHOW_ADDON_KEYBIND, ToggleShowWindow, "CTRL+P");
-
+	
 	APIDefs->GetTextureOrCreateFromURL("log_icon_normal", "https://arekimirai.com", "/static/quick_access/log_normal.png");
 	APIDefs->GetTextureOrCreateFromURL("log_icon_hover", "https://arekimirai.com", "/static/quick_access/log_hover.png");
-	APIDefs->AddShortcut(ADDON_NAME, "log_icon_normal", "log_icon_hover", SHOW_ADDON_KEYBIND, "Log Proofs Table");
+	APIDefs->RegisterKeybindWithString("ToggleShowWindowLogProofs", ToggleShowWindowLogProofs, "(null)");
+	APIDefs->AddShortcut("LogProofsShortcut", "log_icon_normal", "log_icon_hover", "ToggleShowWindowLogProofs", "Toggle Log Proofs Window");
+
+	AddonPath = APIDefs->GetAddonDirectory("log_proofs");
+	SettingsPath = APIDefs->GetAddonDirectory("log_proofs/settings.json");
+	std::filesystem::create_directory(AddonPath);
+	Settings::Load(SettingsPath);
 
 	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
 	APIDefs->RegisterRender(ERenderType_OptionsRender, AddonOptions);
@@ -44,12 +50,15 @@ void AddonLoad(AddonAPI* addonApi) {
 }
 
 void AddonUnload() {
-	APIDefs->DeregisterKeybind(SHOW_ADDON_KEYBIND);
-	APIDefs->RemoveShortcut(ADDON_NAME);
-	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", CombatEventHandler);
-	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", SquadEventHandler);
 	APIDefs->DeregisterRender(AddonOptions);
 	APIDefs->DeregisterRender(AddonRender);
+
+	APIDefs->RemoveShortcut("LogProofsShortcut");
+	APIDefs->DeregisterKeybind("ToggleShowWindowLogProofs");
+	APIDefs->UnsubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", CombatEventHandler);
+	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", SquadEventHandler);
+	
+	Settings::Save(SettingsPath);
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "<c=#ff0000>Log Proofs</c> was unloaded.");
 }
 
@@ -62,7 +71,7 @@ extern "C" __declspec(dllexport) AddonDefinition * GetAddonDef() {
 	AddonDef.Version.Build = 0;
 	AddonDef.Version.Revision = 1;
 	AddonDef.Author = "Subi";
-	AddonDef.Description = "An addon for checking log proofs.";
+	AddonDef.Description = "Displays kill proofs based on logs uploaded to wingman.";
 	AddonDef.Load = AddonLoad;
 	AddonDef.Unload = AddonUnload;
 	AddonDef.Flags = EAddonFlags_None;

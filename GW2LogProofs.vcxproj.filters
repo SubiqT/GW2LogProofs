@@ -26,6 +26,7 @@
     <ClCompile Include="src\gui.cpp" />
     <ClCompile Include="src\proofs.cpp" />
     <ClCompile Include="src\shared.cpp" />
+    <ClCompile Include="src\settings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\nexus\Nexus.h">
@@ -70,6 +71,7 @@
     <ClInclude Include="src\arcdps\arcdps.h">
       <Filter>submodules</Filter>
     </ClInclude>
+    <ClInclude Include="src\settings.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="submodules">

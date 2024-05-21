@@ -1,14 +1,14 @@
 #include <chrono>
 #include <mutex>
+#include <filesystem>
 
 #include "nexus/Nexus.h"
 #include "shared.h"
 
 const char* ADDON_NAME = "Log Proofs";
-const char* SHOW_ADDON_KEYBIND = "Toggle Show Addon";
 
-AddonConfig defaultConfig = { true };
-AddonConfig Config = defaultConfig;
+std::filesystem::path AddonPath;
+std::filesystem::path SettingsPath;
 
 AddonAPI* APIDefs = nullptr;
 NexusLinkData* NexusLink = nullptr;

@@ -18,6 +18,7 @@
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\shared.cpp" />
     <ClCompile Include="src\proofs.cpp" />
     <ClCompile Include="src\unofficial_extras\KeyBindHelper.cpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\json\single_include\nlohmann\json.hpp" />
     <ClInclude Include="src\nexus\Nexus.h" />
+    <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\shared.h" />
     <ClInclude Include="src\proofs.h" />
     <ClInclude Include="src\unofficial_extras\Definitions.h" />
