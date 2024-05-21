@@ -4,7 +4,6 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <mutex>
 #include <filesystem>
 
 #include "nexus/Nexus.h"

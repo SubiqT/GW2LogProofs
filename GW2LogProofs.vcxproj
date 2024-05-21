@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\bosses.cpp" />
     <ClCompile Include="src\entry.cpp" />
     <ClCompile Include="src\gui.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
@@ -26,6 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\arcdps\arcdps.h" />
+    <ClInclude Include="src\bosses.h" />
     <ClInclude Include="src\gui.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
     <ClInclude Include="src\imgui\imgui.h" />

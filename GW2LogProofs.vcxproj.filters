@@ -27,6 +27,7 @@
     <ClCompile Include="src\proofs.cpp" />
     <ClCompile Include="src\shared.cpp" />
     <ClCompile Include="src\settings.cpp" />
+    <ClCompile Include="src\bosses.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\nexus\Nexus.h">
@@ -72,6 +73,7 @@
       <Filter>submodules</Filter>
     </ClInclude>
     <ClInclude Include="src\settings.h" />
+    <ClInclude Include="src\bosses.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="submodules">
