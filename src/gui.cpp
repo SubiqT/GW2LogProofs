@@ -83,7 +83,27 @@ enum Boss {
 	ElementalAndDarkAiKeeperOfThePeak = 232543,
 	ElementalAndDarkAiKeeperOfThePeakCM = -232543,
 	KanaxaiScytheOfHouseAurkus = 25577,
-	KanaxaiScytheOfHouseAurkusCM = -25577
+	KanaxaiScytheOfHouseAurkusCM = -25577,
+	IcebroodConstruct = 22154,
+	TheVoiceAndTheClaw = 22343,
+	FraenirOfJormag = 22492,
+	Boneskinner = 22521,
+	WhisperOfJormag = 22711,
+	Freezie = 21333,
+	CaptainMaiTrin = 24033,
+	CaptainMaiTrinCM = -24033,
+	Ankka = 23957,
+	AnkkaCM = -23957,
+	MinisterLi = 24485,
+	MinisterLiCM = -24485,
+	VoidAmalgamate = 24375,
+	VoidAmalgamateCM = -24375,
+	OldLionsCourt = 25413,
+	OldLionsCourtCM = -25413,
+	Dagda = 25705,
+	DagdaCM = -25705,
+	Cerus = 25989,
+	CerusCM = -25989
 };
 std::vector<Boss> sortedRaidBosses {
 	ValeGuardian, Gorseval, Sabetha,
@@ -112,6 +132,18 @@ std::vector<Boss> sortedFractalCMBosses {
 	SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM,
 	ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM,
 	KanaxaiScytheOfHouseAurkusCM
+};
+std::vector<Boss> sortedStrikeBosses {
+	IcebroodConstruct, TheVoiceAndTheClaw, FraenirOfJormag, Boneskinner, WhisperOfJormag,
+	Freezie,
+	CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate,
+	OldLionsCourt,
+	Dagda, Cerus
+};
+std::vector<Boss> sortedStrikeCMBosses {
+	CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM,
+	OldLionsCourtCM,
+	DagdaCM, CerusCM
 };
 
 enum RaidWing {
@@ -203,6 +235,32 @@ const char* GetBossName(Boss boss) {
 		return "Full Ai";
 	case KanaxaiScytheOfHouseAurkus:
 		return "Kanaxai";
+	case IcebroodConstruct:
+		return "Icebrood Construct";
+	case TheVoiceAndTheClaw:
+		return "The Voice and The Claw";
+	case FraenirOfJormag:
+		return "Fraenir of Jormag";
+	case Boneskinner:
+		return "BoneSkinner";
+	case WhisperOfJormag:
+		return "Whisper of Jormag";
+	case Freezie:
+		return "Freezie";
+	case CaptainMaiTrin:
+		return "Captain Mai Trin";
+	case Ankka:
+		return "Ankka";
+	case MinisterLi:
+		return "MinisterLi";
+	case VoidAmalgamate:
+		return "Void Amalgamate";
+	case OldLionsCourt:
+		return "Old Lion's Court";
+	case Dagda:
+		return "Dagda";
+	case Cerus:
+		return "Cerus";	
 	default:
 		return "Unknown";
 	}
@@ -283,6 +341,32 @@ Texture* GetBossTexture(Boss boss) {
 		return APIDefs->GetTextureOrCreateFromURL("full_ai", "https://gw2wingman.nevermindcreations.de", "/static/AiFullEncounter.png");
 	case KanaxaiScytheOfHouseAurkus:
 		return APIDefs->GetTextureOrCreateFromURL("kanaxai", "https://gw2wingman.nevermindcreations.de", "/static/Kanaxai.png");
+	case IcebroodConstruct:
+		return APIDefs->GetTextureOrCreateFromURL("icebrood_construct", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Icebrood_Construct.png");
+	case TheVoiceAndTheClaw:
+		return APIDefs->GetTextureOrCreateFromURL("the_voice_and_the_claw", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Kodan_Icehammer.png");
+	case FraenirOfJormag:
+		return APIDefs->GetTextureOrCreateFromURL("fraenir_of_jormag", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Shaman_Of_Jormag.png");
+	case Boneskinner:
+		return APIDefs->GetTextureOrCreateFromURL("boneskinner", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Boneskinner.png");
+	case WhisperOfJormag:
+		return APIDefs->GetTextureOrCreateFromURL("whisper_of_jormag", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Whisper_of_Jormag.png");
+	case Freezie:
+		return APIDefs->GetTextureOrCreateFromURL("freezie", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Freezie.png");
+	case CaptainMaiTrin:
+		return APIDefs->GetTextureOrCreateFromURL("captain_mai_trin", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Mai_Trin.png");
+	case Ankka:
+		return APIDefs->GetTextureOrCreateFromURL("ankka", "https://gw2wingman.nevermindcreations.de", "/static/Ankka.png");
+	case MinisterLi:
+		return APIDefs->GetTextureOrCreateFromURL("minister_li", "https://gw2wingman.nevermindcreations.de", "/static/Li.png");
+	case VoidAmalgamate:
+		return APIDefs->GetTextureOrCreateFromURL("void_amalgamate", "https://gw2wingman.nevermindcreations.de", "/static/VA.png");
+	case OldLionsCourt:
+		return APIDefs->GetTextureOrCreateFromURL("old_lions_court", "https://gw2wingman.nevermindcreations.de", "/static/OLC.png");
+	case Dagda:
+		return APIDefs->GetTextureOrCreateFromURL("dagda", "https://gw2wingman.nevermindcreations.de", "/static/Dagda.png");
+	case Cerus:
+		return APIDefs->GetTextureOrCreateFromURL("cerus", "https://gw2wingman.nevermindcreations.de", "/static/Cerus.png");
 	default:
 		return nullptr;
 	}
@@ -338,6 +422,8 @@ void RenderWindow() {
 			DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses);
 			DrawBossesTab("Normal Fractals", "normalFractalsTable", &sortedFractalBosses);
 			DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses);
+			DrawBossesTab("Normal Strikes", "normalStrikesTable", &sortedStrikeBosses);
+			DrawBossesTab("Strike CMs", "cmStrikesTable", &sortedStrikeCMBosses);
 			ImGui::EndTabBar();
 		}
 	}
