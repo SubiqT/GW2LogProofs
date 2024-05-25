@@ -46,6 +46,11 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 				else {
 					ImGui::Text(GetBossName(boss));
 				}
+				if (ImGui::IsItemHovered()) {
+					ImGui::BeginTooltip();
+					ImGui::Text(GetBossName(boss));
+					ImGui::EndTooltip();
+				}
 			}
 			if (players.size() > 0) {
 				for (Player player : players) {
@@ -167,13 +172,6 @@ void DrawColumnOptions() {
 }
 
 void RenderWindowSettings() {
-	/*
-	TODO:
-		- Freeze header column and row
-		- Add settings to quick access r-click
-		- Increment version number with github actions
-		- Setup auto updater
-	*/
 	if (ImGui::Checkbox("Show Window", &Settings::ShowWindowLogProofs)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
 		Settings::Save(SettingsPath);

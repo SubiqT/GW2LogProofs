@@ -134,7 +134,7 @@ const char* GetBossName(Boss boss) {
 	case Ankka:
 		return "Ankka";
 	case MinisterLi:
-		return "MinisterLi";
+		return "Minister Li";
 	case VoidAmalgamate:
 		return "Void Amalgamate";
 	case OldLionsCourt:
