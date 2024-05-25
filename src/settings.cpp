@@ -127,5 +127,5 @@ namespace Settings
 	bool ShowTabStrikesCM = true;
 
 	float ColumnSizeAccount = 200.0f;
-	float ColumnSizeBosses = 48.0f;
+	float ColumnSizeBosses = 32.0f;
 }
