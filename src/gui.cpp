@@ -22,13 +22,14 @@ static ImGuiTableFlags tableFlags = (
 	| ImGuiTableFlags_Hideable
 	| ImGuiTableFlags_Sortable
 	| ImGuiTableFlags_RowBg
-	| ImGuiTableFlags_Resizable
+	| ImGuiTableFlags_ScrollX
+	| ImGuiTableFlags_ScrollY
 	);
 
 void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray) {
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 1, tableFlags)) {
-			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 32.f);
+			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_NoHide, 32.f);
 			for (Boss& boss : *bossesArray) {
 				ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, 32.f);
 			}
@@ -55,10 +56,12 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 					}
 				}
 			}
-			ImGui::EndTable();
 			if (players.size() == 0) {
+				ImGui::TableNextColumn();
 				ImGui::Text("No players found... ");
 			}
+			ImGui::EndTable();
+			
 		}
 		ImGui::EndTabItem();
 	}
@@ -68,22 +71,23 @@ void RenderWindowLogProofs() {
 	if (!Settings::ShowWindowLogProofs) {
 		return;
 	}
+	ImGui::SetNextWindowSizeConstraints(ImVec2(Settings::MinWindowWidth, Settings::MinWindowHeight), ImVec2(Settings::MaxWindowWidth,Settings::MaxWindowHeight));
 	if (ImGui::Begin("Log Proofs", &Settings::ShowWindowLogProofs, windowFlags)) {
 		if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
 			if (Settings::ShowTabRaidsNormal) {
-				DrawBossesTab("Normal Raids", "normalRaidsTable", &sortedRaidBosses);
+				DrawBossesTab("Raids", "normalRaidsTable", &sortedRaidBosses);
 			}
 			if (Settings::ShowTabRaidsCM) {
 				DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses);
 			}
 			if (Settings::ShowTabFractalsNormal) {
-				DrawBossesTab("Normal Fractals", "normalFractalsTable", &sortedFractalBosses);
+				DrawBossesTab("Fractals", "normalFractalsTable", &sortedFractalBosses);
 			}
 			if (Settings::ShowTabFractalsCM) {
 				DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses);
 			}
 			if (Settings::ShowTabStrikesNormal) {
-				DrawBossesTab("Normal Strikes", "normalStrikesTable", &sortedStrikeBosses);
+				DrawBossesTab("Strikes", "normalStrikesTable", &sortedStrikeBosses);
 			}
 			if (Settings::ShowTabStrikesCM) {
 				DrawBossesTab("Strike CMs", "cmStrikesTable", &sortedStrikeCMBosses);
@@ -97,39 +101,63 @@ void RenderWindowLogProofs() {
 void ToggleShowWindowLogProofs(const char* keybindIdentifier) {
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Keybind {} was pressed.", keybindIdentifier).c_str());
 	Settings::ShowWindowLogProofs = !Settings::ShowWindowLogProofs;
-	Settings::Settings[SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
+	Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
 	Settings::Save(SettingsPath);
 }
 
+void DrawWindowSizingOptions() {
+	ImGui::Text("Window Sizing");
+	if (ImGui::SliderFloat("Min Width", &Settings::MinWindowWidth, 100.0f, 1500.0f, "%.3f px")) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::SliderFloat("Max Width", &Settings::MaxWindowWidth, 100.0f, 1500.0f, "%.3f px")) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH] = Settings::MaxWindowWidth;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::SliderFloat("Min Height", &Settings::MinWindowHeight, 100.0f, 1500.0f, "%.3f px")) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT] = Settings::MinWindowHeight;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::SliderFloat("Max Height", &Settings::MaxWindowHeight, 100.0f, 1500.0f, "%.3f px")) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT] = Settings::MaxWindowHeight;
+		Settings::Save(SettingsPath);
+	}
+}
+
+void DrawTabsOptions() {
+	ImGui::Text("Tabs");
+	if (ImGui::Checkbox("Raids", &Settings::ShowTabRaidsNormal)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_NORMAL] = Settings::ShowTabRaidsNormal;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::Checkbox("Raid CMs", &Settings::ShowTabRaidsCM)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_CM] = Settings::ShowTabRaidsCM;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::Checkbox("Fractals", &Settings::ShowTabFractalsNormal)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_NORMAL] = Settings::ShowTabRaidsNormal;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::Checkbox("Fractal CMs", &Settings::ShowTabFractalsCM)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_CM] = Settings::ShowTabRaidsCM;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::Checkbox("Strikes", &Settings::ShowTabStrikesNormal)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_NORMAL] = Settings::ShowTabRaidsNormal;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::Checkbox("Strike CMs", &Settings::ShowTabStrikesCM)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_CM] = Settings::ShowTabStrikesCM;
+		Settings::Save(SettingsPath);
+	}
+}
+
 void RenderWindowSettings() {
-	ImGui::TextDisabled("ShowTabRaidsNormal");
-	if (ImGui::Checkbox("Enabled##ShowTabRaidsNormal", &Settings::ShowTabRaidsNormal)) {
-		Settings::Settings[SHOW_TAB_RAIDS_NORMAL] = Settings::ShowTabRaidsNormal;
+	if (ImGui::Checkbox("Show Window", &Settings::ShowWindowLogProofs)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
 		Settings::Save(SettingsPath);
 	}
-	ImGui::TextDisabled("ShowTabRaidsCM");
-	if (ImGui::Checkbox("Enabled##ShowTabRaidsCM", &Settings::ShowTabRaidsCM)) {
-		Settings::Settings[SHOW_TAB_RAIDS_CM] = Settings::ShowTabRaidsCM;
-		Settings::Save(SettingsPath);
-	}
-	ImGui::TextDisabled("ShowTabFractalsNormal");
-	if (ImGui::Checkbox("Enabled##ShowTabFractalsNormal", &Settings::ShowTabFractalsNormal)) {
-		Settings::Settings[SHOW_TAB_FRACTALS_NORMAL] = Settings::ShowTabRaidsNormal;
-		Settings::Save(SettingsPath);
-	}
-	ImGui::TextDisabled("ShowTabFractalsCM");
-	if (ImGui::Checkbox("Enabled##ShowTabFractalsCM", &Settings::ShowTabFractalsCM)) {
-		Settings::Settings[SHOW_TAB_FRACTALS_CM] = Settings::ShowTabRaidsCM;
-		Settings::Save(SettingsPath);
-	}
-	ImGui::TextDisabled("ShowTabStrikesNormal");
-	if (ImGui::Checkbox("Enabled##ShowTabStrikesNormal", &Settings::ShowTabStrikesNormal)) {
-		Settings::Settings[SHOW_TAB_STRIKES_NORMAL] = Settings::ShowTabRaidsNormal;
-		Settings::Save(SettingsPath);
-	}
-	ImGui::TextDisabled("ShowTabStrikesCM");
-	if (ImGui::Checkbox("Enabled##ShowTabStrikesCM", &Settings::ShowTabStrikesCM)) {
-		Settings::Settings[SHOW_TAB_STRIKES_CM] = Settings::ShowTabStrikesCM;
-		Settings::Save(SettingsPath);
-	}
+	DrawWindowSizingOptions();
+	DrawTabsOptions();
 }

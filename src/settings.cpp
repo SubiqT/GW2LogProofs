@@ -6,8 +6,13 @@
 #include <fstream>
 #include <format>
 
-const char* SHOW_WINDOW_LOG_PROOFS = "ShowWindowLogProofs";
 
+const char* WINDOW_LOG_PROOFS_KEY = "WindowLogProofs";
+const char* SHOW_WINDOW_LOG_PROOFS = "ShowWindow";
+const char* MIN_WINDOW_WIDTH = "MinWindowWidth";
+const char* MIN_WINDOW_HEIGHT = "MinWindowHeight";
+const char* MAX_WINDOW_WIDTH = "MaxWindowWidth";
+const char* MAX_WINDOW_HEIGHT = "MaxWindowHeight";
 const char* SHOW_TAB_RAIDS_NORMAL = "ShowTabRaidsNormal";
 const char* SHOW_TAB_RAIDS_CM = "ShowTabRaidsCM";
 const char* SHOW_TAB_FRACTALS_NORMAL = "ShowTabFractalsNormal";
@@ -40,29 +45,44 @@ namespace Settings
 		}
 		Settings::Mutex.unlock();
 
-		if (!Settings[SHOW_WINDOW_LOG_PROOFS].is_null()) {
-			Settings[SHOW_WINDOW_LOG_PROOFS].get_to<bool>(ShowWindowLogProofs);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS].get_to<bool>(ShowWindowLogProofs);
 		}
 
-		if (!Settings[SHOW_TAB_RAIDS_NORMAL].is_null()) {
-			Settings[SHOW_TAB_RAIDS_NORMAL].get_to<bool>(ShowTabRaidsNormal);
+		/* Sizing */
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH].get_to<float>(MinWindowWidth);
 		}
-		if (!Settings[SHOW_TAB_RAIDS_CM].is_null()) {
-			Settings[SHOW_TAB_RAIDS_CM].get_to<bool>(ShowTabRaidsCM);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT].get_to<float>(MinWindowHeight);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH].get_to<float>(MaxWindowWidth);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT].get_to<float>(MaxWindowHeight);
 		}
 
-		if (!Settings[SHOW_TAB_FRACTALS_NORMAL].is_null()) {
-			Settings[SHOW_TAB_FRACTALS_NORMAL].get_to<bool>(ShowTabFractalsNormal);
+		/* Tabs */
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_NORMAL].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_NORMAL].get_to<bool>(ShowTabRaidsNormal);
 		}
-		if (!Settings[SHOW_TAB_FRACTALS_CM].is_null()) {
-			Settings[SHOW_TAB_FRACTALS_CM].get_to<bool>(ShowTabFractalsCM);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_CM].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_CM].get_to<bool>(ShowTabRaidsCM);
 		}
 
-		if (!Settings[SHOW_TAB_STRIKES_NORMAL].is_null()) {
-			Settings[SHOW_TAB_STRIKES_NORMAL].get_to<bool>(ShowTabStrikesNormal);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_NORMAL].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_NORMAL].get_to<bool>(ShowTabFractalsNormal);
 		}
-		if (!Settings[SHOW_TAB_STRIKES_CM].is_null()) {
-			Settings[SHOW_TAB_STRIKES_CM].get_to<bool>(ShowTabStrikesCM);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_CM].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_CM].get_to<bool>(ShowTabFractalsCM);
+		}
+
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_NORMAL].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_NORMAL].get_to<bool>(ShowTabStrikesNormal);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_CM].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_CM].get_to<bool>(ShowTabStrikesCM);
 		}
 
 	}
@@ -78,7 +98,10 @@ namespace Settings
 	}
 
 	bool ShowWindowLogProofs = false;
-
+	float MinWindowWidth = 400.0f;
+	float MinWindowHeight = 100.0f;
+	float MaxWindowWidth = 1200.0f;
+	float MaxWindowHeight = 800.0f;
 	bool ShowTabRaidsNormal = true;
 	bool ShowTabRaidsCM = true;
 	bool ShowTabFractalsNormal = true;
