@@ -9,16 +9,23 @@
 
 const char* WINDOW_LOG_PROOFS_KEY = "WindowLogProofs";
 const char* SHOW_WINDOW_LOG_PROOFS = "ShowWindow";
+
 const char* MIN_WINDOW_WIDTH = "MinWindowWidth";
 const char* MIN_WINDOW_HEIGHT = "MinWindowHeight";
 const char* MAX_WINDOW_WIDTH = "MaxWindowWidth";
 const char* MAX_WINDOW_HEIGHT = "MaxWindowHeight";
+
 const char* SHOW_TAB_RAIDS_NORMAL = "ShowTabRaidsNormal";
 const char* SHOW_TAB_RAIDS_CM = "ShowTabRaidsCM";
 const char* SHOW_TAB_FRACTALS_NORMAL = "ShowTabFractalsNormal";
 const char* SHOW_TAB_FRACTALS_CM = "ShowTabFractalsCM";
 const char* SHOW_TAB_STRIKES_NORMAL = "ShowTabStrikesNormal";
 const char* SHOW_TAB_STRIKES_CM = "ShowTabStrikesCM";
+
+const char* COLUMNS_KEY = "Columns";
+const char* COLUMN_PROPERTIES_SIZE = "Size";
+const char* COLUMN_NAME_ACCOUNT = "Account";
+const char* COLUMN_NAME_BOSSES = "Bosses";
 
 
 namespace Settings
@@ -49,7 +56,7 @@ namespace Settings
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS].get_to<bool>(ShowWindowLogProofs);
 		}
 
-		/* Sizing */
+		/* Window Sizing */
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH].get_to<float>(MinWindowWidth);
 		}
@@ -85,6 +92,14 @@ namespace Settings
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_CM].get_to<bool>(ShowTabStrikesCM);
 		}
 
+		/* Columns */
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_ACCOUNT][COLUMN_PROPERTIES_SIZE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_ACCOUNT][COLUMN_PROPERTIES_SIZE].get_to<float>(ColumnSizeAccount);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_BOSSES][COLUMN_PROPERTIES_SIZE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_BOSSES][COLUMN_PROPERTIES_SIZE].get_to<float>(ColumnSizeBosses);
+		}
+
 	}
 	void Save(std::filesystem::path filePath)
 	{
@@ -98,14 +113,19 @@ namespace Settings
 	}
 
 	bool ShowWindowLogProofs = false;
-	float MinWindowWidth = 400.0f;
+
+	float MinWindowWidth = 300.0f;
 	float MinWindowHeight = 100.0f;
-	float MaxWindowWidth = 1200.0f;
+	float MaxWindowWidth = 800.0f;
 	float MaxWindowHeight = 800.0f;
+
 	bool ShowTabRaidsNormal = true;
 	bool ShowTabRaidsCM = true;
 	bool ShowTabFractalsNormal = true;
 	bool ShowTabFractalsCM = true;
 	bool ShowTabStrikesNormal = true;
 	bool ShowTabStrikesCM = true;
+
+	float ColumnSizeAccount = 200.0f;
+	float ColumnSizeBosses = 48.0f;
 }

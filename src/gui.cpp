@@ -29,9 +29,9 @@ static ImGuiTableFlags tableFlags = (
 void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray) {
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 1, tableFlags)) {
-			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_NoHide, 32.f);
+			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
 			for (Boss& boss : *bossesArray) {
-				ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, 32.f);
+				ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
 			}
 			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 			ImGui::TableNextColumn();
@@ -40,7 +40,7 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 				ImGui::TableNextColumn();
 				Texture* texture = GetBossTexture(boss);
 				if (texture != nullptr) {
-					ImGui::Image((void*)texture->Resource, ImVec2(32.f, 32.f));
+					ImGui::Image((void*)texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
 				}
 				else {
 					ImGui::Text(GetBossName(boss));
@@ -153,6 +153,18 @@ void DrawTabsOptions() {
 	}
 }
 
+void DrawColumnOptions() {
+	ImGui::Text("Columns");
+	if (ImGui::SliderFloat("Account Size", &Settings::ColumnSizeAccount, 40.0f, 400.0f, "%.3f px")) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_ACCOUNT][COLUMN_PROPERTIES_SIZE] = Settings::ColumnSizeAccount;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::SliderFloat("Bosses Size", &Settings::ColumnSizeBosses, 8.0f, 128.0f, "%.3f px")) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_BOSSES][COLUMN_PROPERTIES_SIZE] = Settings::ColumnSizeBosses;
+		Settings::Save(SettingsPath);
+	}
+}
+
 void RenderWindowSettings() {
 	if (ImGui::Checkbox("Show Window", &Settings::ShowWindowLogProofs)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
@@ -160,4 +172,5 @@ void RenderWindowSettings() {
 	}
 	DrawWindowSizingOptions();
 	DrawTabsOptions();
+	DrawColumnOptions();
 }
