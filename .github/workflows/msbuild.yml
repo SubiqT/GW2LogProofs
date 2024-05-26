@@ -47,12 +47,12 @@ jobs:
 
     - name: Debug Print Artifact Directory
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: ls x64\Release
+      run: ls && ls x64 && ls x64/Release
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: nexus_log_proofs
         path: |
-          x64\Release\nexus_log_proofs.dll
-          x64\Release\nexus_log_proofs.pdb
+          x64/Release/nexus_log_proofs.dll
+          x64/Release/nexus_log_proofs.pdb
