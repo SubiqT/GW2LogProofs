@@ -10,3 +10,6 @@
 [submodule "src/json"]
 	path = src/json
 	url = https://github.com/nlohmann/json
+[submodule "src/arcdps_extension"]
+	path = src/arcdps_extension
+	url = https://github.com/knoxfighter/arcdps-extension
