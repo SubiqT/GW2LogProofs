@@ -75,9 +75,6 @@
     <ClInclude Include="src\imgui\imstb_truetype.h">
       <Filter>submodules\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\json\single_include\nlohmann\json.hpp">
-      <Filter>submodules\nlohmann</Filter>
-    </ClInclude>
     <ClInclude Include="src\arcdps\arcdps.h">
       <Filter>submodules</Filter>
     </ClInclude>
@@ -101,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="src\version.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nlohmann\json.hpp">
+      <Filter>submodules\nlohmann</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
