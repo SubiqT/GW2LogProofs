@@ -22,12 +22,24 @@
     <ClCompile Include="src\imgui\imgui_widgets.cpp">
       <Filter>submodules\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\entry.cpp" />
-    <ClCompile Include="src\gui.cpp" />
-    <ClCompile Include="src\proofs.cpp" />
-    <ClCompile Include="src\shared.cpp" />
-    <ClCompile Include="src\settings.cpp" />
-    <ClCompile Include="src\bosses.cpp" />
+    <ClCompile Include="src\bosses.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entry.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gui.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\proofs.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\settings.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shared.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\nexus\Nexus.h">
@@ -63,17 +75,30 @@
     <ClInclude Include="src\imgui\imstb_truetype.h">
       <Filter>submodules\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\gui.h" />
-    <ClInclude Include="src\proofs.h" />
-    <ClInclude Include="src\shared.h" />
     <ClInclude Include="src\json\single_include\nlohmann\json.hpp">
       <Filter>submodules\nlohmann</Filter>
     </ClInclude>
     <ClInclude Include="src\arcdps\arcdps.h">
       <Filter>submodules</Filter>
     </ClInclude>
-    <ClInclude Include="src\settings.h" />
-    <ClInclude Include="src\bosses.h" />
+    <ClInclude Include="src\bosses.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\proofs.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\settings.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="submodules">
@@ -88,5 +113,105 @@
     <Filter Include="submodules\nlohmann">
       <UniqueIdentifier>{50de2c13-cd6a-4935-a57a-6a9d88ca4f48}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{e1e02f10-4b68-482e-93dd-f65a77320d3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{67fa7fbf-9ce4-4876-a8d5-87646b644545}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="src\resource.rc">
+      <Filter>src</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\Adina.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Bandit_Trio.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Broken_King.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Cairn.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Conjured_Amalgamate.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Deimos.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Dhuum.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Eater_Of_Souls.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Escort.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Eyes_Of_Fate.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Gorseval.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Keep_Construct.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Kenutt.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Log_Hover.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Log_Normal.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Matthias.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Mursaat_Overseer.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Nikare.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Qadim.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Qadim_The_Peerless.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\River_Of_Souls.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Sabetha.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Sabir.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Samarog.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Slothasor.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Soulless_Horror.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Twisted_Castle.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Vale_Guardian.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Xera.png">
+      <Filter>resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>

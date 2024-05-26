@@ -7,9 +7,9 @@
 #include "proofs.h"
 #include "gui.h"
 #include "settings.h"
+#include "resource.h"
 
 AddonDefinition AddonDef = {};
-HMODULE hSelf = nullptr;
 
 void AddonOptions() {
 	ImGui::Separator();
@@ -33,10 +33,10 @@ void AddonLoad(AddonAPI* addonApi) {
 	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", SquadEventHandler);
 	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW" , CombatEventHandler);
 	
-	APIDefs->GetTextureOrCreateFromURL("log_icon_normal", "https://arekimirai.com", "/static/quick_access/log_normal.png");
-	APIDefs->GetTextureOrCreateFromURL("log_icon_hover", "https://arekimirai.com", "/static/quick_access/log_hover.png");
-	APIDefs->RegisterKeybindWithString("ToggleShowWindowLogProofs", ToggleShowWindowLogProofs, "(null)");
-	APIDefs->AddShortcut("LogProofsShortcut", "log_icon_normal", "log_icon_hover", "ToggleShowWindowLogProofs", "Toggle Log Proofs Window");
+	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_NORMAL", IDB_LOG_NORMAL, hSelf);
+	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_HOVER", IDB_LOG_HOVER, hSelf);
+	APIDefs->RegisterKeybindWithString("KEYBIND_TOGGLE_SHOW_WINDOW_LOG_PROOFS", ToggleShowWindowLogProofs, "(null)");
+	APIDefs->AddShortcut("SHORTCUT_LOG_PROOFS", "TEX_LOG_NORMAL", "TEX_LOG_HOVER", "KEYBIND_TOGGLE_SHOW_WINDOW_LOG_PROOFS", "Toggle Log Proofs Window");
 
 	AddonPath = APIDefs->GetAddonDirectory("log_proofs");
 	SettingsPath = APIDefs->GetAddonDirectory("log_proofs/settings.json");
@@ -53,8 +53,8 @@ void AddonUnload() {
 	APIDefs->DeregisterRender(AddonOptions);
 	APIDefs->DeregisterRender(AddonRender);
 
-	APIDefs->RemoveShortcut("LogProofsShortcut");
-	APIDefs->DeregisterKeybind("ToggleShowWindowLogProofs");
+	APIDefs->RemoveShortcut("SHORTCUT_LOG_PROOFS");
+	APIDefs->DeregisterKeybind("KEYBIND_TOGGLE_SHOW_WINDOW_LOG_PROOFS");
 	APIDefs->UnsubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", CombatEventHandler);
 	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", SquadEventHandler);
 	

@@ -17,6 +17,7 @@ extern std::filesystem::path SettingsPath;
 
 extern AddonAPI* APIDefs;
 extern NexusLinkData* NexusLink;
+extern HMODULE hSelf;
 
 struct Player {
     std::string account;

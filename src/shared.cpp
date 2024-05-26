@@ -12,6 +12,7 @@ std::filesystem::path SettingsPath;
 
 AddonAPI* APIDefs = nullptr;
 NexusLinkData* NexusLink = nullptr;
+HMODULE hSelf = nullptr;
 
 std::vector<Player> players;
 std::string selfName;
