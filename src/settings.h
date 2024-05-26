@@ -20,6 +20,7 @@ extern const char* SHOW_TAB_FRACTALS_NORMAL;
 extern const char* SHOW_TAB_FRACTALS_CM;
 extern const char* SHOW_TAB_STRIKES_NORMAL;
 extern const char* SHOW_TAB_STRIKES_CM;
+extern const char* SHOW_TAB_STRIKES_LM;
 
 extern const char* COLUMNS_KEY;
 extern const char* COLUMN_PROPERTIES_SIZE;
@@ -48,6 +49,7 @@ namespace Settings
 	extern bool ShowTabFractalsCM;
 	extern bool ShowTabStrikesNormal;
 	extern bool ShowTabStrikesCM;
+	extern bool ShowTabStrikesLM;
 
 	extern float ColumnSizeAccount;
 	extern float ColumnSizeBosses;

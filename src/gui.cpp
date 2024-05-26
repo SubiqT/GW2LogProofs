@@ -25,7 +25,7 @@ static ImGuiTableFlags tableFlags = (
 	| ImGuiTableFlags_ScrollY
 	);
 
-void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray) {
+void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray , bool isLegendary) {
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 1, tableFlags)) {
 			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
@@ -57,7 +57,9 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 					ImGui::Text(player.account.c_str());
 					for (Boss& boss : *bossesArray) {
 						ImGui::TableNextColumn();
-						ImGui::Text("%i", player.kp[std::format("{}", int(boss))][std::string("total")]);
+						isLegendary
+							? ImGui::Text("%i", player.kp[std::format("-{}", int(boss))][std::string("total")])
+							: ImGui::Text("%i", player.kp[std::format("{}", int(boss))][std::string("total")]);
 					}
 				}
 			}
@@ -80,22 +82,25 @@ void RenderWindowLogProofs() {
 	if (ImGui::Begin("Log Proofs", &Settings::ShowWindowLogProofs, windowFlags)) {
 		if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
 			if (Settings::ShowTabRaidsNormal) {
-				DrawBossesTab("Raids", "normalRaidsTable", &sortedRaidBosses);
+				DrawBossesTab("Raids", "normalRaidsTable", &sortedRaidBosses, false);
 			}
 			if (Settings::ShowTabRaidsCM) {
-				DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses);
+				DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses, false);
 			}
 			if (Settings::ShowTabFractalsNormal) {
-				DrawBossesTab("Fractals", "normalFractalsTable", &sortedFractalBosses);
+				DrawBossesTab("Fractals", "normalFractalsTable", &sortedFractalBosses, false);
 			}
 			if (Settings::ShowTabFractalsCM) {
-				DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses);
+				DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses, false);
 			}
 			if (Settings::ShowTabStrikesNormal) {
-				DrawBossesTab("Strikes", "normalStrikesTable", &sortedStrikeBosses);
+				DrawBossesTab("Strikes", "normalStrikesTable", &sortedStrikeBosses, false);
 			}
 			if (Settings::ShowTabStrikesCM) {
-				DrawBossesTab("Strike CMs", "cmStrikesTable", &sortedStrikeCMBosses);
+				DrawBossesTab("Strike CMs", "cmStrikesTable", &sortedStrikeCMBosses, false);
+			}
+			if (Settings::ShowTabStrikesLM) {
+				DrawBossesTab("Strike LMs", "lmStrikesTable", &sortedStrikeLMBosses, true);
 			}
 			ImGui::EndTabBar();
 		}
@@ -154,6 +159,10 @@ void DrawTabsOptions() {
 	}
 	if (ImGui::Checkbox("Strike CMs", &Settings::ShowTabStrikesCM)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_CM] = Settings::ShowTabStrikesCM;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::Checkbox("Strike LMs", &Settings::ShowTabStrikesLM)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_LM] = Settings::ShowTabStrikesLM;
 		Settings::Save(SettingsPath);
 	}
 }

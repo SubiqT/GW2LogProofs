@@ -21,6 +21,7 @@ const char* SHOW_TAB_FRACTALS_NORMAL = "ShowTabFractalsNormal";
 const char* SHOW_TAB_FRACTALS_CM = "ShowTabFractalsCM";
 const char* SHOW_TAB_STRIKES_NORMAL = "ShowTabStrikesNormal";
 const char* SHOW_TAB_STRIKES_CM = "ShowTabStrikesCM";
+const char* SHOW_TAB_STRIKES_LM = "ShowTabStrikesLM";
 
 const char* COLUMNS_KEY = "Columns";
 const char* COLUMN_PROPERTIES_SIZE = "Size";
@@ -91,6 +92,9 @@ namespace Settings
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_CM].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_CM].get_to<bool>(ShowTabStrikesCM);
 		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_LM].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_LM].get_to<bool>(ShowTabStrikesLM);
+		}
 
 		/* Columns */
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_ACCOUNT][COLUMN_PROPERTIES_SIZE].is_null()) {
@@ -125,6 +129,7 @@ namespace Settings
 	bool ShowTabFractalsCM = true;
 	bool ShowTabStrikesNormal = true;
 	bool ShowTabStrikesCM = true;
+	bool ShowTabStrikesLM = true;
 
 	float ColumnSizeAccount = 200.0f;
 	float ColumnSizeBosses = 32.0f;

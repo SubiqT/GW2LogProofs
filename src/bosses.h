@@ -93,6 +93,7 @@ extern std::vector<Boss> sortedFractalBosses;
 extern std::vector<Boss> sortedFractalCMBosses;
 extern std::vector<Boss> sortedStrikeBosses;
 extern std::vector<Boss> sortedStrikeCMBosses;
+extern std::vector<Boss> sortedStrikeLMBosses;
 
 const char* GetBossName(Boss boss);
 Texture* GetBossTexture(Boss boss);

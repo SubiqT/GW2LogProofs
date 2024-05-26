@@ -4,43 +4,46 @@
 
 std::vector<Boss> sortedRaidBosses {
 	ValeGuardian, Gorseval, Sabetha,
-		Slothasor, BanditTrio, Matthias,
-		Escort, KeepConstruct, TwistedCastle, Xera,
-		Cairn, MursaatOverseer, Samarog, Deimos,
-		SoullessHorror, RiverOfSouls, BrokenKing, EaterOfSouls, Eyes, Dhuum,
-		ConjuredAmalgamate, TwinLargos, Qadim,
-		Adina, Sabir, QadimThePeerless
+	Slothasor, BanditTrio, Matthias,
+	Escort, KeepConstruct, TwistedCastle, Xera,
+	Cairn, MursaatOverseer, Samarog, Deimos,
+	SoullessHorror, RiverOfSouls, BrokenKing, EaterOfSouls, Eyes, Dhuum,
+	ConjuredAmalgamate, TwinLargos, Qadim,
+	Adina, Sabir, QadimThePeerless
 };
 std::vector<Boss> sortedRaidCmBosses {
 	KeepConstructCM,
-		CairnCM, MursaatOverseerCM, SamarogCM, DeimosCM,
-		SoullessHorrorCM, DhuumCM,
-		ConjuredAmalgamateCM, TwinLargosCM, QadimCM,
-		AdinaCM, SabirCM, QadimThePeerlessCM
+	CairnCM, MursaatOverseerCM, SamarogCM, DeimosCM,
+	SoullessHorrorCM, DhuumCM,
+	ConjuredAmalgamateCM, TwinLargosCM, QadimCM,
+	AdinaCM, SabirCM, QadimThePeerlessCM
 };
 std::vector<Boss> sortedFractalBosses {
 	MAMA, SiaxTheCorrupted, EnsolyssOfTheEndlessTorment,
-		SkorvaldTheShattered, Artsariiv, Arkk,
-		ElementalAiKeeperOfThePeak,
-		KanaxaiScytheOfHouseAurkus
+	SkorvaldTheShattered, Artsariiv, Arkk,
+	ElementalAiKeeperOfThePeak,
+	KanaxaiScytheOfHouseAurkus
 };
 std::vector<Boss> sortedFractalCMBosses {
 	MAMACM, SiaxTheCorruptedCM, EnsolyssOfTheEndlessTormentCM,
-		SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM,
-		ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM,
-		KanaxaiScytheOfHouseAurkusCM
+	SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM,
+	ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM,
+	KanaxaiScytheOfHouseAurkusCM
 };
 std::vector<Boss> sortedStrikeBosses {
 	IcebroodConstruct, TheVoiceAndTheClaw, FraenirOfJormag, Boneskinner, WhisperOfJormag,
-		Freezie,
-		CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate,
-		OldLionsCourt,
-		Dagda, Cerus
+	Freezie,
+	CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate,
+	OldLionsCourt,
+	Dagda, Cerus
 };
 std::vector<Boss> sortedStrikeCMBosses {
 	CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM,
-		OldLionsCourtCM,
-		DagdaCM, CerusCM
+	OldLionsCourtCM,
+	DagdaCM, CerusCM
+};
+std::vector<Boss> sortedStrikeLMBosses{
+	CerusCM
 };
 
 const char* GetBossName(Boss boss) {
