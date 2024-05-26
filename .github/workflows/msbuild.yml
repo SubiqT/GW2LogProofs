@@ -50,5 +50,5 @@ jobs:
       with:
         name: nexus_log_proofs
         path: |
-          x64/nexus_log_proofs.dll
-          x64/nexus_log_proofs.pdb
+          x64/Release/nexus_log_proofs.dll
+          x64/Release/nexus_log_proofs.pdb
