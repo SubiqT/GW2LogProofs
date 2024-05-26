@@ -50,5 +50,5 @@ jobs:
       with:
         name: nexus_log_proofs
         path: |
-          x64/Release/nexus_log_proofs.dll
-          x64/Release/nexus_log_proofs.pdb
+          D:/a/GW2LogProofs/GW2LogProofs/x64/Release/nexus_log_proofs.dll
+          D:/a/GW2LogProofs/GW2LogProofs/x64/Release/nexus_log_proofs.pdb
