@@ -378,5 +378,83 @@
     <Image Include="src\resources\Zane.png">
       <Filter>resources</Filter>
     </Image>
+    <Image Include="resources\Ankka.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Ankka.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Boneskinner.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Boneskinner.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Captain_Mai_Trin.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Captain_Mai_Trin.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Cerus.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Cerus.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Dagda.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Dagda.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Fraenir_Of_Jormag.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Fraenir_Of_Jormag.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Freezie.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Freezie.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Harvest_Temple.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Harvest_Temple.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Icebrood_Construct.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Icebrood_Construct.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Kodans.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Kodans.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Minister_Li.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Minister_Li.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Watchknight_Mark_II.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Watchknight_Mark_II.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Whisper_of_Jormag.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Whisper_of_Jormag.png">
+      <Filter>resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>

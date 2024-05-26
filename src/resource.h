@@ -43,12 +43,26 @@
 #define IDB_BERG                        140
 #define IDB_NARELLA                     141
 #define IDB_ZANE                        142
+#define IDB_ANKKA                       143
+#define IDB_BONESKINNER                 144
+#define IDB_CAPTAIN_MAI_TRIN            145
+#define IDB_CERUS                       146
+#define IDB_DAGDA                       147
+#define IDB_FRAENIR_OF_JORMAG           148
+#define IDB_FREEZIE                     149
+#define IDB_HARVEST_TEMPLE              150
+#define IDB_PNG9                        151
+#define IDB_ICEBROOD_CONSTRUCT          151
+#define IDB_KODANS                      153
+#define IDB_MINISTER_LI                 154
+#define IDB_WATCHKNIGHT_MARK_II         155
+#define IDB_WHISPER_OF_JORMAG           156
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        143
+#define _APS_NEXT_RESOURCE_VALUE        157
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101

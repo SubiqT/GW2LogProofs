@@ -121,11 +121,11 @@ const char* GetBossName(Boss boss) {
 	case IcebroodConstruct:
 		return "Icebrood Construct";
 	case TheVoiceAndTheClaw:
-		return "The Voice and The Claw";
+		return "Kodans / The Voice and The Claw";
 	case FraenirOfJormag:
 		return "Fraenir of Jormag";
 	case Boneskinner:
-		return "BoneSkinner";
+		return "Boneskinner";
 	case WhisperOfJormag:
 		return "Whisper of Jormag";
 	case Freezie:
@@ -137,7 +137,7 @@ const char* GetBossName(Boss boss) {
 	case MinisterLi:
 		return "Minister Li";
 	case VoidAmalgamate:
-		return "Void Amalgamate";
+		return "Harvest Temple / Void Amalgamate";
 	case OldLionsCourt:
 		return "Old Lion's Court";
 	case Dagda:
@@ -225,31 +225,31 @@ Texture* GetBossTexture(Boss boss) {
 	case KanaxaiScytheOfHouseAurkus:
 		return APIDefs->GetTextureOrCreateFromResource("TEX_KANAXAI", IDB_KANAXAI, hSelf);
 	case IcebroodConstruct:
-		return APIDefs->GetTextureOrCreateFromURL("icebrood_construct", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Icebrood_Construct.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_ICEBROOD_CONSTRUCT", IDB_ICEBROOD_CONSTRUCT, hSelf);
 	case TheVoiceAndTheClaw:
-		return APIDefs->GetTextureOrCreateFromURL("the_voice_and_the_claw", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Kodan_Icehammer.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_KODANS", IDB_KODANS, hSelf);
 	case FraenirOfJormag:
-		return APIDefs->GetTextureOrCreateFromURL("fraenir_of_jormag", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Shaman_Of_Jormag.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_FRAENIR_OF_JORMAG", IDB_FRAENIR_OF_JORMAG, hSelf);
 	case Boneskinner:
-		return APIDefs->GetTextureOrCreateFromURL("boneskinner", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Boneskinner.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_BONESKINNER", IDB_BONESKINNER, hSelf);
 	case WhisperOfJormag:
-		return APIDefs->GetTextureOrCreateFromURL("whisper_of_jormag", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Whisper_of_Jormag.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_WHISPER_OF_JORMAG", IDB_WHISPER_OF_JORMAG, hSelf);
 	case Freezie:
-		return APIDefs->GetTextureOrCreateFromURL("freezie", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Freezie.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_FREEZIE", IDB_FREEZIE, hSelf);
 	case CaptainMaiTrin:
-		return APIDefs->GetTextureOrCreateFromURL("captain_mai_trin", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Mai_Trin.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_CAPTAIN_MAI_TRIN", IDB_CAPTAIN_MAI_TRIN, hSelf);
 	case Ankka:
-		return APIDefs->GetTextureOrCreateFromURL("ankka", "https://gw2wingman.nevermindcreations.de", "/static/Ankka.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_ANKKA", IDB_ANKKA, hSelf);
 	case MinisterLi:
-		return APIDefs->GetTextureOrCreateFromURL("minister_li", "https://gw2wingman.nevermindcreations.de", "/static/Li.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_MINISTER_LI", IDB_MINISTER_LI, hSelf);
 	case VoidAmalgamate:
-		return APIDefs->GetTextureOrCreateFromURL("void_amalgamate", "https://gw2wingman.nevermindcreations.de", "/static/VA.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_HARVEST_TEMPLE", IDB_HARVEST_TEMPLE, hSelf);
 	case OldLionsCourt:
-		return APIDefs->GetTextureOrCreateFromURL("old_lions_court", "https://gw2wingman.nevermindcreations.de", "/static/OLC.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_WATCHKNIGHT_MARK_II", IDB_WATCHKNIGHT_MARK_II, hSelf);
 	case Dagda:
-		return APIDefs->GetTextureOrCreateFromURL("dagda", "https://gw2wingman.nevermindcreations.de", "/static/Dagda.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_DAGDA", IDB_DAGDA, hSelf);
 	case Cerus:
-		return APIDefs->GetTextureOrCreateFromURL("cerus", "https://gw2wingman.nevermindcreations.de", "/static/Cerus.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_CERUS", IDB_CERUS, hSelf);
 	default:
 		return nullptr;
 	}
