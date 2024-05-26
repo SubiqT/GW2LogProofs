@@ -4,6 +4,7 @@
 #include <format>
 #include <thread>
 #include <queue>
+#include <mutex>
 #include <nlohmann/json.hpp>
 #include "unofficial_extras/Definitions.h"
 
