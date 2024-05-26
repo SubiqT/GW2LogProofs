@@ -37,7 +37,7 @@ jobs:
 
     - name: Debug
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: ls -al && ls -al ./src
+      run: ls && ls ./src
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
