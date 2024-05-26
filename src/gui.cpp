@@ -17,7 +17,6 @@ static ImGuiWindowFlags windowFlags =  (
 static ImGuiTableFlags tableFlags = (
 	ImGuiTableFlags_Borders
 	| ImGuiTableFlags_ContextMenuInBody
-	| ImGuiTableFlags_NoSavedSettings
 	| ImGuiTableFlags_SizingFixedFit
 	| ImGuiTableFlags_Hideable
 	| ImGuiTableFlags_Sortable

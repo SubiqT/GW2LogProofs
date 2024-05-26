@@ -81,7 +81,9 @@ void PushAccountToAddPlayerQueue(std::string account) {
             addPlayer = GetPlayer(account.c_str());
         }
         catch (const std::exception& e) {
-            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("An unexpected exception occurred when trying to update proofs for {}. Exception details: {}", account, e.what()).c_str());
+            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                "An unexpected exception occurred when trying to update kill proofs for {}. Exception details: {}", account, e.what()
+            ).c_str());
         }
         std::scoped_lock lck(mtx);
         addPlayerQueue.push(addPlayer);
@@ -92,7 +94,7 @@ void SquadEventHandler(void* eventArgs) {
     SquadUpdate* squadUpdate = (SquadUpdate*)eventArgs;
     std::string account = StripAccount(squadUpdate->UserInfo->AccountName);
     int role = int(squadUpdate->UserInfo->Role);
-    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("squad event: {} -  {}", account, role).c_str());
+    APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("received squad event for account: {} - role: {}", account, role).c_str());
     if (role == 5) { // Left squad
         if (selfName == account) {
             shouldClearAllPlayers = true;
@@ -127,7 +129,7 @@ void CombatEventHandler(void* eventArgs) {
     }
     if (cbtEvent->dst->self) { // Should only occur on map change
         selfName = StripAccount(std::string(cbtEvent->dst->name));
-        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("self: {}", selfName).c_str());
+        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("detected self: {}", selfName).c_str());
         PushAccountToAddPlayerQueue(selfName);
     }
 }
@@ -155,6 +157,7 @@ void UpdatePlayers() {
             }
         }
         shouldClearAllPlayers = false;
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "cleared all players");
     }
     if (!removePlayerQueue.empty()) {
         std::string removePlayer = removePlayerQueue.front();
@@ -165,11 +168,12 @@ void UpdatePlayers() {
             }
         }
         removePlayerQueue.pop();
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("removed player: {}", removePlayer).c_str());
     }
     if (!addPlayerQueue.empty()) {
         Player addPlayer = addPlayerQueue.front();
-        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player: {}", addPlayer.account).c_str());
         players.push_back(addPlayer);
         addPlayerQueue.pop();
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("added player: {}", addPlayer.account).c_str());
     }
 }
