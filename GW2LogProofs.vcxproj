@@ -45,6 +45,7 @@
     <ClInclude Include="src\unofficial_extras\KeyBindHelper.h" />
     <ClInclude Include="src\unofficial_extras\KeyBindsTranslation.h" />
     <ClInclude Include="src\unofficial_extras\KeyBindStructs.h" />
+    <ClInclude Include="src\version.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\resource.rc" />
@@ -224,6 +225,28 @@
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
     </Link>
+    <PreBuildEvent>
+      <Command>:: Check WMIC is available
+WMIC.EXE Alias /? &gt;NUL 2&gt;&amp;1 || GOTO s_error
+
+:: Use WMIC to retrieve date and time
+FOR /F "skip=1 tokens=1-6" %%G IN ('WMIC Path Win32_LocalTime Get Day^,Hour^,Minute^,Month^,Second^,Year /Format:table') DO (
+   IF "%%~L"=="" goto s_done
+      Set _yyyy=%%L
+      Set _mm=%%J
+      Set _dd=%%G
+      Set _hour=%%H
+      SET _minute=%%I
+)
+:s_done
+
+echo #pragma once &gt; src/version.h
+echo #define V_MAJOR %_yyyy% &gt;&gt; src/version.h
+echo #define V_MINOR %_mm% &gt;&gt; src/version.h
+echo #define V_BUILD %_dd% &gt;&gt; src/version.h
+SET /A var_res = %_hour% * 60 + %_minute%
+echo #define V_REVISION %var_res% &gt;&gt; src/version.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

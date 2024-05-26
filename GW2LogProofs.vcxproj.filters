@@ -99,6 +99,9 @@
     <ClInclude Include="src\resource.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\version.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="submodules">

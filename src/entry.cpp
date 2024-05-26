@@ -8,6 +8,7 @@
 #include "gui.h"
 #include "settings.h"
 #include "resource.h"
+#include "version.h"
 
 AddonDefinition AddonDef = {};
 
@@ -66,10 +67,10 @@ extern "C" __declspec(dllexport) AddonDefinition * GetAddonDef() {
 	AddonDef.Signature = -104905;
 	AddonDef.APIVersion = NEXUS_API_VERSION;
 	AddonDef.Name = ADDON_NAME;
-	AddonDef.Version.Major = 1;
-	AddonDef.Version.Minor = 0;
-	AddonDef.Version.Build = 0;
-	AddonDef.Version.Revision = 1;
+	AddonDef.Version.Major = V_MAJOR;
+	AddonDef.Version.Minor = V_MINOR;
+	AddonDef.Version.Build = V_BUILD;
+	AddonDef.Version.Revision = V_REVISION;
 	AddonDef.Author = "Subi";
 	AddonDef.Description = "Displays kill proofs based on logs uploaded to wingman.";
 	AddonDef.Load = AddonLoad;
