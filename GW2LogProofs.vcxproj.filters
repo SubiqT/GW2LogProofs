@@ -213,5 +213,170 @@
     <Image Include="resources\Xera.png">
       <Filter>resources</Filter>
     </Image>
+    <Image Include="src\resources\Adina.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Arkk.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Arkk.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Artsariiv.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Artsariiv.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Berg.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Berg.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Broken_King.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Cairn.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Conjured_Amalgamate.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Deimos.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Dhuum.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Eater_Of_Souls.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Elemental_Ai_Dark.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Elemental_Ai_Dark.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Elemental_Ai_Light.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Elemental_Ai_Light.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Elemental_Ai_Light_And_Dark.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Elemental_Ai_Light_And_Dark.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Ensolyss.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Ensolyss.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Escort.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Eyes_Of_Fate.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Gorseval.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Kanaxai.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Kanaxai.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Keep_Construct.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Kenutt.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Log_Hover.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Log_Normal.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\MAMA.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\MAMA.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Matthias.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Mursaat_Overseer.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Narella.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Narrela.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Narrela.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Nikare.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Qadim.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Qadim_The_Peerless.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\River_Of_Souls.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Sabetha.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Sabir.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Samarog.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Siax.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Siax.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Skorvald.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Skorvald.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Slothasor.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Soulless_Horror.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Twisted_Castle.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Vale_Guardian.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Xera.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Zane.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Zane.png">
+      <Filter>resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>

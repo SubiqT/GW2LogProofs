@@ -161,7 +161,7 @@ Texture* GetBossTexture(Boss boss) {
 	case Slothasor:
 		return APIDefs->GetTextureOrCreateFromResource("TEX_SLOTHASOR", IDB_SLOTHASOR, hSelf);
 	case BanditTrio:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_BANDIT_TRIO", IDB_BANDIT_TRIO, hSelf);
+		return APIDefs->GetTextureOrCreateFromResource("TEX_NARELLA", IDB_NARELLA, hSelf);
 	case Matthias:
 		return APIDefs->GetTextureOrCreateFromResource("TEX_MATTHIAS", IDB_MATTHIAS, hSelf);
 	case Escort:
@@ -205,25 +205,25 @@ Texture* GetBossTexture(Boss boss) {
 	case QadimThePeerless:
 		return APIDefs->GetTextureOrCreateFromResource("TEX_QADIM_THE_PEERLESS", IDB_QADIM_THE_PEERLESS, hSelf);
 	case MAMA:
-		return APIDefs->GetTextureOrCreateFromURL("mama", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Watchknight.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_MAMA", IDB_MAMA, hSelf);
 	case SiaxTheCorrupted:
-		return APIDefs->GetTextureOrCreateFromURL("siax", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Toxic_Nimross.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_SIAX", IDB_SIAX, hSelf);
 	case EnsolyssOfTheEndlessTorment:
-		return APIDefs->GetTextureOrCreateFromURL("ensolyss", "https://gw2wingman.nevermindcreations.de", "/static/EnsolyssIcon.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_ENSOLYSS", IDB_ENSOLYSS, hSelf);
 	case SkorvaldTheShattered:
-		return APIDefs->GetTextureOrCreateFromURL("skorvald", "https://gw2wingman.nevermindcreations.de", "/static/Male_Norn_Holo-Dancer.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_SKORVALD", IDB_SKORVALD, hSelf);
 	case Artsariiv:
-		return APIDefs->GetTextureOrCreateFromURL("artsariiv", "https://gw2wingman.nevermindcreations.de", "/static/Female_Norn_Holo-Dancer.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_ARTSARIIV", IDB_ARTSARIIV, hSelf);
 	case Arkk:
-		return APIDefs->GetTextureOrCreateFromURL("arkk", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Inquest_Extinguisher.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_ARKK", IDB_ARKK, hSelf);
 	case ElementalAiKeeperOfThePeak:
-		return APIDefs->GetTextureOrCreateFromURL("elemental_ai", "https://gw2wingman.nevermindcreations.de", "/static/ElementalAi.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_ELEMENTAL_AI_LIGHT", IDB_ELEMENTAL_AI_LIGHT, hSelf);
 	case DarkAiKeeperOfThePeak:
-		return APIDefs->GetTextureOrCreateFromURL("dark_ai", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Liadri_the_Concealing_Dark.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_ELEMENTAL_AI_DARK", IDB_ELEMENTAL_AI_DARK, hSelf);
 	case ElementalAndDarkAiKeeperOfThePeak:
-		return APIDefs->GetTextureOrCreateFromURL("full_ai", "https://gw2wingman.nevermindcreations.de", "/static/AiFullEncounter.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_ELEMENTAL_AI_LIGHT_AND_DARK", IDB_ELEMENTAL_AI_LIGHT_AND_DARK, hSelf);
 	case KanaxaiScytheOfHouseAurkus:
-		return APIDefs->GetTextureOrCreateFromURL("kanaxai", "https://gw2wingman.nevermindcreations.de", "/static/Kanaxai.png");
+		return APIDefs->GetTextureOrCreateFromResource("TEX_KANAXAI", IDB_KANAXAI, hSelf);
 	case IcebroodConstruct:
 		return APIDefs->GetTextureOrCreateFromURL("icebrood_construct", "https://gw2wingman.nevermindcreations.de", "/static/Mini_Icebrood_Construct.png");
 	case TheVoiceAndTheClaw:

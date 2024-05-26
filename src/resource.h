@@ -3,14 +3,12 @@
 // Used by resource.rc
 //
 #define IDB_ADINA                       101
-#define IDB_BANDIT_TRIO                 102
 #define IDB_BROKEN_KING                 103
 #define IDB_CAIRN                       104
 #define IDB_CONJURED_AMALGAMATE         105
 #define IDB_DEIMOS                      106
 #define IDB_DHUUM                       107
 #define IDB_EATER_OF_SOULS              108
-#define IDB_PNG9                        109
 #define IDB_ESCORT                      109
 #define IDB_EYES_OF_FATE                110
 #define IDB_GORSEVAL                    111
@@ -32,12 +30,25 @@
 #define IDB_TWISTED_CASTLE              127
 #define IDB_VALE_GUARDIAN               128
 #define IDB_XERA                        129
+#define IDB_ARKK                        130
+#define IDB_ARTSARIIV                   131
+#define IDB_ELEMENTAL_AI_DARK           132
+#define IDB_ELEMENTAL_AI_LIGHT          133
+#define IDB_ELEMENTAL_AI_LIGHT_AND_DARK 134
+#define IDB_ENSOLYSS                    135
+#define IDB_KANAXAI                     136
+#define IDB_MAMA                        137
+#define IDB_SIAX                        138
+#define IDB_SKORVALD                    139
+#define IDB_BERG                        140
+#define IDB_NARELLA                     141
+#define IDB_ZANE                        142
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        130
+#define _APS_NEXT_RESOURCE_VALUE        143
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
