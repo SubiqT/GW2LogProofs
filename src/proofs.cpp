@@ -107,8 +107,7 @@ void SquadEventHandler(void* eventArgs) {
         }
     }
     if (role <= 2) { // In squad
-        std::function<void()> fn = [&]() { PushAccountToAddPlayerQueue(account); };
-        threadpool.spawn(fn.target<void *()>());
+        threadpool.spawn([&]() { PushAccountToAddPlayerQueue(account); return nullptr; });
     }
 }
 
@@ -132,8 +131,7 @@ void CombatEventHandler(void* eventArgs) {
     if (cbtEvent->dst->self) { // Should only occur on map change
         selfName = StripAccount(std::string(cbtEvent->dst->name));
         APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("detected self: {}", selfName).c_str());
-        std::function<void()> fn = [&]() { PushAccountToAddPlayerQueue(selfName); };
-        threadpool.spawn(fn.target<void* ()>());
+        threadpool.spawn([&]() { PushAccountToAddPlayerQueue(selfName); return nullptr; });
     }
 }
 
@@ -172,5 +170,11 @@ void UpdatePlayers() {
         }
         removePlayerQueue.pop();
         APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("removed player: {}", removePlayer).c_str());
+    }
+    if (!addPlayerQueue.empty()) {
+        Player addPlayer = addPlayerQueue.front();
+        players.push_back(addPlayer);
+        addPlayerQueue.pop();
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("added player: {}", addPlayer.account).c_str());
     }
 }
