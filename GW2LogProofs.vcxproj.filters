@@ -102,6 +102,9 @@
     <ClInclude Include="src\nlohmann\json.hpp">
       <Filter>submodules\nlohmann</Filter>
     </ClInclude>
+    <ClInclude Include="src\threadpool.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="submodules">

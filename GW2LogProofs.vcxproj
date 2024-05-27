@@ -41,6 +41,7 @@
     <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\shared.h" />
     <ClInclude Include="src\proofs.h" />
+    <ClInclude Include="src\threadpool.hpp" />
     <ClInclude Include="src\unofficial_extras\Definitions.h" />
     <ClInclude Include="src\unofficial_extras\KeyBindHelper.h" />
     <ClInclude Include="src\unofficial_extras\KeyBindsTranslation.h" />

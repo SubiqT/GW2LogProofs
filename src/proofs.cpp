@@ -11,8 +11,10 @@
 using json = nlohmann::json;
 
 #include "shared.h"
+#include "threadpool.hpp"
 
 bool shouldClearAllPlayers = false;
+Threadpool threadpool = Threadpool();
 std::queue<std::string> removePlayerQueue;
 std::queue<Player> addPlayerQueue;
 std::mutex mtx;
@@ -71,24 +73,22 @@ std::string StripAccount(std::string account) {
 }
 
 void PushAccountToAddPlayerQueue(std::string account) {
-    std::thread([&] {
-        for (Player player : players) { // Already added
-            if (player.account == account) {
-                return;
-            }
+    for (Player player : players) { // Already added
+        if (player.account == account) {
+            return;
         }
-        Player addPlayer;
-        try {
-            addPlayer = GetPlayer(account.c_str());
-        }
-        catch (const std::exception& e) {
-            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
-                "An unexpected exception occurred when trying to update kill proofs for {}. Exception details: {}", account, e.what()
-            ).c_str());
-        }
-        std::scoped_lock lck(mtx);
-        addPlayerQueue.push(addPlayer);
-    }).join();
+    }
+    Player addPlayer;
+    try {
+        addPlayer = GetPlayer(account.c_str());
+    }
+    catch (const std::exception& e) {
+        APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+            "An unexpected exception occurred when trying to update kill proofs for {}. Exception details: {}", account, e.what()
+        ).c_str());
+    }
+    std::scoped_lock lck(mtx);
+    addPlayerQueue.push(addPlayer);
 }
 
 void SquadEventHandler(void* eventArgs) {
@@ -107,7 +107,8 @@ void SquadEventHandler(void* eventArgs) {
         }
     }
     if (role <= 2) { // In squad
-        PushAccountToAddPlayerQueue(account);
+        std::function<void()> fn = [&]() { PushAccountToAddPlayerQueue(account); };
+        threadpool.spawn(fn.target<void *()>());
     }
 }
 
@@ -131,7 +132,8 @@ void CombatEventHandler(void* eventArgs) {
     if (cbtEvent->dst->self) { // Should only occur on map change
         selfName = StripAccount(std::string(cbtEvent->dst->name));
         APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("detected self: {}", selfName).c_str());
-        PushAccountToAddPlayerQueue(selfName);
+        std::function<void()> fn = [&]() { PushAccountToAddPlayerQueue(selfName); };
+        threadpool.spawn(fn.target<void* ()>());
     }
 }
 
@@ -170,11 +172,5 @@ void UpdatePlayers() {
         }
         removePlayerQueue.pop();
         APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("removed player: {}", removePlayer).c_str());
-    }
-    if (!addPlayerQueue.empty()) {
-        Player addPlayer = addPlayerQueue.front();
-        players.push_back(addPlayer);
-        addPlayerQueue.pop();
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("added player: {}", addPlayer.account).c_str());
     }
 }
