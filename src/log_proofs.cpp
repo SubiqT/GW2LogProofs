@@ -17,9 +17,13 @@ namespace LogProofs {
 	std::mutex Mutex;
 
     long long GetPlayerIndex(std::string account) {
-        std::scoped_lock lck(Mutex);
-        if (players.size() > 0) {
-            for (Player& p : players) if (p.account == account) return std::addressof(p) - std::addressof(players[0]);;
+        try {
+            std::scoped_lock lck(Mutex);
+            for (Player& p : players) if (p.account == account) return std::addressof(p) - std::addressof(players.at(0));;
+        }
+        catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                "tried to get index of player with account {} but an error occurred. exception details: {}", account, e.what()).c_str());
         }
         return -1;
     }
@@ -37,58 +41,79 @@ namespace LogProofs {
         }
         long long index = GetPlayerIndex(account);
         if (index == -1) {
-            APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("player with account {} was not found in players vector.", account).c_str());
+            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                "tried to load kp for player with account {} but player was not found in players vector.", account).c_str());
             return;
         }
-        {
+        try {
             std::scoped_lock lck(Mutex);
             if (players[index].state != LOADING) {
-                APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("player with account {} is not in the loading state.", account).c_str());
+                APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                    "tried to load kp for player with account {} but player was not in the loading state.", account).c_str());
                 return;
             }
-            players[index].kp = kp;
-            players[index].state = READY;
+            players.at(index).kp = kp;
+            players.at(index).state = READY;
+        } catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
+                "tried to load kp for player with account {} but a subscript out of bounds error occurred. exception details: {}", account, e.what()).c_str());
+            return;
         }
         APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded kp for player: {}", account).c_str());
     }
 
     void AddPlayer(std::string account) {
-        {
+        try {
             std::scoped_lock lck(Mutex);
             for (Player p : players) if (p.account == account) return;  // skip already added players
             players.push_back({ account, LOADING });
+        } catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
+                "tried to add player with account {} but an error occurred. exception details: {}", account, e.what()).c_str());
+            return;
         }
-        threadpool.spawn([&]() { LoadKillProofs(account); return nullptr; });
+        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player to log proofs table: {}", account).c_str());
         threadpool.spawn([=]() { LoadKillProofs(account); return nullptr; });
     }
 
     void RemovePlayer(std::string account) {
         long long index = GetPlayerIndex(account);
         if (index == -1) {
-            APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("player with account {} was not found in players vector.", account).c_str());
+            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                "tried to remove player with account {} but player was not found in players vector.", account).c_str());
             return;
         }
-        {
+        try {
             std::scoped_lock lck(Mutex);
             players.erase(players.begin() + index);
+        } catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
+                "tried to remove player with account {} but an error occurred. exception details: {}", account, e.what()).c_str());
+            return;
         }
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("removed player: {}", account).c_str());
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("removed player from log proofs table: {}", account).c_str());
     }
 
     void ClearPlayers() {
         long long index = GetPlayerIndex(selfName);
-        {
+        try {
             std::scoped_lock lck(Mutex);
             if (index == -1) {
                 players.clear();
+                APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "removed all players from log proofs table (self was not found).");
             }
             else {
                 Player self = players[index];
                 players.clear();
                 players.push_back(self);
+                APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "removed all players from log proofs table (except for self).");
             }
+        } catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
+                "tried to remove all players but an error occurred. exception details: {}", e.what()).c_str());
+            return;
         }
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "cleared players");
+        
     }
 
     std::string StripAccount(std::string account) {
@@ -103,18 +128,13 @@ namespace LogProofs {
         int role = int(squadUpdate->UserInfo->Role);
         APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("received squad event for account: {} - role: {}", account, role).c_str());
         if (role == 5) {
-            if (selfName == account) {
-                ClearPlayers();
-                APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("{} has left the squad or party", account, role).c_str());
-            }
-            else {
-                RemovePlayer(account);
-                APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("{} has left the squad or party", account, role).c_str());
-            }
+            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("{} has left the squad or party", account, role).c_str());
+            if (selfName == account) ClearPlayers();
+            else RemovePlayer(account);
         }
         if (role <= 2) {
+            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("{} has joined the squad or party", account, role).c_str());
             AddPlayer(account);
-            APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("{} has joined the squad or party", account, role).c_str());
         }
     }
 
@@ -128,7 +148,7 @@ namespace LogProofs {
         if (cbtEvent->src->name == nullptr || cbtEvent->src->name[0] == '\0' || cbtEvent->dst->name == nullptr || cbtEvent->dst->name[0] == '\0') return;
         if (cbtEvent->dst->self) { // Should only occur on map change
             selfName = StripAccount(std::string(cbtEvent->dst->name));
-            APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("detected self: {}", selfName).c_str());
+            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("self account was detected: {}", selfName).c_str());
             AddPlayer(selfName);
         }
     }
