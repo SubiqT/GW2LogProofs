@@ -181,11 +181,11 @@ void DrawTabsOptions() {
 void DrawColumnOptions() {
 	ImGui::Text("Columns");
 	if (ImGui::SliderFloat("Account Size", &Settings::ColumnSizeAccount, 40.0f, 400.0f, "%.3f px")) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_ACCOUNT][COLUMN_PROPERTIES_SIZE] = Settings::ColumnSizeAccount;
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE] = Settings::ColumnSizeAccount;
 		Settings::Save(SettingsPath);
 	}
 	if (ImGui::SliderFloat("Bosses Size", &Settings::ColumnSizeBosses, 8.0f, 128.0f, "%.3f px")) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_BOSSES][COLUMN_PROPERTIES_SIZE] = Settings::ColumnSizeBosses;
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE] = Settings::ColumnSizeBosses;
 		Settings::Save(SettingsPath);
 	}
 }

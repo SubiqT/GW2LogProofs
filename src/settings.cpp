@@ -23,10 +23,8 @@ const char* SHOW_TAB_STRIKES_NORMAL = "ShowTabStrikesNormal";
 const char* SHOW_TAB_STRIKES_CM = "ShowTabStrikesCM";
 const char* SHOW_TAB_STRIKES_LM = "ShowTabStrikesLM";
 
-const char* COLUMNS_KEY = "Columns";
-const char* COLUMN_PROPERTIES_SIZE = "Size";
-const char* COLUMN_NAME_ACCOUNT = "Account";
-const char* COLUMN_NAME_BOSSES = "Bosses";
+const char* COLUMN_ACCOUNT_SIZE = "ColumnAccountSize";
+const char* COLUMN_BOSSES_SIZE = "ColumnBossesSize";
 
 
 namespace Settings
@@ -97,11 +95,11 @@ namespace Settings
 		}
 
 		/* Columns */
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_ACCOUNT][COLUMN_PROPERTIES_SIZE].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_ACCOUNT][COLUMN_PROPERTIES_SIZE].get_to<float>(ColumnSizeAccount);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE].get_to<float>(ColumnSizeAccount);
 		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_BOSSES][COLUMN_PROPERTIES_SIZE].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][COLUMNS_KEY][COLUMN_NAME_BOSSES][COLUMN_PROPERTIES_SIZE].get_to<float>(ColumnSizeBosses);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE].get_to<float>(ColumnSizeBosses);
 		}
 
 	}

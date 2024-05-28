@@ -22,10 +22,8 @@ extern const char* SHOW_TAB_STRIKES_NORMAL;
 extern const char* SHOW_TAB_STRIKES_CM;
 extern const char* SHOW_TAB_STRIKES_LM;
 
-extern const char* COLUMNS_KEY;
-extern const char* COLUMN_PROPERTIES_SIZE;
-extern const char* COLUMN_NAME_ACCOUNT;
-extern const char* COLUMN_NAME_BOSSES;
+extern const char* COLUMN_ACCOUNT_SIZE;
+extern const char* COLUMN_BOSSES_SIZE;
 
 
 namespace Settings
