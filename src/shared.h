@@ -14,5 +14,6 @@ extern AddonAPI* APIDefs;
 extern NexusLinkData* NexusLink;
 extern HMODULE hSelf;
 
+extern const char* KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS;
 
 #endif

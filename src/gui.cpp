@@ -192,7 +192,7 @@ void DrawColumnOptions() {
 
 void RegisterQuickAccessShortcut() {
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "registering quick access shortcut");
-	APIDefs->AddShortcut("SHORTCUT_LOG_PROOFS", "TEX_LOG_NORMAL", "TEX_LOG_HOVER", "KEYBIND_TOGGLE_SHOW_WINDOW_LOG_PROOFS", "Toggle Log Proofs Window");
+	APIDefs->AddShortcut("SHORTCUT_LOG_PROOFS", "TEX_LOG_NORMAL", "TEX_LOG_HOVER", KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS, "Toggle Log Proofs Window");
 }
 
 void DeregisterQuickAccessShortcut() {

@@ -37,7 +37,7 @@ void AddonLoad(AddonAPI* addonApi) {
 	
 	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_NORMAL", IDB_LOG_NORMAL, hSelf);
 	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_HOVER", IDB_LOG_HOVER, hSelf);
-	APIDefs->RegisterKeybindWithString("KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS", ToggleShowWindowLogProofs, "(null)");
+	APIDefs->RegisterKeybindWithString(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS, ToggleShowWindowLogProofs, "(null)");
 	if (Settings::ShowQuickAccessShortcut) RegisterQuickAccessShortcut();
 
 	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::SquadEventHandler);
@@ -54,7 +54,7 @@ void AddonUnload() {
 	APIDefs->DeregisterRender(AddonRender);
 
 	if (&Settings::ShowQuickAccessShortcut) DeregisterQuickAccessShortcut();
-	APIDefs->DeregisterKeybind("KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS");
+	APIDefs->DeregisterKeybind(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
 	APIDefs->UnsubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", LogProofs::CombatEventHandler);
 	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::SquadEventHandler);
 
