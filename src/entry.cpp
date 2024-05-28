@@ -1,10 +1,10 @@
 #include <Windows.h>
-#include <chrono>
 
 #include "nexus/Nexus.h"
 #include "imgui/imgui.h"
+
 #include "shared.h"
-#include "proofs.h"
+#include "log_proofs.h"
 #include "gui.h"
 #include "settings.h"
 #include "resource.h"
@@ -19,7 +19,6 @@ void AddonOptions() {
 }
 
 void AddonRender() {
-	UpdatePlayers();
 	RenderWindowLogProofs();
 }
 
@@ -31,8 +30,8 @@ void AddonLoad(AddonAPI* addonApi) {
 
 	NexusLink = (NexusLinkData*)APIDefs->GetResource("DL_NEXUS_LINK");
 
-	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", SquadEventHandler);
-	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW" , CombatEventHandler);
+	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::SquadEventHandler);
+	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW" , LogProofs::CombatEventHandler);
 	
 	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_NORMAL", IDB_LOG_NORMAL, hSelf);
 	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_HOVER", IDB_LOG_HOVER, hSelf);
@@ -56,10 +55,10 @@ void AddonUnload() {
 
 	APIDefs->RemoveShortcut("SHORTCUT_LOG_PROOFS");
 	APIDefs->DeregisterKeybind("KEYBIND_TOGGLE_SHOW_WINDOW_LOG_PROOFS");
-	APIDefs->UnsubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", CombatEventHandler);
-	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", SquadEventHandler);
+	APIDefs->UnsubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", LogProofs::CombatEventHandler);
+	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::SquadEventHandler);
 	
-	threadpool.shutdown();
+	LogProofs::threadpool.shutdown();
 
 	Settings::Save(SettingsPath);
 	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "<c=#ff0000>Log Proofs</c> was unloaded.");

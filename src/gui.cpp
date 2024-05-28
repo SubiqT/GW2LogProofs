@@ -3,7 +3,7 @@
 
 #include "imgui/imgui.h"
 #include "shared.h"
-#include "proofs.h"
+#include "log_proofs.h"
 #include "bosses.h"
 #include "settings.h"
 
@@ -51,19 +51,30 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 					ImGui::EndTooltip();
 				}
 			}
-			if (players.size() > 0) {
-				for (Player player : players) {
-					ImGui::TableNextColumn();
-					ImGui::Text(player.account.c_str());
-					for (Boss& boss : *bossesArray) {
+			{
+				std::scoped_lock lck(LogProofs::Mutex);
+				if (LogProofs::players.size() > 0) {
+					for (LogProofs::Player p : LogProofs::players) {
 						ImGui::TableNextColumn();
-						isLegendary
-							? ImGui::Text("%i", player.kp[std::format("-{}", int(boss))][std::string("total")])
-							: ImGui::Text("%i", player.kp[std::format("{}", int(boss))][std::string("total")]);
+						ImGui::Text(p.account.c_str());
+						for (Boss& boss : *bossesArray) {
+							ImGui::TableNextColumn();
+							if (p.state == LogProofs::READY) {
+								if (isLegendary) {
+									ImGui::Text("%i", p.kp[std::format("-{}", int(boss))]);
+								}
+								else {
+									ImGui::Text("%i", p.kp[std::format("{}", int(boss))]);
+								}
+							}
+							else {
+								ImGui::Text("...");
+							}
+						}
 					}
 				}
 			}
-			if (players.size() == 0) {
+			if (LogProofs::players.size() == 0) {
 				ImGui::TableNextColumn();
 				ImGui::Text("No players found... ");
 			}
