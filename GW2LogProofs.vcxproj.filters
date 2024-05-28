@@ -31,13 +31,16 @@
     <ClCompile Include="src\gui.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\proofs.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\settings.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\shared.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\wingman.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\log_proofs.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -84,9 +87,6 @@
     <ClInclude Include="src\gui.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\proofs.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="src\settings.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -103,6 +103,15 @@
       <Filter>submodules\nlohmann</Filter>
     </ClInclude>
     <ClInclude Include="src\threadpool.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\httpclient.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\wingman.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\log_proofs.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
