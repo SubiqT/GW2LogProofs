@@ -59,7 +59,7 @@ namespace LogProofs {
             players.push_back({ account, LOADING });
         }
         threadpool.spawn([&]() { LoadKillProofs(account); return nullptr; });
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("added player: {}", account).c_str());
+        threadpool.spawn([=]() { LoadKillProofs(account); return nullptr; });
     }
 
     void RemovePlayer(std::string account) {
