@@ -6,6 +6,7 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
+extern const char* SHOW_QUICK_ACCESS_SHORTCUT;
 extern const char* WINDOW_LOG_PROOFS_KEY;
 extern const char* SHOW_WINDOW_LOG_PROOFS;
 
@@ -34,6 +35,7 @@ namespace Settings
 	void Load(std::filesystem::path filePath);
 	void Save(std::filesystem::path filePath);
 
+	extern bool ShowQuickAccessShortcut;
 	extern bool ShowWindowLogProofs;
 
 	extern float MinWindowWidth;

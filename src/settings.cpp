@@ -6,7 +6,7 @@
 #include <fstream>
 #include <format>
 
-
+const char* SHOW_QUICK_ACCESS_SHORTCUT = "ShowQuickAccessShortcut";
 const char* WINDOW_LOG_PROOFS_KEY = "WindowLogProofs";
 const char* SHOW_WINDOW_LOG_PROOFS = "ShowWindow";
 
@@ -32,24 +32,21 @@ namespace Settings
 	std::mutex Mutex;
 	json Settings = json::object();
 
-	void Load(std::filesystem::path filePath)
-	{
-		if (!std::filesystem::exists(filePath)) { return; }
+	void Load(std::filesystem::path filePath) {
+		if (!std::filesystem::exists(filePath)) return;
 
-		Settings::Mutex.lock();
-		{
-			try
-			{
-				std::ifstream file(filePath);
-				Settings = json::parse(file);
-				file.close();
-			}
-			catch (json::parse_error& ex)
-			{
-				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse settings.json file. Exception details: {}", ex.what()).c_str());
-			}
+		try {
+			std::scoped_lock lck(Mutex);
+			std::ifstream file(filePath);
+			Settings = json::parse(file);
+			file.close();
+		} catch (json::parse_error& ex) {
+			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("failed to parse settings.json file. exception details: {}", ex.what()).c_str());
 		}
-		Settings::Mutex.unlock();
+
+		if (!Settings[SHOW_QUICK_ACCESS_SHORTCUT].is_null()) {
+			Settings[SHOW_QUICK_ACCESS_SHORTCUT].get_to<bool>(ShowQuickAccessShortcut);
+		}
 
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS].get_to<bool>(ShowWindowLogProofs);
@@ -103,17 +100,14 @@ namespace Settings
 		}
 
 	}
-	void Save(std::filesystem::path filePath)
-	{
-		Settings::Mutex.lock();
-		{
-			std::ofstream file(filePath);
-			file << Settings.dump(4, ' ') << std::endl;
-			file.close();
-		}
-		Settings::Mutex.unlock();
+	void Save(std::filesystem::path filePath) {
+		std::scoped_lock lck(Mutex);
+		std::ofstream file(filePath);
+		file << Settings.dump(4, ' ') << std::endl;
+		file.close();
 	}
 
+	bool ShowQuickAccessShortcut = true;
 	bool ShowWindowLogProofs = false;
 
 	float MinWindowWidth = 300.0f;

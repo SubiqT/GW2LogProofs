@@ -30,18 +30,18 @@ void AddonLoad(AddonAPI* addonApi) {
 
 	NexusLink = (NexusLinkData*)APIDefs->GetResource("DL_NEXUS_LINK");
 
-	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::SquadEventHandler);
-	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW" , LogProofs::CombatEventHandler);
-	
-	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_NORMAL", IDB_LOG_NORMAL, hSelf);
-	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_HOVER", IDB_LOG_HOVER, hSelf);
-	APIDefs->RegisterKeybindWithString("KEYBIND_TOGGLE_SHOW_WINDOW_LOG_PROOFS", ToggleShowWindowLogProofs, "(null)");
-	APIDefs->AddShortcut("SHORTCUT_LOG_PROOFS", "TEX_LOG_NORMAL", "TEX_LOG_HOVER", "KEYBIND_TOGGLE_SHOW_WINDOW_LOG_PROOFS", "Toggle Log Proofs Window");
-
 	AddonPath = APIDefs->GetAddonDirectory("log_proofs");
 	SettingsPath = APIDefs->GetAddonDirectory("log_proofs/settings.json");
 	std::filesystem::create_directory(AddonPath);
 	Settings::Load(SettingsPath);
+	
+	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_NORMAL", IDB_LOG_NORMAL, hSelf);
+	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_HOVER", IDB_LOG_HOVER, hSelf);
+	APIDefs->RegisterKeybindWithString("KEYBIND_TOGGLE_SHOW_WINDOW_LOG_PROOFS", ToggleShowWindowLogProofs, "(null)");
+	if (Settings::ShowQuickAccessShortcut) RegisterQuickAccessShortcut();
+
+	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::SquadEventHandler);
+	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", LogProofs::CombatEventHandler);
 
 	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
 	APIDefs->RegisterRender(ERenderType_OptionsRender, AddonOptions);
@@ -53,11 +53,11 @@ void AddonUnload() {
 	APIDefs->DeregisterRender(AddonOptions);
 	APIDefs->DeregisterRender(AddonRender);
 
-	APIDefs->RemoveShortcut("SHORTCUT_LOG_PROOFS");
+	if (&Settings::ShowQuickAccessShortcut) DeregisterQuickAccessShortcut();
 	APIDefs->DeregisterKeybind("KEYBIND_TOGGLE_SHOW_WINDOW_LOG_PROOFS");
 	APIDefs->UnsubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", LogProofs::CombatEventHandler);
 	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::SquadEventHandler);
-	
+
 	LogProofs::threadpool.shutdown();
 
 	Settings::Save(SettingsPath);

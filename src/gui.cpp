@@ -190,7 +190,23 @@ void DrawColumnOptions() {
 	}
 }
 
+void RegisterQuickAccessShortcut() {
+	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "registering quick access shortcut");
+	APIDefs->AddShortcut("SHORTCUT_LOG_PROOFS", "TEX_LOG_NORMAL", "TEX_LOG_HOVER", "KEYBIND_TOGGLE_SHOW_WINDOW_LOG_PROOFS", "Toggle Log Proofs Window");
+}
+
+void DeregisterQuickAccessShortcut() {
+	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "deregistering quick access shortcut");
+	APIDefs->RemoveShortcut("SHORTCUT_LOG_PROOFS");
+}
+
 void RenderWindowSettings() {
+	if (ImGui::Checkbox("Show Quick Access Shortcut", &Settings::ShowQuickAccessShortcut)) {
+		Settings::Settings[SHOW_QUICK_ACCESS_SHORTCUT] = Settings::ShowQuickAccessShortcut;
+		Settings::Save(SettingsPath);
+		if (Settings::ShowQuickAccessShortcut) RegisterQuickAccessShortcut();
+		else DeregisterQuickAccessShortcut();
+	}
 	if (ImGui::Checkbox("Show Window", &Settings::ShowWindowLogProofs)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
 		Settings::Save(SettingsPath);
@@ -199,3 +215,4 @@ void RenderWindowSettings() {
 	DrawTabsOptions();
 	DrawColumnOptions();
 }
+

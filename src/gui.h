@@ -6,4 +6,7 @@ void RenderWindowSettings(void);
 
 void ToggleShowWindowLogProofs(const char* keybindIdentifier);
 
+void RegisterQuickAccessShortcut(void);
+void DeregisterQuickAccessShortcut(void);
+
 #endif
