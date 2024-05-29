@@ -139,17 +139,10 @@ namespace LogProofs {
     }
 
     /* Arcdps */
-    void CombatEventHandler(void* eventArgs) {
-        EvCombatData* cbtEvent = (EvCombatData*)eventArgs;
-        if (!selfName.empty()) return;
-        if (cbtEvent->ev) return;
-        if (cbtEvent->src->elite) return;
-        if (!cbtEvent->src->prof) return;
-        if (cbtEvent->src->name == nullptr || cbtEvent->src->name[0] == '\0' || cbtEvent->dst->name == nullptr || cbtEvent->dst->name[0] == '\0') return;
-        if (cbtEvent->dst->self) { // Should only occur on map change
-            selfName = StripAccount(std::string(cbtEvent->dst->name));
-            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("self account was detected: {}", selfName).c_str());
-            AddPlayer(selfName);
-        }
+    void SelfAccountNameHandler(void* eventArgs) {
+        const char* selfAccountName = (const char*)eventArgs;
+        selfName = StripAccount(selfAccountName);
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("self account was detected: {}", selfName).c_str());
+        AddPlayer(selfName);
     }
 }

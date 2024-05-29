@@ -30,6 +30,7 @@ namespace LogProofs {
 
     void SquadEventHandler(void* eventArgs);
     void CombatEventHandler(void* eventArgs);
+    void SelfAccountNameHandler(void* eventArgs);
 }
 
 /* Unofficial Extras */

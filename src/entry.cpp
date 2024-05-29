@@ -41,8 +41,8 @@ void AddonLoad(AddonAPI* addonApi) {
 	if (Settings::ShowQuickAccessShortcut) RegisterQuickAccessShortcut();
 
 	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::SquadEventHandler);
-	APIDefs->SubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", LogProofs::CombatEventHandler);
-
+	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_ACCOUNT_NAME", LogProofs::SelfAccountNameHandler);
+	APIDefs->RaiseEvent("EV_ARCDPS_SELF_ACCOUNT_NAME_REQUEST", nullptr);
 	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
 	APIDefs->RegisterRender(ERenderType_OptionsRender, AddonOptions);
 
@@ -55,7 +55,7 @@ void AddonUnload() {
 
 	if (&Settings::ShowQuickAccessShortcut) DeregisterQuickAccessShortcut();
 	APIDefs->DeregisterKeybind(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
-	APIDefs->UnsubscribeEvent("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", LogProofs::CombatEventHandler);
+	APIDefs->UnsubscribeEvent("EV_ARCDPS_SELF_ACCOUNT_NAME", LogProofs::SelfAccountNameHandler);
 	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::SquadEventHandler);
 
 	LogProofs::threadpool.shutdown();
