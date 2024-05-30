@@ -45,8 +45,8 @@ void AddonLoad(AddonAPI* addonApi) {
 	APIDefs->SubscribeEvent("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
 	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
 	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
-	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_DETECT", LogProofs::ArcSelfDetectedEventHandler);
-	APIDefs->RaiseEvent("EV_ARCDPS_SELF_REQUEST", nullptr);
+	APIDefs->RaiseEvent("EV_REPLAY_ARCDPS_SELF_JOIN", nullptr);
+	APIDefs->RaiseEvent("EV_REPLAY_ARCDPS_SQUAD_JOIN", nullptr);
 
 	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
 	APIDefs->RegisterRender(ERenderType_OptionsRender, AddonOptions);
@@ -60,7 +60,6 @@ void AddonUnload() {
 
 	if (&Settings::ShowQuickAccessShortcut) DeregisterQuickAccessShortcut();
 	APIDefs->DeregisterKeybind(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
-	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_DETECT", LogProofs::ArcSelfDetectedEventHandler);
 	APIDefs->UnsubscribeEvent("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
 	APIDefs->UnsubscribeEvent("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
 	APIDefs->UnsubscribeEvent("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
