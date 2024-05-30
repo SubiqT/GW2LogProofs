@@ -11,7 +11,8 @@
 
 namespace LogProofs {
 	std::vector<Player> players;
-	std::string selfName;
+	std::string selfAccountName;
+    bool unofficalExtrasEnabled = false;
 
 	Threadpool threadpool = Threadpool();
 	std::mutex Mutex;
@@ -24,6 +25,18 @@ namespace LogProofs {
         catch (const std::exception& e) {
             APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
                 "tried to get index of player with account {} but an error occurred. exception details: {}", account, e.what()).c_str());
+        }
+        return -1;
+    }
+
+    long long GetPlayerIndex(uintptr_t id) {
+        try {
+            std::scoped_lock lck(Mutex);
+            for (Player& p : players) if (p.id == id) return std::addressof(p) - std::addressof(players.at(0));;
+        }
+        catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                "tried to get index of player with id {} but an error occurred. exception details: {}", id, e.what()).c_str());
         }
         return -1;
     }
@@ -63,16 +76,32 @@ namespace LogProofs {
     }
 
     void AddPlayer(std::string account) {
+        if (!unofficalExtrasEnabled) return;
         try {
             std::scoped_lock lck(Mutex);
             for (Player p : players) if (p.account == account) return;  // skip already added players
-            players.push_back({ account, LOADING });
+            players.push_back({ 0, account, LOADING });
         } catch (const std::exception& e) {
             APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
                 "tried to add player with account {} but an error occurred. exception details: {}", account, e.what()).c_str());
             return;
         }
-        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player to log proofs table: {}", account).c_str());
+        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player to log proofs table with account {}", account).c_str());
+        threadpool.spawn([=]() { LoadKillProofs(account); return nullptr; });
+    }
+
+    void AddPlayer(uintptr_t id, std::string account) {
+        try {
+            std::scoped_lock lck(Mutex);
+            for (Player p : players) if (p.account == account) return;  // skip already added players
+            players.push_back({ id, account, LOADING });
+        }
+        catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
+                "tried to add player with id {} and account {} but an error occurred. exception details: {}", id, account, e.what()).c_str());
+            return;
+        }
+        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player to log proofs table with id {} and account {}", id, account).c_str());
         threadpool.spawn([=]() { LoadKillProofs(account); return nullptr; });
     }
 
@@ -94,8 +123,27 @@ namespace LogProofs {
         APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("removed player from log proofs table: {}", account).c_str());
     }
 
+    void RemovePlayer(uintptr_t id) {
+        long long index = GetPlayerIndex(id);
+        if (index == -1) {
+            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                "tried to remove player with id {} but player was not found in players vector.", id).c_str());
+            return;
+        }
+        try {
+            std::scoped_lock lck(Mutex);
+            players.erase(players.begin() + index);
+        }
+        catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
+                "tried to remove player with id {} but an error occurred. exception details: {}", id, e.what()).c_str());
+            return;
+        }
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("removed player from log proofs table: {}", id).c_str());
+    }
+
     void ClearPlayers() {
-        long long index = GetPlayerIndex(selfName);
+        long long index = GetPlayerIndex(selfAccountName);
         try {
             std::scoped_lock lck(Mutex);
             if (index == -1) {
@@ -113,36 +161,58 @@ namespace LogProofs {
                 "tried to remove all players but an error occurred. exception details: {}", e.what()).c_str());
             return;
         }
-        
     }
 
     std::string StripAccount(std::string account) {
-        if (account.at(0) == ':') account.erase(0, 1);  // the game prefixes accounts with :
+        if (!account.empty() || account.at(0) == ':') {
+            return account.erase(0, 1);  // the game prefixes accounts with :
+        }
         return account;
     }
 
     /* Unofficial Extras */
-    void SquadEventHandler(void* eventArgs) {
+    void UnExSquadEventHandler(void* eventArgs) {
         SquadUpdate* squadUpdate = (SquadUpdate*)eventArgs;
+        unofficalExtrasEnabled = true;
         std::string account = StripAccount(squadUpdate->UserInfo->AccountName);
         int role = int(squadUpdate->UserInfo->Role);
-        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("received squad event for account: {} - role: {}", account, role).c_str());
+        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("unex: received event for account: {} - role: {}", account, role).c_str());
         if (role == 5) {
-            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("{} has left the squad or party", account, role).c_str());
-            if (selfName == account) ClearPlayers();
+            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: {} has left the squad or party", account, role).c_str());
+            if (selfAccountName == account) ClearPlayers();
             else RemovePlayer(account);
         }
         if (role <= 2) {
-            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("{} has joined the squad or party", account, role).c_str());
+            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: detected player with account {} in squad or party", account, role).c_str());
             AddPlayer(account);
         }
     }
 
     /* Arcdps */
-    void SelfAccountNameHandler(void* eventArgs) {
-        const char* selfAccountName = (const char*)eventArgs;
-        selfName = StripAccount(selfAccountName);
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("self account was detected: {}", selfName).c_str());
-        AddPlayer(selfName);
+    void ArcSquadJoinEventHandler(void* eventArgs) {
+        EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
+        std::string accountName = StripAccount(evAgentUpdateData->account);
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: detected player with account {} in squad or party", accountName).c_str());
+        AddPlayer(evAgentUpdateData->id, accountName);
+    }
+
+    void ArcSquadLeaveEventHandler(void* eventArgs) {
+        EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: {} has left the squad or party", evAgentUpdateData->id).c_str());
+        RemovePlayer(evAgentUpdateData->id);
+    }
+
+    void ArcSelfLeaveEventHandler(void* eventArgs) {
+        EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
+        if (unofficalExtrasEnabled) return;
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: {} has left the squad or party", selfAccountName).c_str());
+        ClearPlayers();
+    }
+
+    void ArcSelfDetectedEventHandler(void* eventArgs) {
+        EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
+        selfAccountName = StripAccount(evAgentUpdateData->account);
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: self detected with id {} account: {}", evAgentUpdateData->id, selfAccountName).c_str());
+        AddPlayer(evAgentUpdateData->id, selfAccountName);
     }
 }

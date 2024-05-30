@@ -17,6 +17,7 @@ namespace LogProofs {
     };
 
     struct Player {
+        uintptr_t id;
         std::string account;
         PlayerState state;
         std::map<std::string, int > kp;
@@ -24,13 +25,15 @@ namespace LogProofs {
 
 
     extern std::vector<Player> players;
-    extern std::string selfName;
+    extern std::string selfAccountName;
     extern std::mutex Mutex;
     extern Threadpool threadpool;
 
-    void SquadEventHandler(void* eventArgs);
-    void CombatEventHandler(void* eventArgs);
-    void SelfAccountNameHandler(void* eventArgs);
+    void UnExSquadEventHandler(void* eventArgs);
+    void ArcSquadJoinEventHandler(void* eventArgs);
+    void ArcSquadLeaveEventHandler(void* eventArgs);
+    void ArcSelfLeaveEventHandler(void* eventArgs);
+    void ArcSelfDetectedEventHandler(void* eventArgs);
 }
 
 /* Unofficial Extras */

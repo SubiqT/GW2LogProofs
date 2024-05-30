@@ -40,9 +40,14 @@ void AddonLoad(AddonAPI* addonApi) {
 	APIDefs->RegisterKeybindWithString(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS, ToggleShowWindowLogProofs, "(null)");
 	if (Settings::ShowQuickAccessShortcut) RegisterQuickAccessShortcut();
 
-	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::SquadEventHandler);
-	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_ACCOUNT_NAME", LogProofs::SelfAccountNameHandler);
-	APIDefs->RaiseEvent("EV_ARCDPS_SELF_ACCOUNT_NAME_REQUEST", nullptr);
+	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
+	APIDefs->SubscribeEvent("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
+	APIDefs->SubscribeEvent("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
+	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
+	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
+	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_DETECT", LogProofs::ArcSelfDetectedEventHandler);
+	APIDefs->RaiseEvent("EV_ARCDPS_SELF_REQUEST", nullptr);
+
 	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
 	APIDefs->RegisterRender(ERenderType_OptionsRender, AddonOptions);
 
@@ -55,8 +60,12 @@ void AddonUnload() {
 
 	if (&Settings::ShowQuickAccessShortcut) DeregisterQuickAccessShortcut();
 	APIDefs->DeregisterKeybind(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
-	APIDefs->UnsubscribeEvent("EV_ARCDPS_SELF_ACCOUNT_NAME", LogProofs::SelfAccountNameHandler);
-	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::SquadEventHandler);
+	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_DETECT", LogProofs::ArcSelfDetectedEventHandler);
+	APIDefs->UnsubscribeEvent("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
+	APIDefs->UnsubscribeEvent("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
+	APIDefs->UnsubscribeEvent("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
+	APIDefs->UnsubscribeEvent("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
+	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
 
 	LogProofs::threadpool.shutdown();
 

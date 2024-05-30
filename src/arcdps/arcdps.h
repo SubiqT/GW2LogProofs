@@ -57,13 +57,28 @@ typedef struct ag {
 	uint16_t team; /* sep21+ */
 } ag;
 
-/* combat event send by nexus */
+/* Nexus */
 struct EvCombatData
 {
-	cbtevent* ev;
-	ag* src;
-	ag* dst;
-	char* skillname;
-	uint64_t id;
-	uint64_t revision;
+	cbtevent* ev = nullptr;
+	ag* src = nullptr;
+	ag* dst = nullptr;
+	char* skillname = nullptr;
+	uint64_t id = NULL;
+	uint64_t revision = NULL;
+};
+
+struct EvAgentUpdateData		// when ev is null
+{
+	char account[64] = "";		// dst->name	= account name
+	char character[64] = "";	// src->name	= character name
+	uintptr_t id;				// src->id		= agent id
+	uintptr_t instanceId;		// dst->id		= instance id (per map)
+	uint32_t added;				// src->prof	= is new agent
+	uint32_t target;			// src->elite	= is new targeted agent
+	uint32_t self;				// dst->self	= is self
+	uint32_t prof;				// dst->prof	= profession / core spec
+	uint32_t elite;				// dst->elite	= elite spec
+	uint16_t team;				// src->team	= team
+	uint16_t subgroup;			// dst->team	= subgroup
 };
