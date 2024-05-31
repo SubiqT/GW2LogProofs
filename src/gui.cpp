@@ -117,6 +117,11 @@ void RenderWindowLogProofs() {
 		}
 	}
 	ImGui::End();
+
+	if (!Settings::ShowWindowLogProofs) { // X button on top right was clicked
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
+		Settings::Save(SettingsPath);
+	}
 }
 
 void ToggleShowWindowLogProofs(const char* keybindIdentifier) {
