@@ -124,7 +124,8 @@ void RenderWindowLogProofs() {
 	}
 }
 
-void ToggleShowWindowLogProofs(const char* keybindIdentifier) {
+void ToggleShowWindowLogProofs(const char* keybindIdentifier, bool isRelease) {
+	if (isRelease) return;
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Keybind {} was pressed.", keybindIdentifier).c_str());
 	Settings::ShowWindowLogProofs = !Settings::ShowWindowLogProofs;
 	Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
