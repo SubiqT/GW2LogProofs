@@ -471,9 +471,23 @@
     <Image Include="src\resources\Whisper_of_Jormag.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="resources\CerusAndDeimos.png" />
-    <Image Include="resources\Eparch.png" />
-    <Image Include="src\resources\CerusAndDeimos.png" />
-    <Image Include="src\resources\Eparch.png" />
+    <Image Include="resources\CerusAndDeimos.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\CerusAndDeimos.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Eparch.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\Eparch.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\UnderConstruction.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\UnderConstruction.png">
+      <Filter>resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>

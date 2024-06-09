@@ -270,6 +270,6 @@ Texture* GetBossTexture(Boss boss) {
 	case Cerus:
 		return APIDefs->GetTextureOrCreateFromResource("TEX_CERUS", IDB_CERUS, hSelf);
 	default:
-		return nullptr;
+		return APIDefs->GetTextureOrCreateFromResource("TEX_UNDER_CONSTRUCTION", IDB_UNDER_CONSTRUCTION, hSelf);
 	}
 }

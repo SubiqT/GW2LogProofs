@@ -107,6 +107,7 @@
     <Image Include="resources\Slothasor.png" />
     <Image Include="resources\Soulless_Horror.png" />
     <Image Include="resources\Twisted_Castle.png" />
+    <Image Include="resources\UnderConstruction.png" />
     <Image Include="resources\Vale_Guardian.png" />
     <Image Include="resources\Watchknight_Mark_II.png" />
     <Image Include="resources\Whisper_of_Jormag.png" />
@@ -164,6 +165,7 @@
     <Image Include="src\resources\Slothasor.png" />
     <Image Include="src\resources\Soulless_Horror.png" />
     <Image Include="src\resources\Twisted_Castle.png" />
+    <Image Include="src\resources\UnderConstruction.png" />
     <Image Include="src\resources\Vale_Guardian.png" />
     <Image Include="src\resources\Watchknight_Mark_II.png" />
     <Image Include="src\resources\Whisper_of_Jormag.png" />
