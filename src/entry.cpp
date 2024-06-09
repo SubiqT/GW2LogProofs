@@ -68,7 +68,6 @@ void AddonUnload() {
 
 	LogProofs::threadpool.shutdown();
 
-	Settings::Save(SettingsPath);
 	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "<c=#ff0000>Log Proofs</c> was unloaded.");
 }
 
