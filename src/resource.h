@@ -57,12 +57,15 @@
 #define IDB_MINISTER_LI                 154
 #define IDB_WATCHKNIGHT_MARK_II         155
 #define IDB_WHISPER_OF_JORMAG           156
+#define IDB_CERUS_AND_DEIMOS            157
+#define IDB_PNG2                        158
+#define IDB_EPARCH                      158
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        157
+#define _APS_NEXT_RESOURCE_VALUE        159
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101

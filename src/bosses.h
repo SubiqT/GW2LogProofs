@@ -6,6 +6,7 @@
 #include "nexus/Nexus.h"
 
 enum Boss {
+	/* Raids */
 	ValeGuardian = 15438,
 	Gorseval = 15429,
 	Sabetha = 15375,
@@ -45,6 +46,7 @@ enum Boss {
 	SabirCM = -21964,
 	QadimThePeerless = 22000,
 	QadimThePeerlessCM = -22000,
+	/* Fractals  */
 	MAMA = 17021,
 	MAMACM = -17021,
 	SiaxTheCorrupted = 17028,
@@ -65,6 +67,11 @@ enum Boss {
 	ElementalAndDarkAiKeeperOfThePeakCM = -232543,
 	KanaxaiScytheOfHouseAurkus = 25577,
 	KanaxaiScytheOfHouseAurkusCM = -25577,
+	CerusAndDeimos = 26257,
+	CerusAndDeimosCM = -26257,
+	Eparch = 26231,
+	EparchCM = -26231,
+	/* Strikes */
 	IcebroodConstruct = 22154,
 	TheVoiceAndTheClaw = 22343,
 	FraenirOfJormag = 22492,

@@ -66,6 +66,7 @@
     <Image Include="resources\Cairn.png" />
     <Image Include="resources\Captain_Mai_Trin.png" />
     <Image Include="resources\Cerus.png" />
+    <Image Include="resources\CerusAndDeimos.png" />
     <Image Include="resources\Conjured_Amalgamate.png" />
     <Image Include="resources\Dagda.png" />
     <Image Include="resources\Deimos.png" />
@@ -75,6 +76,7 @@
     <Image Include="resources\Elemental_Ai_Light.png" />
     <Image Include="resources\Elemental_Ai_Light_And_Dark.png" />
     <Image Include="resources\Ensolyss.png" />
+    <Image Include="resources\Eparch.png" />
     <Image Include="resources\Escort.png" />
     <Image Include="resources\Eyes_Of_Fate.png" />
     <Image Include="resources\Fraenir_Of_Jormag.png" />
@@ -120,6 +122,7 @@
     <Image Include="src\resources\Cairn.png" />
     <Image Include="src\resources\Captain_Mai_Trin.png" />
     <Image Include="src\resources\Cerus.png" />
+    <Image Include="src\resources\CerusAndDeimos.png" />
     <Image Include="src\resources\Conjured_Amalgamate.png" />
     <Image Include="src\resources\Dagda.png" />
     <Image Include="src\resources\Deimos.png" />
@@ -129,6 +132,7 @@
     <Image Include="src\resources\Elemental_Ai_Light.png" />
     <Image Include="src\resources\Elemental_Ai_Light_And_Dark.png" />
     <Image Include="src\resources\Ensolyss.png" />
+    <Image Include="src\resources\Eparch.png" />
     <Image Include="src\resources\Escort.png" />
     <Image Include="src\resources\Eyes_Of_Fate.png" />
     <Image Include="src\resources\Fraenir_Of_Jormag.png" />

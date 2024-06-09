@@ -22,13 +22,15 @@ std::vector<Boss> sortedFractalBosses {
 	MAMA, SiaxTheCorrupted, EnsolyssOfTheEndlessTorment,
 	SkorvaldTheShattered, Artsariiv, Arkk,
 	ElementalAiKeeperOfThePeak,
-	KanaxaiScytheOfHouseAurkus
+	KanaxaiScytheOfHouseAurkus,
+	CerusAndDeimos, Eparch
 };
 std::vector<Boss> sortedFractalCMBosses {
 	MAMACM, SiaxTheCorruptedCM, EnsolyssOfTheEndlessTormentCM,
 	SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM,
 	ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM,
-	KanaxaiScytheOfHouseAurkusCM
+	KanaxaiScytheOfHouseAurkusCM,
+	CerusAndDeimosCM, EparchCM
 };
 std::vector<Boss> sortedStrikeBosses {
 	IcebroodConstruct, TheVoiceAndTheClaw, FraenirOfJormag, Boneskinner, WhisperOfJormag,
@@ -49,6 +51,7 @@ std::vector<Boss> sortedStrikeLMBosses{
 const char* GetBossName(Boss boss) {
 	boss = Boss(abs(boss));
 	switch (boss) {
+	/* Raids */
 	case ValeGuardian:
 		return "Vale Guardian";
 	case Gorseval:
@@ -101,6 +104,7 @@ const char* GetBossName(Boss boss) {
 		return "Sabir";
 	case QadimThePeerless:
 		return "Qadim the Peerless";
+	/* Fractals */
 	case MAMA:
 		return "MAMA";
 	case SiaxTheCorrupted:
@@ -121,6 +125,11 @@ const char* GetBossName(Boss boss) {
 		return "Full Ai";
 	case KanaxaiScytheOfHouseAurkus:
 		return "Kanaxai";
+	case CerusAndDeimos:
+		return "Cerus & Deimos";
+	case Eparch:
+		return "Eparch";
+	/* Strikes */
 	case IcebroodConstruct:
 		return "Icebrood Construct";
 	case TheVoiceAndTheClaw:
@@ -155,6 +164,7 @@ const char* GetBossName(Boss boss) {
 Texture* GetBossTexture(Boss boss) {
 	boss = Boss(abs(boss));
 	switch (boss) {
+	/* Raids */
 	case ValeGuardian:
 		return APIDefs->GetTextureOrCreateFromResource("TEX_VALE_GUARDIAN", IDB_VALE_GUARDIAN, hSelf);
 	case Gorseval:
@@ -207,6 +217,7 @@ Texture* GetBossTexture(Boss boss) {
 		return APIDefs->GetTextureOrCreateFromResource("TEX_SABIR", IDB_SABIR, hSelf);
 	case QadimThePeerless:
 		return APIDefs->GetTextureOrCreateFromResource("TEX_QADIM_THE_PEERLESS", IDB_QADIM_THE_PEERLESS, hSelf);
+	/* Fractals */
 	case MAMA:
 		return APIDefs->GetTextureOrCreateFromResource("TEX_MAMA", IDB_MAMA, hSelf);
 	case SiaxTheCorrupted:
@@ -227,6 +238,11 @@ Texture* GetBossTexture(Boss boss) {
 		return APIDefs->GetTextureOrCreateFromResource("TEX_ELEMENTAL_AI_LIGHT_AND_DARK", IDB_ELEMENTAL_AI_LIGHT_AND_DARK, hSelf);
 	case KanaxaiScytheOfHouseAurkus:
 		return APIDefs->GetTextureOrCreateFromResource("TEX_KANAXAI", IDB_KANAXAI, hSelf);
+	case CerusAndDeimos:
+		return APIDefs->GetTextureOrCreateFromResource("TEX_CERUS_AND_DEIMOS", IDB_CERUS_AND_DEIMOS, hSelf);
+	case Eparch:
+		return APIDefs->GetTextureOrCreateFromResource("TEX_EPARCH", IDB_EPARCH, hSelf);
+	/* Strikes */
 	case IcebroodConstruct:
 		return APIDefs->GetTextureOrCreateFromResource("TEX_ICEBROOD_CONSTRUCT", IDB_ICEBROOD_CONSTRUCT, hSelf);
 	case TheVoiceAndTheClaw:

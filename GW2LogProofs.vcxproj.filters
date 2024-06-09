@@ -471,5 +471,9 @@
     <Image Include="src\resources\Whisper_of_Jormag.png">
       <Filter>resources</Filter>
     </Image>
+    <Image Include="resources\CerusAndDeimos.png" />
+    <Image Include="resources\Eparch.png" />
+    <Image Include="src\resources\CerusAndDeimos.png" />
+    <Image Include="src\resources\Eparch.png" />
   </ItemGroup>
 </Project>
