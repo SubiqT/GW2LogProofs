@@ -25,6 +25,14 @@ static ImGuiTableFlags tableFlags = (
 	| ImGuiTableFlags_ScrollY
 	);
 
+enum DataSource {
+	WINGMAN,
+	KPME
+};
+
+DataSource selectedDataSource = WINGMAN;
+std::vector<std::string> dataSources = { "Wingman", "Kpme" };
+
 void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray , bool isLegendary) {
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 1, tableFlags)) {
@@ -91,29 +99,47 @@ void RenderWindowLogProofs() {
 	}
 	ImGui::SetNextWindowSizeConstraints(ImVec2(Settings::MinWindowWidth, Settings::MinWindowHeight), ImVec2(Settings::MaxWindowWidth,Settings::MaxWindowHeight));
 	if (ImGui::Begin("Log Proofs", &Settings::ShowWindowLogProofs, windowFlags)) {
-		if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
-			if (Settings::ShowTabRaidsNormal) {
-				DrawBossesTab("Raids", "normalRaidsTable", &sortedRaidBosses, false);
+
+		if (ImGui::BeginCombo("Source##DataSource", dataSources[selectedDataSource].c_str())) {
+			for (int index = 0; index < dataSources.size(); ++index) {
+				const bool is_selected = (dataSources[index] == dataSources[selectedDataSource]);
+				if (ImGui::Selectable(dataSources[index].c_str(), is_selected)) {
+					selectedDataSource = DataSource(index);
+				}
+				if (is_selected) ImGui::SetItemDefaultFocus();
 			}
-			if (Settings::ShowTabRaidsCM) {
-				DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses, false);
+			ImGui::EndCombo();
+		}
+
+		if (selectedDataSource == WINGMAN) {
+			if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
+				if (Settings::ShowTabRaidsNormal) {
+					DrawBossesTab("Raids", "normalRaidsTable", &sortedRaidBosses, false);
+				}
+				if (Settings::ShowTabRaidsCM) {
+					DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses, false);
+				}
+				if (Settings::ShowTabFractalsNormal) {
+					DrawBossesTab("Fractals", "normalFractalsTable", &sortedFractalBosses, false);
+				}
+				if (Settings::ShowTabFractalsCM) {
+					DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses, false);
+				}
+				if (Settings::ShowTabStrikesNormal) {
+					DrawBossesTab("Strikes", "normalStrikesTable", &sortedStrikeBosses, false);
+				}
+				if (Settings::ShowTabStrikesCM) {
+					DrawBossesTab("Strike CMs", "cmStrikesTable", &sortedStrikeCMBosses, false);
+				}
+				if (Settings::ShowTabStrikesLM) {
+					DrawBossesTab("Strike LMs", "lmStrikesTable", &sortedStrikeLMBosses, true);
+				}
+				ImGui::EndTabBar();
 			}
-			if (Settings::ShowTabFractalsNormal) {
-				DrawBossesTab("Fractals", "normalFractalsTable", &sortedFractalBosses, false);
-			}
-			if (Settings::ShowTabFractalsCM) {
-				DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses, false);
-			}
-			if (Settings::ShowTabStrikesNormal) {
-				DrawBossesTab("Strikes", "normalStrikesTable", &sortedStrikeBosses, false);
-			}
-			if (Settings::ShowTabStrikesCM) {
-				DrawBossesTab("Strike CMs", "cmStrikesTable", &sortedStrikeCMBosses, false);
-			}
-			if (Settings::ShowTabStrikesLM) {
-				DrawBossesTab("Strike LMs", "lmStrikesTable", &sortedStrikeLMBosses, true);
-			}
-			ImGui::EndTabBar();
+		}
+		
+		if (selectedDataSource == KPME) {
+
 		}
 	}
 	ImGui::End();
