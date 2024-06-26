@@ -4,7 +4,7 @@
 #include <string>
 
 namespace Wingman {
-    struct KillProofsResponse {
+    struct WingmanResponse {
         std::string account;
         std::map<std::string, std::map<std::string, int>> kp;
         // Not used fields:
@@ -12,7 +12,7 @@ namespace Wingman {
         //std::vector<std::string> groups;
     };
 
-	KillProofsResponse GetKillProofs(std::string account);
+	WingmanResponse GetKillProofs(std::string account);
 }
 
 #endif

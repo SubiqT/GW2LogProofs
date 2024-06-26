@@ -11,18 +11,18 @@ using json = nlohmann::json;
 
 namespace Wingman {
 
-    void from_json(const json& j, KillProofsResponse& r) {
+    void from_json(const json& j, WingmanResponse& r) {
         j.at("account").get_to(r.account);
         j.at("kp").get_to<std::map<std::string, std::map<std::string, int>>>(r.kp);
     }
 
-    KillProofsResponse GetKillProofs(std::string account) {
+    WingmanResponse GetKillProofs(std::string account) {
         std::string url = std::format("https://gw2wingman.nevermindcreations.de/api/kp?account={}", account);
         const char* cUrl = url.c_str();
         APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, cUrl);
         std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
         std::string response = HTTPClient::GetRequest(wUrl.c_str());
         json j = json::parse(response);
-        return j.template get<KillProofsResponse>();
+        return j.template get<WingmanResponse>();
     }
 }
