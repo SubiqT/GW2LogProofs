@@ -9,9 +9,10 @@
 #include "unofficial_extras/Definitions.h"
 
 #include "threadpool.hpp"
+#include "kpme.h"
 
 namespace LogProofs {
-    enum PlayerState {
+    enum KpState {
         LOADING = 0,
         READY = 1
     };
@@ -19,8 +20,10 @@ namespace LogProofs {
     struct Player {
         uintptr_t id;
         std::string account;
-        PlayerState state;
-        std::map<std::string, int > kp;
+        KpState wingmanState;
+        KpState kpmeState;
+        std::map<std::string, int> wingman;
+        Kpme::KpmeResponse kpme;
     };
 
 

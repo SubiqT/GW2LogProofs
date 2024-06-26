@@ -8,6 +8,7 @@
 #include "shared.h"
 #include "threadpool.hpp"
 #include "wingman.h"
+#include "kpme.h"
 
 namespace LogProofs {
 	std::vector<Player> players;
@@ -41,11 +42,11 @@ namespace LogProofs {
         return -1;
     }
 
-    void LoadKillProofs(std::string account) {
-        Wingman::KillProofsResponse wingmanResponse = Wingman::GetKillProofs(account);
+    void LoadWingmanKillProofs(std::string account) {
+        Wingman::WingmanResponse res = Wingman::GetKillProofs(account);
 
         std::map<std::string, int> kp;
-        for (const auto& outer : wingmanResponse.kp) {
+        for (const auto& outer : res.kp) {
             for (const auto& inner : outer.second) {
                 if (inner.first == "total") {
                     kp.insert({ outer.first, inner.second });  // { boss_id, total_kills }
@@ -55,24 +56,51 @@ namespace LogProofs {
         long long index = GetPlayerIndex(account);
         if (index == -1) {
             APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
-                "tried to load kp for player with account {} but player was not found in players vector.", account).c_str());
+                "tried to load wingman for player with account {} but player was not found in players vector.", account).c_str());
             return;
         }
         try {
             std::scoped_lock lck(Mutex);
-            if (players[index].state != LOADING) {
+            if (players[index].wingmanState != LOADING) {
                 APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
-                    "tried to load kp for player with account {} but player was not in the loading state.", account).c_str());
+                    "tried to load wingman for player with account {} but player was not in the loading state.", account).c_str());
                 return;
             }
-            players.at(index).kp = kp;
-            players.at(index).state = READY;
+            players.at(index).wingman = kp;
+            players.at(index).wingmanState = READY;
         } catch (const std::exception& e) {
             APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
-                "tried to load kp for player with account {} but a subscript out of bounds error occurred. exception details: {}", account, e.what()).c_str());
+                "tried to load wingman for player with account {} but a subscript out of bounds error occurred. exception details: {}", account, e.what()).c_str());
             return;
         }
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded kp for player: {}", account).c_str());
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded wingman for player: {}", account).c_str());
+    }
+
+    void LoadKpmeKillProofs(std::string account) {
+        Kpme::KpmeResponse res = Kpme::GetKillProofs(account);
+
+        long long index = GetPlayerIndex(account);
+        if (index == -1) {
+            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                "tried to load kpme for player with account {} but player was not found in players vector.", account).c_str());
+            return;
+        }
+        try {
+            std::scoped_lock lck(Mutex);
+            if (players[index].kpmeState != LOADING) {
+                APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                    "tried to load kpme for player with account {} but player was not in the loading state.", account).c_str());
+                return;
+            }
+            players.at(index).kpme = res;
+            players.at(index).kpmeState = READY;
+        }
+        catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
+                "tried to load kpme for player with account {} but a subscript out of bounds error occurred. exception details: {}", account, e.what()).c_str());
+            return;
+        }
+        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded kpme for player: {}", account).c_str());
     }
 
     void AddPlayer(std::string account) {
@@ -80,21 +108,22 @@ namespace LogProofs {
         try {
             std::scoped_lock lck(Mutex);
             for (Player p : players) if (p.account == account) return;  // skip already added players
-            players.push_back({ 0, account, LOADING });
+            players.push_back({ 0, account, LOADING, LOADING });
         } catch (const std::exception& e) {
             APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
                 "tried to add player with account {} but an error occurred. exception details: {}", account, e.what()).c_str());
             return;
         }
         APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player to log proofs table with account {}", account).c_str());
-        threadpool.spawn([=]() { LoadKillProofs(account); return nullptr; });
+        threadpool.spawn([=]() { LoadWingmanKillProofs(account); return nullptr; });
+        threadpool.spawn([=]() { LoadKpmeKillProofs(account); return nullptr; });
     }
 
     void AddPlayer(uintptr_t id, std::string account) {
         try {
             std::scoped_lock lck(Mutex);
             for (Player p : players) if (p.account == account) return;  // skip already added players
-            players.push_back({ id, account, LOADING });
+            players.push_back({ id, account, LOADING, LOADING });
         }
         catch (const std::exception& e) {
             APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
@@ -102,7 +131,8 @@ namespace LogProofs {
             return;
         }
         APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player to log proofs table with id {} and account {}", id, account).c_str());
-        threadpool.spawn([=]() { LoadKillProofs(account); return nullptr; });
+        threadpool.spawn([=]() { LoadWingmanKillProofs(account); return nullptr; });
+        threadpool.spawn([=]() { LoadKpmeKillProofs(account); return nullptr; });
     }
 
     void RemovePlayer(std::string account) {
