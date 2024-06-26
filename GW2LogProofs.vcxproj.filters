@@ -37,13 +37,10 @@
     <ClCompile Include="src\shared.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\wingman.cpp">
+    <ClCompile Include="src\kp_loader.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\log_proofs.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\kpme.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -111,13 +108,10 @@
     <ClInclude Include="src\httpclient.hpp">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\wingman.h">
+    <ClInclude Include="src\kp_loader.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\log_proofs.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\kpme.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

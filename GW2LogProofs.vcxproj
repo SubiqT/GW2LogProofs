@@ -19,13 +19,12 @@
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\kpme.cpp" />
     <ClCompile Include="src\log_proofs.cpp" />
     <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\shared.cpp" />
     <ClCompile Include="src\unofficial_extras\KeyBindHelper.cpp" />
     <ClCompile Include="src\unofficial_extras\KeyBindsTranslation.cpp" />
-    <ClCompile Include="src\wingman.cpp" />
+    <ClCompile Include="src\kp_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\arcdps\arcdps.h" />
@@ -38,7 +37,6 @@
     <ClInclude Include="src\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\kpme.h" />
     <ClInclude Include="src\log_proofs.h" />
     <ClInclude Include="src\nexus\Nexus.h" />
     <ClInclude Include="src\nlohmann\json.hpp" />
@@ -51,7 +49,7 @@
     <ClInclude Include="src\unofficial_extras\KeyBindsTranslation.h" />
     <ClInclude Include="src\unofficial_extras\KeyBindStructs.h" />
     <ClInclude Include="src\version.h" />
-    <ClInclude Include="src\wingman.h" />
+    <ClInclude Include="src\kp_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\resource.rc" />

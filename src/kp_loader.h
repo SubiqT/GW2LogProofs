@@ -1,9 +1,21 @@
-#ifndef KPME_H
-#define KPME_H
+#ifndef KP_LOADER_H
+#define KP_LOADER_H
 
 #include <string>
-#include <vector>
 #include <map>
+#include <vector>
+
+namespace Wingman {
+    struct WingmanResponse {
+        std::string account;
+        std::map<std::string, std::map<std::string, int>> kp;
+        // Not used fields:
+        //std::vector<std::string> characters;
+        //std::vector<std::string> groups;
+    };
+
+	WingmanResponse GetKillProofs(std::string account);
+}
 
 namespace Kpme {
     struct Kp {
@@ -41,5 +53,6 @@ namespace Kpme {
 
     KpmeResponse GetKillProofs(std::string account);
 }
+
 
 #endif

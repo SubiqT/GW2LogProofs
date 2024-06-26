@@ -9,7 +9,7 @@
 #include "unofficial_extras/Definitions.h"
 
 #include "threadpool.hpp"
-#include "kpme.h"
+#include "kp_loader.h"
 
 namespace LogProofs {
     enum KpState {

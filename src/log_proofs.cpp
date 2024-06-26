@@ -7,8 +7,7 @@
 #include "log_proofs.h"
 #include "shared.h"
 #include "threadpool.hpp"
-#include "wingman.h"
-#include "kpme.h"
+#include "kp_loader.h"
 
 namespace LogProofs {
 	std::vector<Player> players;
