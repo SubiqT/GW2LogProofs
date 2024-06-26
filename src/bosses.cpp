@@ -44,8 +44,16 @@ std::vector<Boss> sortedStrikeCMBosses {
 	OldLionsCourtCM,
 	DagdaCM, CerusCM
 };
-std::vector<Boss> sortedStrikeLMBosses{
+std::vector<Boss> sortedStrikeLMBosses {
 	CerusCM
+};
+
+std::vector<std::string> sortedKpmeKillProofs {
+	"Legendary Insight",
+	"Legendary Divination",
+	"Unstable Fractal Essence",
+	"Unstable Cosmic Essence",
+	"Boneskinner Ritual Vial"
 };
 
 const char* GetBossName(Boss boss) {

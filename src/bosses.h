@@ -102,6 +102,8 @@ extern std::vector<Boss> sortedStrikeBosses;
 extern std::vector<Boss> sortedStrikeCMBosses;
 extern std::vector<Boss> sortedStrikeLMBosses;
 
+extern std::vector<std::string> sortedKpmeKillProofs;
+
 const char* GetBossName(Boss boss);
 Texture* GetBossTexture(Boss boss);
 

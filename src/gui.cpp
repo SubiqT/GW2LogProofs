@@ -93,6 +93,79 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 	}
 }
 
+void DrawKpmeTab(const char* tabName, const char* tableName, std::vector<std::string>* proofsArray) {
+	if (ImGui::BeginTabItem(tabName)) {
+		if (ImGui::BeginTable(tableName, int(proofsArray->size()) + 2, tableFlags)) {
+			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
+			ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 20.0f);
+			for (std::string proof : *proofsArray) {
+				ImGui::TableSetupColumn(proof.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
+			}
+			ImGui::TableSetupScrollFreeze(1, 1);
+			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+			ImGui::TableNextColumn();
+			ImGui::Text("Account");
+			ImGui::TableNextColumn();
+			ImGui::Text("Id");
+			for (std::string proof : *proofsArray) {
+				ImGui::TableNextColumn();
+				ImGui::Text(proof.c_str());
+				if (ImGui::IsItemHovered()) {
+					ImGui::BeginTooltip();
+					ImGui::Text(proof.c_str());
+					ImGui::EndTooltip();
+				}
+			}
+			{
+				std::scoped_lock lck(LogProofs::Mutex);
+				if (LogProofs::players.size() > 0) {
+					for (LogProofs::Player p : LogProofs::players) {
+						ImGui::TableNextColumn();
+						ImGui::Text(p.account.c_str());
+						ImGui::TableNextColumn();
+						ImGui::Text(p.kpme.id.c_str());
+						for (std::string proof : *proofsArray) {
+							ImGui::TableNextColumn();
+							if (p.kpmeState == LogProofs::READY) {
+								bool found = false;
+								if (true) { // add checkbox to toggle it
+									for (Kpme::Kp kp : p.kpme.shared.killproofs) {
+										if (kp.name == proof) {
+											ImGui::Text("%i", kp.amount);
+											found = true;
+										}
+									}
+								}
+								if (!found) {
+									for (Kpme::Kp kp : p.kpme.self.killproofs) {
+										if (kp.name == proof) {
+											ImGui::Text("%i", kp.amount);
+											found = true;
+										}
+									}
+								}
+								if (!found) {
+									ImGui::Text("...");
+								}
+							}
+							else {
+								ImGui::Text("...");
+							}
+						}
+					}
+				}
+			}
+			if (LogProofs::players.size() == 0) {
+				ImGui::TableNextColumn();
+				ImGui::Text("No players found... ");
+			}
+			ImGui::EndTable();
+
+		}
+		ImGui::EndTabItem();
+	}
+}
+
 void RenderWindowLogProofs() {
 	if (!Settings::ShowWindowLogProofs) {
 		return;
@@ -112,7 +185,7 @@ void RenderWindowLogProofs() {
 		}
 
 		if (selectedDataSource == WINGMAN) {
-			if (ImGui::BeginTabBar("##GameModes", ImGuiTabBarFlags_None)) {
+			if (ImGui::BeginTabBar("##Wingman", ImGuiTabBarFlags_None)) {
 				if (Settings::ShowTabRaidsNormal) {
 					DrawBossesTab("Raids", "normalRaidsTable", &sortedRaidBosses, false);
 				}
@@ -139,7 +212,14 @@ void RenderWindowLogProofs() {
 		}
 		
 		if (selectedDataSource == KPME) {
+			if (ImGui::BeginTabBar("##Kpme", ImGuiTabBarFlags_None)) {
+				if (true) {
+					DrawKpmeTab("Killproofs", "killproofsTable", &sortedKpmeKillProofs);
+				}
 
+
+				ImGui::EndTabBar();
+			}
 		}
 	}
 	ImGui::End();
