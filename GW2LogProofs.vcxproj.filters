@@ -43,6 +43,9 @@
     <ClCompile Include="src\log_proofs.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\kpme.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\nexus\Nexus.h">
@@ -112,6 +115,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\log_proofs.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kpme.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
