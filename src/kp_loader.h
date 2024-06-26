@@ -14,7 +14,7 @@ namespace Wingman {
         //std::vector<std::string> groups;
     };
 
-	WingmanResponse GetKillProofs(std::string account);
+	WingmanResponse GetKp(std::string account);
 }
 
 namespace Kpme {
@@ -30,15 +30,7 @@ namespace Kpme {
         std::string mode;
     };
 
-    struct AccountKp {
-        std::string account;
-        std::vector<Kp> killproofs;
-        std::vector<Kp> tokens;
-        std::vector<Kp> coffers;
-        std::vector<Title> titles;
-    };
-
-    struct TotalKp {
+    struct KpSummary {
         std::vector<Kp> killproofs;
         std::vector<Kp> tokens;
         std::vector<Kp> coffers;
@@ -46,12 +38,12 @@ namespace Kpme {
     };
 
     struct KpmeResponse {
-        std::string kpId;
-        std::vector<AccountKp> linked;
-        TotalKp linkedTotals;
+        std::string id;
+        KpSummary self;
+        KpSummary shared;
     };
 
-    KpmeResponse GetKillProofs(std::string account);
+    KpmeResponse GetKp(std::string account);
 }
 
 

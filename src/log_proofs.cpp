@@ -42,7 +42,7 @@ namespace LogProofs {
     }
 
     void LoadWingmanKillProofs(std::string account) {
-        Wingman::WingmanResponse res = Wingman::GetKillProofs(account);
+        Wingman::WingmanResponse res = Wingman::GetKp(account);
 
         std::map<std::string, int> kp;
         for (const auto& outer : res.kp) {
@@ -76,7 +76,7 @@ namespace LogProofs {
     }
 
     void LoadKpmeKillProofs(std::string account) {
-        Kpme::KpmeResponse res = Kpme::GetKillProofs(account);
+        Kpme::KpmeResponse res = Kpme::GetKp(account);
 
         long long index = GetPlayerIndex(account);
         if (index == -1) {
