@@ -124,16 +124,19 @@ void DrawKpmeTab(const char* tabName, const char* tableName, std::vector<std::st
 						ImGui::TableNextColumn();
 						ImGui::Text(p.account.c_str());
 						ImGui::TableNextColumn();
-						ImGui::Text(p.kpme.id.c_str());
+						ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "...");
 						for (std::string proof : *proofsArray) {
 							ImGui::TableNextColumn();
 							if (p.kpmeState == LogProofs::READY) {
 								int amount = 0;
-								if (true) {
-									amount = max(p.kpme.shared.killproofs.at(proof), p.kpme.self.killproofs.at(proof));
-								}
-								else {
-									amount = p.kpme.self.killproofs.at(proof);
+								if (!p.kpme.self.killproofs.empty()) {
+									try {
+										/*if (true) {
+											amount = max(p.kpme.shared.killproofs.at(proof), p.kpme.self.killproofs.at(proof));
+										}*/
+										amount = p.kpme.self.killproofs.at(proof);
+									}
+									catch (const std::out_of_range &e) {}
 								}
 								ImGui::Text("%i", amount);
 							}

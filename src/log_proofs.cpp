@@ -19,7 +19,6 @@ namespace LogProofs {
 
     long long GetPlayerIndex(std::string account) {
         try {
-            std::scoped_lock lck(Mutex);
             for (Player& p : players) if (p.account == account) return std::addressof(p) - std::addressof(players.at(0));;
         }
         catch (const std::exception& e) {
@@ -31,7 +30,6 @@ namespace LogProofs {
 
     long long GetPlayerIndex(uintptr_t id) {
         try {
-            std::scoped_lock lck(Mutex);
             for (Player& p : players) if (p.id == id) return std::addressof(p) - std::addressof(players.at(0));;
         }
         catch (const std::exception& e) {
@@ -42,50 +40,40 @@ namespace LogProofs {
     }
 
     void LoadWingmanKillProofs(std::string account) {
-        Wingman::WingmanResponse res = Wingman::GetKp(account);
-
-        std::map<std::string, int> kp;
-        for (const auto& outer : res.kp) {
-            for (const auto& inner : outer.second) {
-                if (inner.first == "total") {
-                    kp.insert({ outer.first, inner.second });  // { boss_id, total_kills }
-                }
-            }
-        }
-        long long index = GetPlayerIndex(account);
-        if (index == -1) {
-            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
-                "tried to load wingman for player with account {} but player was not found in players vector.", account).c_str());
-            return;
-        }
         try {
+            Wingman::WingmanResponse res = Wingman::GetKp(account);
             std::scoped_lock lck(Mutex);
+            long long index = GetPlayerIndex(account);
+            if (index == -1) {
+                APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                    "tried to load wingman for player with account {} but player was not found in players vector.", account).c_str());
+                return;
+            }
             if (players[index].wingmanState != LOADING) {
                 APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
                     "tried to load wingman for player with account {} but player was not in the loading state.", account).c_str());
                 return;
             }
-            players.at(index).wingman = kp;
+            players.at(index).wingman = res.kp;
             players.at(index).wingmanState = READY;
+            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded wingman for player: {}", account).c_str());
         } catch (const std::exception& e) {
             APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
                 "tried to load wingman for player with account {} but a subscript out of bounds error occurred. exception details: {}", account, e.what()).c_str());
             return;
         }
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded wingman for player: {}", account).c_str());
     }
 
     void LoadKpmeKillProofs(std::string account) {
-        Kpme::KpmeResponse res = Kpme::GetKp(account);
-
-        long long index = GetPlayerIndex(account);
-        if (index == -1) {
-            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
-                "tried to load kpme for player with account {} but player was not found in players vector.", account).c_str());
-            return;
-        }
         try {
+            Kpme::KpmeResponse res = Kpme::GetKp(account);
             std::scoped_lock lck(Mutex);
+            long long index = GetPlayerIndex(account);
+            if (index == -1) {
+                APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                    "tried to load kpme for player with account {} but player was not found in players vector.", account).c_str());
+                return;
+            }
             if (players[index].kpmeState != LOADING) {
                 APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
                     "tried to load kpme for player with account {} but player was not in the loading state.", account).c_str());
@@ -93,13 +81,13 @@ namespace LogProofs {
             }
             players.at(index).kpme = res;
             players.at(index).kpmeState = READY;
+            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded kpme for player: {}", account).c_str());
         }
         catch (const std::exception& e) {
             APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
                 "tried to load kpme for player with account {} but a subscript out of bounds error occurred. exception details: {}", account, e.what()).c_str());
             return;
         }
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded kpme for player: {}", account).c_str());
     }
 
     void AddPlayer(std::string account) {
@@ -135,14 +123,14 @@ namespace LogProofs {
     }
 
     void RemovePlayer(std::string account) {
-        long long index = GetPlayerIndex(account);
-        if (index == -1) {
-            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
-                "tried to remove player with account {} but player was not found in players vector.", account).c_str());
-            return;
-        }
         try {
             std::scoped_lock lck(Mutex);
+            long long index = GetPlayerIndex(account);
+            if (index == -1) {
+                APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                    "tried to remove player with account {} but player was not found in players vector.", account).c_str());
+                return;
+            }
             players.erase(players.begin() + index);
         } catch (const std::exception& e) {
             APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
@@ -153,14 +141,14 @@ namespace LogProofs {
     }
 
     void RemovePlayer(uintptr_t id) {
-        long long index = GetPlayerIndex(id);
-        if (index == -1) {
-            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
-                "tried to remove player with id {} but player was not found in players vector.", id).c_str());
-            return;
-        }
         try {
             std::scoped_lock lck(Mutex);
+            long long index = GetPlayerIndex(id);
+            if (index == -1) {
+                APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format(
+                    "tried to remove player with id {} but player was not found in players vector.", id).c_str());
+                return;
+            }
             players.erase(players.begin() + index);
         }
         catch (const std::exception& e) {
@@ -172,9 +160,9 @@ namespace LogProofs {
     }
 
     void ClearPlayers() {
-        long long index = GetPlayerIndex(selfAccountName);
         try {
             std::scoped_lock lck(Mutex);
+            long long index = GetPlayerIndex(selfAccountName);
             if (index == -1) {
                 players.clear();
                 APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "removed all players from log proofs table (self was not found).");
@@ -193,8 +181,10 @@ namespace LogProofs {
     }
 
     std::string StripAccount(std::string account) {
-        if (!account.empty() || account.at(0) == ':') {
-            return account.erase(0, 1);  // the game prefixes accounts with :
+        if (!account.empty()) {
+            if (account.at(0) == ':') {
+                return account.erase(0, 1);  // the game prefixes accounts with :
+            }
         }
         return account;
     }
