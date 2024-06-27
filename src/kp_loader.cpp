@@ -30,67 +30,47 @@ namespace Wingman {
 namespace Kpme {
 
     void from_json(const json& j, KpmeResponse& r) {
-        // kpid
-        j.at("kpid").get_to(r.id);
+        try {
+            // kpid
+            j.at("kpid").get_to(r.id);
 
-        // kp
-        for (auto& killproof : j.at("killproofs")) {
-            Kp kp = {};
-            killproof.at("id").get_to(kp.id);
-            killproof.at("name").get_to(kp.name);
-            killproof.at("amount").get_to(kp.amount);
-            r.self.killproofs.push_back(kp);
+            // kp
+            for (auto& killproof : j.at("killproofs")) {
+                r.self.killproofs.insert({ killproof.at("name"), killproof.at("amount") });
+            }
+            for (auto& token : j.at("tokens")) {
+                r.self.tokens.insert({ token.at("name"), token.at("amount") });
+            }
+            for (auto& coffer : j.at("coffers")) {
+                r.self.coffers.insert({ coffer.at("name"), coffer.at("amount") });;
+            }
+            for (auto& title : j.at("titles")) {
+                r.self.titles.insert({ title.at("name"), title.at("amount") });
+            }
         }
-        for (auto& token : j.at("tokens")) {
-            Kp kp = {};
-            token.at("id").get_to(kp.id);
-            token.at("name").get_to(kp.name);
-            token.at("amount").get_to(kp.amount);
-            r.self.tokens.push_back(kp);
-        }
-        for (auto& coffer : j.at("coffers")) {
-            Kp kp = {};
-            coffer.at("id").get_to(kp.id);
-            coffer.at("name").get_to(kp.name);
-            coffer.at("amount").get_to(kp.amount);
-            r.self.coffers.push_back(kp);
-        }
-        for (auto& title : j.at("titles")) {
-            Title ttl = {};
-            title.at("id").get_to(ttl.id);
-            title.at("name").get_to(ttl.name);
-            title.at("mode").get_to(ttl.mode);
-            r.self.titles.push_back(ttl);
+        catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "Failed to parse kpme self.");
         }
 
         // kpShared
-        for (auto& killproof : j.at("killproofs")) {
-            Kp kp = {};
-            killproof.at("id").get_to(kp.id);
-            killproof.at("name").get_to(kp.name);
-            killproof.at("amount").get_to(kp.amount);
-            r.shared.killproofs.push_back(kp);
+        try {
+            if (!j.at("linked_totals").is_null()) {
+                for (auto& killproof : j.at("linked_totals").at("killproofs")) {
+                    r.shared.killproofs.insert({ killproof.at("name"), killproof.at("amount") });
+                }
+                for (auto& token : j.at("linked_totals").at("tokens")) {
+                    r.shared.tokens.insert({ token.at("name"), token.at("amount") });
+                }
+                for (auto& coffer : j.at("linked_totals").at("coffers")) {
+                    r.shared.coffers.insert({ coffer.at("name"), coffer.at("amount") });;
+                }
+                for (auto& title : j.at("linked_totals").at("titles")) {
+                    r.shared.titles.insert({ title.at("name"), title.at("amount") });
+                }
+            } 
         }
-        for (auto& token : j.at("tokens")) {
-            Kp kp = {};
-            token.at("id").get_to(kp.id);
-            token.at("name").get_to(kp.name);
-            token.at("amount").get_to(kp.amount);
-            r.shared.tokens.push_back(kp);
-        }
-        for (auto& coffer : j.at("coffers")) {
-            Kp kp = {};
-            coffer.at("id").get_to(kp.id);
-            coffer.at("name").get_to(kp.name);
-            coffer.at("amount").get_to(kp.amount);
-            r.shared.coffers.push_back(kp);
-        }
-        for (auto& title : j.at("titles")) {
-            Title ttl = {};
-            title.at("id").get_to(ttl.id);
-            title.at("name").get_to(ttl.name);
-            title.at("mode").get_to(ttl.mode);
-            r.shared.titles.push_back(ttl);
+        catch (const std::exception& e) {
+            APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "Failed to parse kpme shared.");
         }
     }
 

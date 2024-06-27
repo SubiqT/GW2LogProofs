@@ -18,12 +18,6 @@ namespace Wingman {
 }
 
 namespace Kpme {
-    struct Kp {
-        int id;
-        std::string name;
-        int amount;
-    };
-
     struct Title {
         int id;
         std::string name;
@@ -31,10 +25,10 @@ namespace Kpme {
     };
 
     struct KpSummary {
-        std::vector<Kp> killproofs;
-        std::vector<Kp> tokens;
-        std::vector<Kp> coffers;
-        std::vector<Title> titles;
+        std::map<std::string, int> killproofs;
+        std::map<std::string, int> tokens;
+        std::map<std::string, int> coffers;
+        std::map<std::string, std::string> titles;
     };
 
     struct KpmeResponse {

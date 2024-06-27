@@ -1,5 +1,6 @@
 #include <format>
 #include <thread>
+#include <algorithm>
 
 #include "imgui/imgui.h"
 #include "shared.h"
@@ -127,26 +128,14 @@ void DrawKpmeTab(const char* tabName, const char* tableName, std::vector<std::st
 						for (std::string proof : *proofsArray) {
 							ImGui::TableNextColumn();
 							if (p.kpmeState == LogProofs::READY) {
-								bool found = false;
-								if (true) { // add checkbox to toggle it
-									for (Kpme::Kp kp : p.kpme.shared.killproofs) {
-										if (kp.name == proof) {
-											ImGui::Text("%i", kp.amount);
-											found = true;
-										}
-									}
+								int amount = 0;
+								if (true) {
+									amount = max(p.kpme.shared.killproofs.at(proof), p.kpme.self.killproofs.at(proof));
 								}
-								if (!found) {
-									for (Kpme::Kp kp : p.kpme.self.killproofs) {
-										if (kp.name == proof) {
-											ImGui::Text("%i", kp.amount);
-											found = true;
-										}
-									}
+								else {
+									amount = p.kpme.self.killproofs.at(proof);
 								}
-								if (!found) {
-									ImGui::Text("...");
-								}
+								ImGui::Text("%i", amount);
 							}
 							else {
 								ImGui::Text("...");
