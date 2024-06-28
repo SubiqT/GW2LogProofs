@@ -43,9 +43,9 @@ std::vector<Boss> sortedStrikeLMBosses {
 
 std::vector<std::string> sortedKpmeKillProofs {
 	"Legendary Insight",
-	"Legendary Divination",
+	//"Legendary Divination", // Added to LI ( 1LD == 1LI )
 	"Unstable Fractal Essence",
-	"Unstable Cosmic Essence",
+	//"Unstable Cosmic Essence", // Added to UFE ( 1UCE == 5UFE )
 	"Boneskinner Ritual Vial"
 };
 

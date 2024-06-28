@@ -94,7 +94,7 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 	}
 }
 
-void DrawKpmeTab(const char* tabName, const char* tableName, std::vector<std::string>* proofsArray) {
+void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<std::string>* proofsArray) {
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(proofsArray->size()) + 2, tableFlags)) {
 			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
@@ -129,14 +129,18 @@ void DrawKpmeTab(const char* tabName, const char* tableName, std::vector<std::st
 							ImGui::TableNextColumn();
 							if (p.kpmeState == LogProofs::READY) {
 								int amount = 0;
-								if (!p.kpme.self.killproofs.empty()) {
-									try {
-										/*if (true) {
-											amount = max(p.kpme.shared.killproofs.at(proof), p.kpme.self.killproofs.at(proof));
-										}*/
-										amount = p.kpme.self.killproofs.at(proof);
+								if (p.kpme.self.killproofs.contains(proof)) {
+									amount = p.kpme.self.killproofs.at(proof);
+								}
+								if (proof == "Legendary Insight") {
+									if (p.kpme.self.killproofs.contains("Legendary Divination")) {
+										amount += p.kpme.self.killproofs.at("Legendary Divination");
 									}
-									catch (...) {}
+								}
+								if (proof == "Unstable Fractal Essence") {
+									if (p.kpme.self.killproofs.contains("Unstable Cosmic Essence")) {
+										amount += p.kpme.self.killproofs.at("Unstable Cosmic Essence") * 5;
+									}
 								}
 								ImGui::Text("%i", amount);
 							}
@@ -203,7 +207,7 @@ void RenderWindowLogProofs() {
 		if (selectedDataSource == KPME) {
 			if (ImGui::BeginTabBar("##Kpme", ImGuiTabBarFlags_None)) {
 				if (true) {
-					DrawKpmeTab("Killproofs", "killproofsTable", &sortedKpmeKillProofs);
+					DrawKpmeSummaryTab("Summary", "killproofsTable", &sortedKpmeKillProofs);
 				}
 
 
