@@ -136,7 +136,7 @@ void DrawKpmeTab(const char* tabName, const char* tableName, std::vector<std::st
 										}*/
 										amount = p.kpme.self.killproofs.at(proof);
 									}
-									catch (const std::out_of_range &e) {}
+									catch (...) {}
 								}
 								ImGui::Text("%i", amount);
 							}

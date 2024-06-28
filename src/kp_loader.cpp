@@ -17,14 +17,14 @@ namespace Wingman {
                 for (const auto& outer : j.at("kp").items()) {
                     for (const auto& inner : outer.value().items()) {
                         if (inner.key() == "total") {
-                            r.kp.insert({ outer.key(), inner.value()});  // { boss_id, total_kills }
+                            r.kp[outer.key()] = inner.value();  // { boss_id, total_kills }
                         }
                     }
                 }
             }
         }
         catch (...) {
-            r.kp = {};
+            // log error
         }
     }
 
@@ -43,72 +43,134 @@ namespace Kpme {
 
     void from_json(const json& j, KpmeResponse& r) {
         try {
-            j.at("kpid").get_to(r.id);
-        }
-        catch (...) { r.id = ""; };
-
-        // self
-        try {
-            for (auto& killproof : j.at("killproofs")) {
-                r.self.killproofs.insert({ killproof.at("name"), killproof.at("amount") });
+            if (j.contains("kpid")) {
+                if (j.at("kpid").is_string()) {
+                    j.at("kpid").get_to(r.id);
+                }
             }
-        }
-        catch (...) { r.self.killproofs = {}; }
-
-        try {
-            for (auto& token : j.at("tokens")) {
-                r.self.tokens.insert({ token.at("name"), token.at("amount") });
-            }
-        }
-        catch (...) { r.self.tokens = {}; };
-
-        try {
-            for (auto& coffer : j.at("coffers")) {
-                r.self.coffers.insert({ coffer.at("name"), coffer.at("amount") });;
-            }
-        }
-        catch (...) { r.self.coffers = {}; };
-
-        try {
-            for (auto& title : j.at("titles")) {
-                r.self.titles.insert({ title.at("name"), title.at("amount") });
-            }
-        }
-        catch (...) { r.self.titles = {}; }
-
-        // shared
-        try {
-            if (!j.at("linked_totals").is_null()) {
-                try {
-                    for (auto& killproof : j.at("linked_totals").at("killproofs")) {
-                        r.shared.killproofs.insert({ killproof.at("name"), killproof.at("amount") });
+            
+            if (j.contains("killproofs")) {
+                if (j.at("killproofs").is_array()) {
+                    for (const auto& item : j.at("killproofs")) {
+                        if (item.is_object()) {
+                            if (item.contains("name") && item.contains("amount")) {
+                                if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
+                                    r.self.killproofs[item.at("name")] = item.at("amount");
+                                }
+                            }
+                        }
                     }
                 }
-                catch (...) { r.shared.killproofs = {}; };
-
-                try {
-                    for (auto& token : j.at("linked_totals").at("tokens")) {
-                        r.shared.tokens.insert({ token.at("name"), token.at("amount") });
-                    }
-                }
-                catch (...) { r.shared.tokens = {}; };
-
-                try {
-                    for (auto& coffer : j.at("linked_totals").at("coffers")) {
-                        r.shared.coffers.insert({ coffer.at("name"), coffer.at("amount") });;
-                    }
-                }
-                catch (...) { r.shared.coffers = {}; };
-
-                try {
-                    for (auto& title : j.at("linked_totals").at("titles")) {
-                        r.shared.titles.insert({ title.at("name"), title.at("amount") });
-                    }
-                }
-                catch (...) { r.shared.titles = {}; };
             }
+
+            if (j.contains("tokens")) {
+                if (j.at("tokens").is_array()) {
+                    for (const auto& item : j.at("tokens")) {
+                        if (item.is_object()) {
+                            if (item.contains("name") && item.contains("amount")) {
+                                if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
+                                    r.self.tokens[item.at("name")] = item.at("amount");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (j.contains("coffers")) {
+                if (j.at("coffers").is_array()) {
+                    for (const auto& item : j.at("coffers")) {
+                        if (item.is_object()) {
+                            if (item.contains("name") && item.contains("amount")) {
+                                if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
+                                    r.self.coffers[item.at("name")] = item.at("amount");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (j.contains("titles")) {
+                if (j.at("titles").is_array()) {
+                    for (const auto& item : j.at("titles")) {
+                        if (item.is_object()) {
+                            if (item.contains("name") && item.contains("mode")) {
+                                if (item.at("name").is_string() && item.at("mode").is_number_integer()) {
+                                    r.self.titles[item.at("name")] = item.at("mode");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (j.contains("linked_totals")) {
+                if (j.at("linked_totals").is_object()) {
+
+                    if (j.contains("killproofs")) {
+                        if (j.at("killproofs").is_array()) {
+                            for (const auto& item : j.at("killproofs")) {
+                                if (item.is_object()) {
+                                    if (item.contains("name") && item.contains("amount")) {
+                                        if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
+                                            r.shared.killproofs[item.at("name")] = item.at("amount");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (j.contains("tokens")) {
+                        if (j.at("tokens").is_array()) {
+                            for (const auto& item : j.at("tokens")) {
+                                if (item.is_object()) {
+                                    if (item.contains("name") && item.contains("amount")) {
+                                        if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
+                                            r.shared.tokens[item.at("name")] = item.at("amount");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (j.contains("coffers")) {
+                        if (j.at("coffers").is_array()) {
+                            for (const auto& item : j.at("coffers")) {
+                                if (item.is_object()) {
+                                    if (item.contains("name") && item.contains("amount")) {
+                                        if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
+                                            r.shared.coffers[item.at("name")] = item.at("amount");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (j.contains("titles")) {
+                        if (j.at("titles").is_array()) {
+                            for (const auto& item : j.at("titles")) {
+                                if (item.is_object()) {
+                                    if (item.contains("name") && item.contains("mode")) {
+                                        if (item.at("name").is_string() && item.at("mode").is_number_integer()) {
+                                            r.shared.titles[item.at("name")] = item.at("mode");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
         }
-        catch (...) {};
+        catch (...) {
+            // log error
+        }
     }
 
     KpmeResponse GetKp(std::string account) {

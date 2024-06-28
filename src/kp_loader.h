@@ -18,12 +18,6 @@ namespace Wingman {
 }
 
 namespace Kpme {
-    struct Title {
-        int id;
-        std::string name;
-        std::string mode;
-    };
-
     struct KpSummary {
         std::map<std::string, int> killproofs;
         std::map<std::string, int> tokens;
