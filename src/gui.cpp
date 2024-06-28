@@ -33,6 +33,7 @@ enum DataSource {
 
 DataSource selectedDataSource = WINGMAN;
 std::vector<std::string> dataSources = { "Wingman", "Kpme" };
+bool includeAltAccounts = false;
 
 void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray , bool isLegendary) {
 	if (ImGui::BeginTabItem(tabName)) {
@@ -129,17 +130,34 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 							ImGui::TableNextColumn();
 							if (p.kpmeState == LogProofs::READY) {
 								int amount = 0;
-								if (p.kpme.self.killproofs.contains(proof)) {
-									amount = p.kpme.self.killproofs.at(proof);
-								}
-								if (proof == "Legendary Insight") {
-									if (p.kpme.self.killproofs.contains("Legendary Divination")) {
-										amount += p.kpme.self.killproofs.at("Legendary Divination");
+								if (includeAltAccounts) {
+									if (p.kpme.shared.killproofs.contains(proof)) {
+										amount = p.kpme.shared.killproofs.at(proof);
+									}
+									if (proof == "Legendary Insight") {
+										if (p.kpme.shared.killproofs.contains("Legendary Divination")) {
+											amount += p.kpme.shared.killproofs.at("Legendary Divination");
+										}
+									}
+									if (proof == "Unstable Fractal Essence") {
+										if (p.kpme.shared.killproofs.contains("Unstable Cosmic Essence")) {
+											amount += p.kpme.shared.killproofs.at("Unstable Cosmic Essence") * 5;
+										}
 									}
 								}
-								if (proof == "Unstable Fractal Essence") {
-									if (p.kpme.self.killproofs.contains("Unstable Cosmic Essence")) {
-										amount += p.kpme.self.killproofs.at("Unstable Cosmic Essence") * 5;
+								if (!amount) {
+									if (p.kpme.self.killproofs.contains(proof)) {
+										amount = p.kpme.self.killproofs.at(proof);
+									}
+									if (proof == "Legendary Insight") {
+										if (p.kpme.self.killproofs.contains("Legendary Divination")) {
+											amount += p.kpme.self.killproofs.at("Legendary Divination");
+										}
+									}
+									if (proof == "Unstable Fractal Essence") {
+										if (p.kpme.self.killproofs.contains("Unstable Cosmic Essence")) {
+											amount += p.kpme.self.killproofs.at("Unstable Cosmic Essence") * 5;
+										}
 									}
 								}
 								ImGui::Text("%i", amount);
@@ -205,6 +223,10 @@ void RenderWindowLogProofs() {
 		}
 		
 		if (selectedDataSource == KPME) {
+			ImGui::SameLine();
+			if (ImGui::Checkbox("Include Alt Accounts", &includeAltAccounts)) {
+				// Save to disk once this is a proper setting
+			}
 			if (ImGui::BeginTabBar("##Kpme", ImGuiTabBarFlags_None)) {
 				if (true) {
 					DrawKpmeSummaryTab("Summary", "killproofsTable", &sortedKpmeKillProofs);
