@@ -17,7 +17,6 @@ extern const char* MAX_WINDOW_HEIGHT;
 
 extern const char* SHOW_TAB_RAIDS_NORMAL;
 extern const char* SHOW_TAB_RAIDS_CM;
-extern const char* SHOW_TAB_FRACTALS_NORMAL;
 extern const char* SHOW_TAB_FRACTALS_CM;
 extern const char* SHOW_TAB_STRIKES_NORMAL;
 extern const char* SHOW_TAB_STRIKES_CM;
@@ -45,7 +44,6 @@ namespace Settings
 
 	extern bool ShowTabRaidsNormal;
 	extern bool ShowTabRaidsCM;
-	extern bool ShowTabFractalsNormal;
 	extern bool ShowTabFractalsCM;
 	extern bool ShowTabStrikesNormal;
 	extern bool ShowTabStrikesCM;

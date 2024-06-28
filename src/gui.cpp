@@ -184,9 +184,6 @@ void RenderWindowLogProofs() {
 				if (Settings::ShowTabRaidsCM) {
 					DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses, false);
 				}
-				if (Settings::ShowTabFractalsNormal) {
-					DrawBossesTab("Fractals", "normalFractalsTable", &sortedFractalBosses, false);
-				}
 				if (Settings::ShowTabFractalsCM) {
 					DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses, false);
 				}
@@ -258,10 +255,6 @@ void DrawTabsOptions() {
 	}
 	if (ImGui::Checkbox("Raid CMs", &Settings::ShowTabRaidsCM)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_CM] = Settings::ShowTabRaidsCM;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::Checkbox("Fractals", &Settings::ShowTabFractalsNormal)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_NORMAL] = Settings::ShowTabRaidsNormal;
 		Settings::Save(SettingsPath);
 	}
 	if (ImGui::Checkbox("Fractal CMs", &Settings::ShowTabFractalsCM)) {

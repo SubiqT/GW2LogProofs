@@ -17,7 +17,6 @@ const char* MAX_WINDOW_HEIGHT = "MaxWindowHeight";
 
 const char* SHOW_TAB_RAIDS_NORMAL = "ShowTabRaidsNormal";
 const char* SHOW_TAB_RAIDS_CM = "ShowTabRaidsCM";
-const char* SHOW_TAB_FRACTALS_NORMAL = "ShowTabFractalsNormal";
 const char* SHOW_TAB_FRACTALS_CM = "ShowTabFractalsCM";
 const char* SHOW_TAB_STRIKES_NORMAL = "ShowTabStrikesNormal";
 const char* SHOW_TAB_STRIKES_CM = "ShowTabStrikesCM";
@@ -74,9 +73,6 @@ namespace Settings
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_CM].get_to<bool>(ShowTabRaidsCM);
 		}
 
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_NORMAL].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_NORMAL].get_to<bool>(ShowTabFractalsNormal);
-		}
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_CM].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_CM].get_to<bool>(ShowTabFractalsCM);
 		}
@@ -117,7 +113,6 @@ namespace Settings
 
 	bool ShowTabRaidsNormal = true;
 	bool ShowTabRaidsCM = true;
-	bool ShowTabFractalsNormal = true;
 	bool ShowTabFractalsCM = true;
 	bool ShowTabStrikesNormal = true;
 	bool ShowTabStrikesCM = true;

@@ -18,13 +18,6 @@ std::vector<Boss> sortedRaidCmBosses {
 	ConjuredAmalgamateCM, TwinLargosCM, QadimCM,
 	AdinaCM, SabirCM, QadimThePeerlessCM
 };
-std::vector<Boss> sortedFractalBosses {
-	MAMA, SiaxTheCorrupted, EnsolyssOfTheEndlessTorment,
-	SkorvaldTheShattered, Artsariiv, Arkk,
-	ElementalAiKeeperOfThePeak,
-	KanaxaiScytheOfHouseAurkus,
-	CerusAndDeimos, Eparch
-};
 std::vector<Boss> sortedFractalCMBosses {
 	MAMACM, SiaxTheCorruptedCM, EnsolyssOfTheEndlessTormentCM,
 	SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM,
