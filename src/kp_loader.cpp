@@ -13,18 +13,22 @@ namespace Wingman {
 
     void from_json(const json& j, WingmanResponse& r) {
         try {
-            if (!j.at("kp").is_null()) {
-                for (const auto& outer : j.at("kp").items()) {
-                    for (const auto& inner : outer.value().items()) {
-                        if (inner.key() == "total") {
-                            r.kp[outer.key()] = inner.value();  // { boss_id, total_kills }
+            if (j.contains("kp")) {
+                if (j.at("kp").is_object()) {
+                    for (const auto& item : j.at("kp").items()) {
+                        if (item.value().is_object()) {
+                            if (item.value().contains("total")) {
+                                if (item.value().at("total").is_number_integer()) {
+                                    r.kp[item.key()] = item.value().at("total");  // { boss_id, total_kills }
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-        catch (...) {
-            // log error
+        catch (json::parse_error& ex) {
+            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("failed to parse wingman response. \nexception details: {}", ex.what()).c_str());
         }
     }
 
@@ -168,8 +172,8 @@ namespace Kpme {
             }
 
         }
-        catch (...) {
-            // log error
+        catch (json::parse_error& ex) {
+            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("failed to parse kpme response. \nexception details: {}", ex.what()).c_str());
         }
     }
 
