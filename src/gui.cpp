@@ -181,7 +181,7 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 }
 
 
-void DrawKpmeRaidsTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray) {
+void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray) {
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 2, tableFlags)) {
 			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
@@ -258,6 +258,77 @@ void DrawKpmeRaidsTab(const char* tabName, const char* tableName, std::vector<Bo
 	}
 }
 
+void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray) {
+	if (ImGui::BeginTabItem(tabName)) {
+		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 2, tableFlags)) {
+			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
+			ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 30.0f);
+			for (Boss boss : *bossesArray) {
+				ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
+			}
+			ImGui::TableSetupScrollFreeze(1, 1);
+			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+			ImGui::TableNextColumn();
+			ImGui::Text("Account");
+			ImGui::TableNextColumn();
+			ImGui::Text("Id");
+			for (Boss& boss : *bossesArray) {
+				ImGui::TableNextColumn();
+				Texture* texture = GetBossTexture(boss);
+				if (texture != nullptr) {
+					ImGui::Image((void*)texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+				}
+				else {
+					ImGui::Text(GetKpMeBossCoffer(boss).c_str());
+				}
+				if (ImGui::IsItemHovered()) {
+					ImGui::BeginTooltip();
+					ImGui::Text(GetKpMeBossCoffer(boss).c_str());
+					ImGui::EndTooltip();
+				}
+			}
+			{
+				std::scoped_lock lck(LogProofs::Mutex);
+				if (LogProofs::players.size() > 0) {
+					for (LogProofs::Player p : LogProofs::players) {
+						ImGui::TableNextColumn();
+						ImGui::Text(p.account.c_str());
+						ImGui::TableNextColumn();
+						ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "...");
+						for (Boss boss : *bossesArray) {
+							ImGui::TableNextColumn();
+							if (p.kpmeState == LogProofs::READY) {
+								int amount = 0;
+								if (includeAltAccounts) {
+									if (p.kpme.shared.coffers.contains(GetKpMeBossCoffer(boss))) {
+										amount = p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss));
+									}
+								}
+								if (!amount) {
+									if (p.kpme.self.coffers.contains(GetKpMeBossCoffer(boss))) {
+										amount = p.kpme.self.coffers.at(GetKpMeBossCoffer(boss));
+									}
+								}
+								ImGui::Text("%i", amount);
+							}
+							else {
+								ImGui::Text("...");
+							}
+						}
+					}
+				}
+			}
+			if (LogProofs::players.size() == 0) {
+				ImGui::TableNextColumn();
+				ImGui::Text("No players found... ");
+			}
+			ImGui::EndTable();
+
+		}
+		ImGui::EndTabItem();
+	}
+}
+
 void RenderWindowLogProofs() {
 	if (!Settings::ShowWindowLogProofs) {
 		return;
@@ -311,9 +382,14 @@ void RenderWindowLogProofs() {
 					DrawKpmeSummaryTab("Summary", "kpmeSummaryTable", &sortedKpmeSummary);
 				}
 				if (true) {
-					DrawKpmeRaidsTab("Raids", "kpmeRaidsTable", &sortedKpmeRaidBosses);
+					DrawKpmeTokensTab("Raid Tokens", "kpmeRaidsTable", &sortedKpmeRaidBosses);
 				}
-
+				if (true) {
+					DrawKpmeCoffersTab("Strike Coffers", "kpmeStrikesTable", &sortedKpmeStrikeBosses);
+				}
+				if (true) {
+					DrawKpmeCoffersTab("Strike CM Coffers", "kpmeStrikeCMsTable", &sortedKpmeStrikeCMBosses);
+				}
 
 				ImGui::EndTabBar();
 			}

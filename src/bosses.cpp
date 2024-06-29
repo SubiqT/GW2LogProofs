@@ -59,6 +59,17 @@ std::vector<Boss> sortedKpmeRaidBosses {
 	Adina, Sabir, QadimThePeerless
 };
 
+std::vector<Boss> sortedKpmeStrikeBosses {
+	CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate,
+	OldLionsCourt,
+	Dagda, Cerus
+};
+std::vector<Boss> sortedKpmeStrikeCMBosses {
+	CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM,
+	OldLionsCourtCM,
+	DagdaCM, CerusCM
+};
+
 const char* GetBossName(Boss boss) {
 	boss = Boss(abs(boss));
 	switch (boss) {
@@ -287,7 +298,6 @@ Texture* GetBossTexture(Boss boss) {
 
 
 std::string GetKpMeBossToken(Boss boss) {
-	boss = Boss(abs(boss));
 	switch (boss) {
 	/* Raids */
 	case ValeGuardian:
@@ -340,7 +350,6 @@ std::string GetKpMeBossToken(Boss boss) {
 }
 
 std::string GetKpMeBossCoffer(Boss boss) {
-	boss = Boss(abs(boss));
 	switch (boss) {
 	/* Raids */
 	case ValeGuardian:
@@ -387,6 +396,36 @@ std::string GetKpMeBossCoffer(Boss boss) {
 		return "Cardinal Sabir's Coffer";
 	case QadimThePeerless:
 		return "Qadim the Peerless's Coffer";
+	/* Strikes */
+	case CaptainMaiTrin:
+		return "Mai Trin's Coffer";
+	case Ankka:
+		return "Ankka's Coffer";
+	case MinisterLi:
+		return 	"Minister Li's Coffer";
+	case VoidAmalgamate:
+		return "Void's Coffer";
+	case OldLionsCourt:
+		return "Assault Knights' Coffer";
+	case Dagda:
+		return "Dagda's Coffer";
+	case Cerus:
+		return "Cerus's Coffer";
+	/* Strike CMs */
+	case CaptainMaiTrinCM:
+		return "Mai Trin's Magnificent Coffer";
+	case AnkkaCM:
+		return "Ankka's Magnificent Coffer";
+	case MinisterLiCM:
+		return 	"Minister Li's Magnificent Coffer";
+	case VoidAmalgamateCM:
+		return "Void's Magnificent Coffer";
+	case OldLionsCourtCM:
+		return "Assault Knights' Magnificent Coffer";
+	case DagdaCM:
+		return "Dagda's Magnificent Coffer";
+	case CerusCM:
+		return "Cerus's Magnificent Coffer";
 	default:
 		return "Unknown";
 	}
