@@ -59,13 +59,12 @@
 #define IDB_WHISPER_OF_JORMAG           156
 #define IDB_CERUS_AND_DEIMOS            157
 #define IDB_EPARCH                      158
-#define IDB_PNG1                        159
 #define IDB_UNDER_CONSTRUCTION          159
 #define IDB_BONESKINNER_RITUAL_VIAL     160
 #define IDB_LEGENDARY_DIVINATION        161
 #define IDB_LEGENDARY_INSIGHT           162
-#define IDB_PNG5                        163
 #define IDB_UNSTABLE_FRACTAL_ESSENSE    163
+#define IDB_UNSTABLE_FRACTAL_ESSENCE    163
 
 // Next default values for new objects
 // 

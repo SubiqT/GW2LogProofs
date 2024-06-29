@@ -434,7 +434,7 @@ std::string GetKpMeBossCoffer(Boss boss) {
 Texture* GetCurrencyTexture(std::string name) {
 	if (name == "Legendary Insight") return APIDefs->GetTextureOrCreateFromResource("TEX_LEGENDARY_INSIGHT", IDB_LEGENDARY_INSIGHT, hSelf);
 	if (name == "Legendary Divination") return APIDefs->GetTextureOrCreateFromResource("TEX_LEGENDARY_DIVINATION", IDB_LEGENDARY_DIVINATION, hSelf);
-	if (name == "Unstable Fractal Essence") return APIDefs->GetTextureOrCreateFromResource("TEX_UNSTABLE_FRACTAL_ESSENCE", IDB_UNSTABLE_FRACTAL_ESSENSE, hSelf);
+	if (name == "Unstable Fractal Essence") return APIDefs->GetTextureOrCreateFromResource("TEX_UNSTABLE_FRACTAL_ESSENCE", IDB_UNSTABLE_FRACTAL_ESSENCE, hSelf);
 	if (name == "Boneskinner Ritual Vial") return APIDefs->GetTextureOrCreateFromResource("TEX_BONESKINNER_RITUAL_VIAL", IDB_BONESKINNER_RITUAL_VIAL, hSelf);
-	return nullptr;
+	return APIDefs->GetTextureOrCreateFromResource("TEX_UNDER_CONSTRUCTION", IDB_UNDER_CONSTRUCTION, hSelf);
 }

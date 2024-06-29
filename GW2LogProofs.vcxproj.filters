@@ -471,10 +471,10 @@
     <Image Include="src\resources\Whisper_of_Jormag.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="resources\CerusAndDeimos.png">
+    <Image Include="resources\Cerus_And_Deimos.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="src\resources\CerusAndDeimos.png">
+    <Image Include="src\resources\Cerus_And_Deimos.png">
       <Filter>resources</Filter>
     </Image>
     <Image Include="resources\Eparch.png">
@@ -486,31 +486,31 @@
     <Image Include="resources\UnderConstruction.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="src\resources\UnderConstruction.png">
+    <Image Include="src\resources\Under_Construction.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="resources\BoneSkinnerRitualVial.png">
+    <Image Include="resources\Boneskinner_Ritual_Vial.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="src\resources\BoneSkinnerRitualVial.png">
+    <Image Include="src\resources\Boneskinner_Ritual_Vial.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="resources\LegendaryDivination.png">
+    <Image Include="resources\Legendary_Divination.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="src\resources\LegendaryDivination.png">
+    <Image Include="src\resources\Legendary_Divination.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="resources\LegendaryInsight.png">
+    <Image Include="resources\Legendary_Insight.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="src\resources\LegendaryInsight.png">
+    <Image Include="src\resources\Legendary_Insight.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="resources\UnstableFractalEssense.png">
+    <Image Include="resources\Unstable_Fractal_Essense.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="src\resources\UnstableFractalEssense.png">
+    <Image Include="src\resources\Unstable_Fractal_Essence.png">
       <Filter>resources</Filter>
     </Image>
   </ItemGroup>
