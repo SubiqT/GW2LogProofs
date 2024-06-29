@@ -249,6 +249,9 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 										if (p.kpme.shared.coffers.contains(GetKpMeBossCoffer(boss))) {
 											amount += p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss)) * 3;  // 1 Coffer == 3 Tokens
 										}
+										if (p.kpme.shared.tokens.contains(GetKpMeBossCoffer(boss))) {
+											amount += p.kpme.shared.tokens.at(GetKpMeBossCoffer(boss)) * 3;  // Coffers show under tokens if opened
+										}
 									}
 									if (amount == 0) {
 										if (p.kpme.self.tokens.contains(GetKpMeBossToken(boss))) {
@@ -256,6 +259,9 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 										}
 										if (p.kpme.self.coffers.contains(GetKpMeBossCoffer(boss))) {
 											amount += p.kpme.self.coffers.at(GetKpMeBossCoffer(boss)) * 3;  // 1 Coffer == 3 Tokens
+										}
+										if (p.kpme.self.tokens.contains(GetKpMeBossCoffer(boss))) {
+											amount += p.kpme.self.tokens.at(GetKpMeBossCoffer(boss)) * 3;  // Coffers show under tokens if opened
 										}
 									}
 									ImGui::Text("%i", amount);
@@ -333,10 +339,16 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 										if (p.kpme.shared.coffers.contains(GetKpMeBossCoffer(boss))) {
 											amount = p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss));
 										}
+										if (p.kpme.shared.tokens.contains(GetKpMeBossCoffer(boss))) {
+											amount = p.kpme.shared.tokens.at(GetKpMeBossCoffer(boss));  // Coffers show under tokens if opened
+										}
 									}
 									if (amount == 0) {
 										if (p.kpme.self.coffers.contains(GetKpMeBossCoffer(boss))) {
 											amount = p.kpme.self.coffers.at(GetKpMeBossCoffer(boss));
+										}
+										if (p.kpme.self.tokens.contains(GetKpMeBossCoffer(boss))) {
+											amount = p.kpme.self.tokens.at(GetKpMeBossCoffer(boss));  // Coffers show under tokens if opened
 										}
 									}
 									ImGui::Text("%i", amount);
