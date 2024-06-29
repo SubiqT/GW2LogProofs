@@ -383,17 +383,16 @@ void RenderWindowLogProofs() {
 				// Save to disk once this is a proper setting
 			}
 			if (ImGui::BeginTabBar("##Kpme", ImGuiTabBarFlags_None)) {
-				// Create settings for each tab
-				if (true) { 
+				if (Settings::ShowTabKpmeSummary) { 
 					DrawKpmeSummaryTab("Summary", "kpmeSummaryTable", &sortedKpmeSummary);
 				}
-				if (true) {
+				if (Settings::ShowTabKpmeRaidTokens) {
 					DrawKpmeTokensTab("Raid Tokens", "kpmeRaidsTable", &sortedKpmeRaidBosses);
 				}
-				if (true) {
+				if (Settings::ShowTabKpmeStrikeCoffers) {
 					DrawKpmeCoffersTab("Strike Coffers", "kpmeStrikesTable", &sortedKpmeStrikeBosses);
 				}
-				if (true) {
+				if (Settings::ShowTabKpmeStrikeCMCoffers) {
 					DrawKpmeCoffersTab("Strike CM Coffers", "kpmeStrikeCMsTable", &sortedKpmeStrikeCMBosses);
 				}
 				// Skip titles for now - they can be added with the alternative "profile" view
@@ -439,7 +438,7 @@ void DrawWindowSizingOptions() {
 }
 
 void DrawTabsOptions() {
-	ImGui::Text("Tabs");
+	ImGui::Text("Wingman Tabs");
 	if (ImGui::Checkbox("Raids", &Settings::ShowTabRaidsNormal)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_NORMAL] = Settings::ShowTabRaidsNormal;
 		Settings::Save(SettingsPath);
@@ -462,6 +461,23 @@ void DrawTabsOptions() {
 	}
 	if (ImGui::Checkbox("Strike LMs", &Settings::ShowTabStrikesLM)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_LM] = Settings::ShowTabStrikesLM;
+		Settings::Save(SettingsPath);
+	}
+	ImGui::Text("Kpme Tabs");
+	if (ImGui::Checkbox("Summary", &Settings::ShowTabKpmeSummary)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_SUMMARY] = Settings::ShowTabKpmeSummary;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::Checkbox("Raid Tokens", &Settings::ShowTabKpmeRaidTokens)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_TOKENS] = Settings::ShowTabKpmeRaidTokens;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::Checkbox("Strike Coffers", &Settings::ShowTabKpmeStrikeCoffers)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_COFFERS] = Settings::ShowTabKpmeStrikeCoffers;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::Checkbox("Strike CM Coffers", &Settings::ShowTabKpmeStrikeCMCoffers)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_CM_COFFERS] = Settings::ShowTabKpmeStrikeCMCoffers;
 		Settings::Save(SettingsPath);
 	}
 }

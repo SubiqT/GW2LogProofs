@@ -22,6 +22,11 @@ extern const char* SHOW_TAB_STRIKES_NORMAL;
 extern const char* SHOW_TAB_STRIKES_CM;
 extern const char* SHOW_TAB_STRIKES_LM;
 
+extern const char* SHOW_TAB_KPME_SUMMARY;
+extern const char* SHOW_TAB_KPME_RAID_TOKENS;
+extern const char* SHOW_TAB_KPME_STRIKE_COFFERS;
+extern const char* SHOW_TAB_KPME_STRIKE_CM_COFFERS;
+
 extern const char* COLUMN_ACCOUNT_SIZE;
 extern const char* COLUMN_BOSSES_SIZE;
 
@@ -48,6 +53,11 @@ namespace Settings
 	extern bool ShowTabStrikesNormal;
 	extern bool ShowTabStrikesCM;
 	extern bool ShowTabStrikesLM;
+
+	extern bool ShowTabKpmeSummary;
+	extern bool ShowTabKpmeRaidTokens;
+	extern bool ShowTabKpmeStrikeCoffers;
+	extern bool ShowTabKpmeStrikeCMCoffers;
 
 	extern float ColumnSizeAccount;
 	extern float ColumnSizeBosses;

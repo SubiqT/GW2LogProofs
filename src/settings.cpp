@@ -22,6 +22,11 @@ const char* SHOW_TAB_STRIKES_NORMAL = "ShowTabStrikesNormal";
 const char* SHOW_TAB_STRIKES_CM = "ShowTabStrikesCM";
 const char* SHOW_TAB_STRIKES_LM = "ShowTabStrikesLM";
 
+const char* SHOW_TAB_KPME_SUMMARY = "ShowTabKpmeSummary";
+const char* SHOW_TAB_KPME_RAID_TOKENS = "ShowTabKpmeRaidTokens";
+const char* SHOW_TAB_KPME_STRIKE_COFFERS = "ShowTabKpmeStrikeCoffers";
+const char* SHOW_TAB_KPME_STRIKE_CM_COFFERS = "ShowTabKpmeStrikeCMCoffers";
+
 const char* COLUMN_ACCOUNT_SIZE = "ColumnAccountSize";
 const char* COLUMN_BOSSES_SIZE = "ColumnBossesSize";
 
@@ -65,7 +70,7 @@ namespace Settings
 			Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT].get_to<float>(MaxWindowHeight);
 		}
 
-		/* Tabs */
+		/* Wingman Tabs */
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_NORMAL].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_NORMAL].get_to<bool>(ShowTabRaidsNormal);
 		}
@@ -85,6 +90,20 @@ namespace Settings
 		}
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_LM].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_LM].get_to<bool>(ShowTabStrikesLM);
+		}
+
+		/* Kpme Tabs */
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_SUMMARY].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_SUMMARY].get_to<bool>(ShowTabKpmeSummary);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_TOKENS].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_TOKENS].get_to<bool>(ShowTabKpmeRaidTokens);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_COFFERS].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_COFFERS].get_to<bool>(ShowTabKpmeStrikeCoffers);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_CM_COFFERS].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_CM_COFFERS].get_to<bool>(ShowTabKpmeStrikeCMCoffers);
 		}
 
 		/* Columns */
@@ -117,6 +136,11 @@ namespace Settings
 	bool ShowTabStrikesNormal = true;
 	bool ShowTabStrikesCM = true;
 	bool ShowTabStrikesLM = true;
+
+	bool ShowTabKpmeSummary = true;
+	bool ShowTabKpmeRaidTokens = true;
+	bool ShowTabKpmeStrikeCoffers = true;
+	bool ShowTabKpmeStrikeCMCoffers = true;
 
 	float ColumnSizeAccount = 200.0f;
 	float ColumnSizeBosses = 32.0f;
