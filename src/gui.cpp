@@ -26,14 +26,7 @@ static ImGuiTableFlags tableFlags = (
 	| ImGuiTableFlags_ScrollY
 	);
 
-enum DataSource {
-	WINGMAN,
-	KPME
-};
-
-DataSource selectedDataSource = WINGMAN;
 std::vector<std::string> dataSources = { "Wingman", "Kpme" };
-bool includeAltAccounts = false;
 
 void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray , bool isLegendary) {
 	if (ImGui::BeginTabItem(tabName)) {
@@ -136,7 +129,7 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 							ImGui::TableNextColumn();
 							if (p.kpmeState == LogProofs::READY) {
 								int amount = 0;
-								if (includeAltAccounts) {
+								if (Settings::IncludeLinkedAccounts) {
 									if (p.kpme.shared.killproofs.contains(proof)) {
 										amount = p.kpme.shared.killproofs.at(proof);
 									}
@@ -228,7 +221,7 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 							ImGui::TableNextColumn();
 							if (p.kpmeState == LogProofs::READY) {
 								int amount = 0;
-								if (includeAltAccounts) {
+								if (Settings::IncludeLinkedAccounts) {
 									if (p.kpme.shared.tokens.contains(GetKpMeBossToken(boss))) {
 										amount = p.kpme.shared.tokens.at(GetKpMeBossToken(boss));
 									}
@@ -305,7 +298,7 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 							ImGui::TableNextColumn();
 							if (p.kpmeState == LogProofs::READY) {
 								int amount = 0;
-								if (includeAltAccounts) {
+								if (Settings::IncludeLinkedAccounts) {
 									if (p.kpme.shared.coffers.contains(GetKpMeBossCoffer(boss))) {
 										amount = p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss));
 									}
@@ -342,18 +335,20 @@ void RenderWindowLogProofs() {
 	ImGui::SetNextWindowSizeConstraints(ImVec2(Settings::MinWindowWidth, Settings::MinWindowHeight), ImVec2(Settings::MaxWindowWidth,Settings::MaxWindowHeight));
 	if (ImGui::Begin("Log Proofs", &Settings::ShowWindowLogProofs, windowFlags)) {
 
-		if (ImGui::BeginCombo("Source##DataSource", dataSources[selectedDataSource].c_str())) {
+		if (ImGui::BeginCombo("Source##DataSource", dataSources[Settings::SelectedDataSource].c_str())) {
 			for (int index = 0; index < dataSources.size(); ++index) {
-				const bool is_selected = (dataSources[index] == dataSources[selectedDataSource]);
+				const bool is_selected = (dataSources[index] == dataSources[Settings::SelectedDataSource]);
 				if (ImGui::Selectable(dataSources[index].c_str(), is_selected)) {
-					selectedDataSource = DataSource(index);
+					Settings::SelectedDataSource = DataSource(index);
+					Settings::Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE] = Settings::SelectedDataSource;
+					Settings::Save(SettingsPath);
 				}
 				if (is_selected) ImGui::SetItemDefaultFocus();
 			}
 			ImGui::EndCombo();
 		}
 
-		if (selectedDataSource == WINGMAN) {
+		if (Settings::SelectedDataSource == WINGMAN) {
 			if (ImGui::BeginTabBar("##Wingman", ImGuiTabBarFlags_None)) {
 				if (Settings::ShowTabRaidsNormal) {
 					DrawBossesTab("Raids", "normalRaidsTable", &sortedRaidBosses, false);
@@ -377,10 +372,11 @@ void RenderWindowLogProofs() {
 			}
 		}
 		
-		if (selectedDataSource == KPME) {
+		if (Settings::SelectedDataSource == KPME) {
 			ImGui::SameLine();
-			if (ImGui::Checkbox("Include Linked Accounts", &includeAltAccounts)) {
-				// Save to disk once this is a proper setting
+			if (ImGui::Checkbox("Include Linked Accounts", &Settings::IncludeLinkedAccounts)) {
+				Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS] = Settings::IncludeLinkedAccounts;
+				Settings::Save(SettingsPath);
 			}
 			if (ImGui::BeginTabBar("##Kpme", ImGuiTabBarFlags_None)) {
 				if (Settings::ShowTabKpmeSummary) { 
@@ -516,7 +512,7 @@ void RenderWindowSettings() {
 		Settings::Save(SettingsPath);
 	}
 	DrawWindowSizingOptions();
-	DrawTabsOptions();
 	DrawColumnOptions();
+	DrawTabsOptions();
 }
 

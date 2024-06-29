@@ -6,6 +6,11 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
+enum DataSource {
+	WINGMAN,
+	KPME
+};
+
 extern const char* SHOW_QUICK_ACCESS_SHORTCUT;
 extern const char* WINDOW_LOG_PROOFS_KEY;
 extern const char* SHOW_WINDOW_LOG_PROOFS;
@@ -29,6 +34,9 @@ extern const char* SHOW_TAB_KPME_STRIKE_CM_COFFERS;
 
 extern const char* COLUMN_ACCOUNT_SIZE;
 extern const char* COLUMN_BOSSES_SIZE;
+
+extern const char* SELECTED_DATA_SOURCE;
+extern const char* INCLUDE_LINKED_ACCOUNTS;
 
 
 namespace Settings
@@ -61,6 +69,9 @@ namespace Settings
 
 	extern float ColumnSizeAccount;
 	extern float ColumnSizeBosses;
+	
+	extern DataSource SelectedDataSource;
+	extern bool IncludeLinkedAccounts;
 }
 
 #endif

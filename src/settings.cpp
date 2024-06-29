@@ -30,6 +30,9 @@ const char* SHOW_TAB_KPME_STRIKE_CM_COFFERS = "ShowTabKpmeStrikeCMCoffers";
 const char* COLUMN_ACCOUNT_SIZE = "ColumnAccountSize";
 const char* COLUMN_BOSSES_SIZE = "ColumnBossesSize";
 
+const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
+const char* INCLUDE_LINKED_ACCOUNTS = "IncludeLinkedAccounts";
+
 
 namespace Settings
 {
@@ -114,6 +117,13 @@ namespace Settings
 			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE].get_to<float>(ColumnSizeBosses);
 		}
 
+		/* Data settings */
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE].get_to<DataSource>(SelectedDataSource);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS].get_to<bool>(IncludeLinkedAccounts);
+		}
 	}
 	void Save(std::filesystem::path filePath) {
 		std::scoped_lock lck(Mutex);
@@ -144,4 +154,7 @@ namespace Settings
 
 	float ColumnSizeAccount = 200.0f;
 	float ColumnSizeBosses = 32.0f;
+
+	DataSource SelectedDataSource = WINGMAN;
+	bool IncludeLinkedAccounts = false;
 }
