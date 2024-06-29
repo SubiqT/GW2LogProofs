@@ -7,7 +7,7 @@
 
 namespace Wingman {
     struct WingmanResponse {
-        //std::string account;
+        std::string account;
         std::map<std::string, int> kp;
         // Not used fields:
         //std::vector<std::string> characters;

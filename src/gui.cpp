@@ -63,11 +63,16 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 						for (Boss& boss : *bossesArray) {
 							ImGui::TableNextColumn();
 							if (p.wingmanState == LogProofs::READY) {
-								if (isLegendary) {
-									ImGui::Text("%i", p.wingman[std::format("-{}", int(boss))]);
+								if (!p.wingman.account.empty()) {
+									if (isLegendary) {
+										ImGui::Text("%i", p.wingman.kp[std::format("-{}", int(boss))]);
+									}
+									else {
+										ImGui::Text("%i", p.wingman.kp[std::format("{}", int(boss))]);
+									}
 								}
 								else {
-									ImGui::Text("%i", p.wingman[std::format("{}", int(boss))]);
+									ImGui::Text("-");
 								}
 							}
 							else {

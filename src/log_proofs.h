@@ -22,7 +22,7 @@ namespace LogProofs {
         std::string account;
         KpState wingmanState;
         KpState kpmeState;
-        std::map<std::string, int> wingman;
+        Wingman::WingmanResponse wingman;
         Kpme::KpmeResponse kpme;
     };
 

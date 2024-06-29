@@ -54,7 +54,7 @@ namespace LogProofs {
                     "tried to load wingman for player with account {} but player was not in the loading state.", account).c_str());
                 return;
             }
-            players.at(index).wingman = res.kp;
+            players.at(index).wingman = res;
             players.at(index).wingmanState = READY;
             APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded wingman for player: {}", account).c_str());
         } catch (const std::exception& e) {

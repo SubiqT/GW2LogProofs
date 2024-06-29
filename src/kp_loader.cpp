@@ -13,6 +13,12 @@ namespace Wingman {
 
     void from_json(const json& j, WingmanResponse& r) {
         try {
+            if (j.contains("account")) {
+                if (j.at("account").is_string()) {
+                    j.at("account").get_to(r.account);
+                }
+            }
+
             if (j.contains("kp")) {
                 if (j.at("kp").is_object()) {
                     for (const auto& item : j.at("kp").items()) {
