@@ -80,7 +80,7 @@ extern "C" __declspec(dllexport) AddonDefinition * GetAddonDef() {
 	AddonDef.Version.Build = V_BUILD;
 	AddonDef.Version.Revision = V_REVISION;
 	AddonDef.Author = "Subi";
-	AddonDef.Description = "Displays kill proofs based on logs uploaded to wingman.";
+	AddonDef.Description = "Displays kill proofs based on logs uploaded to wingman or currencies, tokens and coffers tracked by kpme.";
 	AddonDef.Load = AddonLoad;
 	AddonDef.Unload = AddonUnload;
 	AddonDef.Flags = EAddonFlags_None;
