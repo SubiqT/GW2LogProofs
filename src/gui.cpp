@@ -111,7 +111,13 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 			ImGui::Text("Id");
 			for (std::string proof : *proofsArray) {
 				ImGui::TableNextColumn();
-				ImGui::Text(proof.c_str());
+				Texture* texture = GetCurrencyTexture(proof);
+				if (texture != nullptr) {
+					ImGui::Image((void*)texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+				}
+				else {
+					ImGui::Text(proof.c_str());
+				}
 				if (ImGui::IsItemHovered()) {
 					ImGui::BeginTooltip();
 					ImGui::Text(proof.c_str());

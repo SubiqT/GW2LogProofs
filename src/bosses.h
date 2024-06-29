@@ -110,5 +110,6 @@ const char* GetBossName(Boss boss);
 Texture* GetBossTexture(Boss boss);
 std::string GetKpMeBossToken(Boss boss);
 std::string GetKpMeBossCoffer(Boss boss);
+Texture* GetCurrencyTexture(std::string name);
 
 #endif

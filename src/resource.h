@@ -61,12 +61,17 @@
 #define IDB_EPARCH                      158
 #define IDB_PNG1                        159
 #define IDB_UNDER_CONSTRUCTION          159
+#define IDB_BONESKINNER_RITUAL_VIAL     160
+#define IDB_LEGENDARY_DIVINATION        161
+#define IDB_LEGENDARY_INSIGHT           162
+#define IDB_PNG5                        163
+#define IDB_UNSTABLE_FRACTAL_ESSENSE    163
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        160
+#define _APS_NEXT_RESOURCE_VALUE        164
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101

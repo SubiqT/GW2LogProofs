@@ -351,7 +351,7 @@ std::string GetKpMeBossToken(Boss boss) {
 
 std::string GetKpMeBossCoffer(Boss boss) {
 	switch (boss) {
-	/* Raids */
+		/* Raids */
 	case ValeGuardian:
 		return "Vale Guardian Coffer";
 	case Gorseval:
@@ -396,7 +396,7 @@ std::string GetKpMeBossCoffer(Boss boss) {
 		return "Cardinal Sabir's Coffer";
 	case QadimThePeerless:
 		return "Qadim the Peerless's Coffer";
-	/* Strikes */
+		/* Strikes */
 	case CaptainMaiTrin:
 		return "Mai Trin's Coffer";
 	case Ankka:
@@ -411,7 +411,7 @@ std::string GetKpMeBossCoffer(Boss boss) {
 		return "Dagda's Coffer";
 	case Cerus:
 		return "Cerus's Coffer";
-	/* Strike CMs */
+		/* Strike CMs */
 	case CaptainMaiTrinCM:
 		return "Mai Trin's Magnificent Coffer";
 	case AnkkaCM:
@@ -429,4 +429,12 @@ std::string GetKpMeBossCoffer(Boss boss) {
 	default:
 		return "Unknown";
 	}
+}
+
+Texture* GetCurrencyTexture(std::string name) {
+	if (name == "Legendary Insight") return APIDefs->GetTextureOrCreateFromResource("TEX_LEGENDARY_INSIGHT", IDB_LEGENDARY_INSIGHT, hSelf);
+	if (name == "Legendary Divination") return APIDefs->GetTextureOrCreateFromResource("TEX_LEGENDARY_DIVINATION", IDB_LEGENDARY_DIVINATION, hSelf);
+	if (name == "Unstable Fractal Essence") return APIDefs->GetTextureOrCreateFromResource("TEX_UNSTABLE_FRACTAL_ESSENCE", IDB_UNSTABLE_FRACTAL_ESSENSE, hSelf);
+	if (name == "Boneskinner Ritual Vial") return APIDefs->GetTextureOrCreateFromResource("TEX_BONESKINNER_RITUAL_VIAL", IDB_BONESKINNER_RITUAL_VIAL, hSelf);
+	return nullptr;
 }

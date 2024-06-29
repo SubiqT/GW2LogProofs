@@ -489,5 +489,29 @@
     <Image Include="src\resources\UnderConstruction.png">
       <Filter>resources</Filter>
     </Image>
+    <Image Include="resources\BoneSkinnerRitualVial.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\BoneSkinnerRitualVial.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\LegendaryDivination.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\LegendaryDivination.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\LegendaryInsight.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\LegendaryInsight.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\UnstableFractalEssense.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="src\resources\UnstableFractalEssense.png">
+      <Filter>resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>
