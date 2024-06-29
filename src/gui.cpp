@@ -99,7 +99,7 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(proofsArray->size()) + 2, tableFlags)) {
 			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
-			ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 20.0f);
+			ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 30.0f);
 			for (std::string proof : *proofsArray) {
 				ImGui::TableSetupColumn(proof.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
 			}
@@ -145,7 +145,7 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 										}
 									}
 								}
-								if (!amount) {
+								if (amount == 0) {
 									if (p.kpme.self.killproofs.contains(proof)) {
 										amount = p.kpme.self.killproofs.at(proof);
 									}
@@ -230,7 +230,7 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 										amount += p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss)) * 3;  // 1 Coffer == 3 Tokens
 									}
 								}
-								if (!amount) {
+								if (amount == 0) {
 									if (p.kpme.self.tokens.contains(GetKpMeBossToken(boss))) {
 										amount = p.kpme.self.tokens.at(GetKpMeBossToken(boss));
 									}
@@ -304,7 +304,7 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 										amount = p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss));
 									}
 								}
-								if (!amount) {
+								if (amount == 0) {
 									if (p.kpme.self.coffers.contains(GetKpMeBossCoffer(boss))) {
 										amount = p.kpme.self.coffers.at(GetKpMeBossCoffer(boss));
 									}
@@ -390,6 +390,7 @@ void RenderWindowLogProofs() {
 				if (true) {
 					DrawKpmeCoffersTab("Strike CM Coffers", "kpmeStrikeCMsTable", &sortedKpmeStrikeCMBosses);
 				}
+				// Skip titles for now - they can be added with the alternative "profile" view
 
 				ImGui::EndTabBar();
 			}

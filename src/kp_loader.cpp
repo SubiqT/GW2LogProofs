@@ -112,9 +112,9 @@ namespace Kpme {
             if (j.contains("linked_totals")) {
                 if (j.at("linked_totals").is_object()) {
 
-                    if (j.contains("killproofs")) {
-                        if (j.at("killproofs").is_array()) {
-                            for (const auto& item : j.at("killproofs")) {
+                    if (j.at("linked_totals").contains("killproofs")) {
+                        if (j.at("linked_totals").at("killproofs").is_array()) {
+                            for (const auto& item : j.at("linked_totals").at("killproofs")) {
                                 if (item.is_object()) {
                                     if (item.contains("name") && item.contains("amount")) {
                                         if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
@@ -126,9 +126,9 @@ namespace Kpme {
                         }
                     }
 
-                    if (j.contains("tokens")) {
-                        if (j.at("tokens").is_array()) {
-                            for (const auto& item : j.at("tokens")) {
+                    if (j.at("linked_totals").contains("tokens")) {
+                        if (j.at("linked_totals").at("tokens").is_array()) {
+                            for (const auto& item : j.at("linked_totals").at("tokens")) {
                                 if (item.is_object()) {
                                     if (item.contains("name") && item.contains("amount")) {
                                         if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
@@ -140,9 +140,9 @@ namespace Kpme {
                         }
                     }
 
-                    if (j.contains("coffers")) {
-                        if (j.at("coffers").is_array()) {
-                            for (const auto& item : j.at("coffers")) {
+                    if (j.at("linked_totals").contains("coffers")) {
+                        if (j.at("linked_totals").at("coffers").is_array()) {
+                            for (const auto& item : j.at("linked_totals").at("coffers")) {
                                 if (item.is_object()) {
                                     if (item.contains("name") && item.contains("amount")) {
                                         if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
@@ -154,9 +154,9 @@ namespace Kpme {
                         }
                     }
 
-                    if (j.contains("titles")) {
-                        if (j.at("titles").is_array()) {
-                            for (const auto& item : j.at("titles")) {
+                    if (j.at("linked_totals").contains("titles")) {
+                        if (j.at("linked_totals").at("titles").is_array()) {
+                            for (const auto& item : j.at("linked_totals").at("titles")) {
                                 if (item.is_object()) {
                                     if (item.contains("name") && item.contains("mode")) {
                                         if (item.at("name").is_string() && item.at("mode").is_number_integer()) {
