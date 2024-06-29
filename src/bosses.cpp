@@ -41,12 +41,22 @@ std::vector<Boss> sortedStrikeLMBosses {
 	CerusCM
 };
 
-std::vector<std::string> sortedKpmeKillProofs {
+std::vector<std::string> sortedKpmeSummary {
 	"Legendary Insight",
 	//"Legendary Divination", // Added to LI ( 1LD == 1LI )
 	"Unstable Fractal Essence",
 	//"Unstable Cosmic Essence", // Added to UFE ( 1UCE == 5UFE )
 	"Boneskinner Ritual Vial"
+};
+
+std::vector<Boss> sortedKpmeRaidBosses {
+	ValeGuardian, Gorseval, Sabetha,
+	Slothasor, Matthias,
+	Escort, KeepConstruct, Xera,
+	Cairn, MursaatOverseer, Samarog, Deimos,
+	SoullessHorror, RiverOfSouls, BrokenKing, Dhuum,
+	ConjuredAmalgamate, TwinLargos, Qadim,
+	Adina, Sabir, QadimThePeerless
 };
 
 const char* GetBossName(Boss boss) {
@@ -272,5 +282,112 @@ Texture* GetBossTexture(Boss boss) {
 		return APIDefs->GetTextureOrCreateFromResource("TEX_CERUS", IDB_CERUS, hSelf);
 	default:
 		return APIDefs->GetTextureOrCreateFromResource("TEX_UNDER_CONSTRUCTION", IDB_UNDER_CONSTRUCTION, hSelf);
+	}
+}
+
+
+std::string GetKpMeBossToken(Boss boss) {
+	boss = Boss(abs(boss));
+	switch (boss) {
+	/* Raids */
+	case ValeGuardian:
+		return "Vale Guardian Fragment";
+	case Gorseval:
+		return "Gorseval Tentacle Piece";
+	case Sabetha:
+		return "Sabetha Flamethrower Fragment Piece";
+	case Slothasor:
+		return "Slothasor Mushroom";
+	case Matthias:
+		return "White Mantle Abomination Crystal";
+	case Escort:
+		return "Turret Fragment";
+	case KeepConstruct:
+		return "Keep Construct Rubble";
+	case Xera:
+		return "Ribbon Scrap";
+	case Cairn:
+		return "Cairn Fragment";
+	case MursaatOverseer:
+		return "Recreation Room Floor Fragment";
+	case Samarog:
+		return "Impaled Prisoner Token";
+	case Deimos:
+		return "Fragment of Saul's Burden";
+	case SoullessHorror:
+		return "Desmina's Token";
+	case RiverOfSouls:
+		return "River of Souls Token";
+	case BrokenKing:
+		return "Statue Token";
+	case Dhuum:
+		return "Dhuum's Token";
+	case ConjuredAmalgamate:
+		return "Conjured Amalgamate Token";
+	case TwinLargos:
+		return "Twin Largos Token";
+	case Qadim:
+		return "Qadim's Token";
+	case Adina:
+		return "Cardinal Adina's Token";
+	case Sabir:
+		return "Cardinal Sabir's Token";
+	case QadimThePeerless:
+		return "Ether Djinn's Token";
+	default:
+		return "Unknown";
+	}
+}
+
+std::string GetKpMeBossCoffer(Boss boss) {
+	boss = Boss(abs(boss));
+	switch (boss) {
+	/* Raids */
+	case ValeGuardian:
+		return "Vale Guardian Coffer";
+	case Gorseval:
+		return "Gorseval's Coffer";
+	case Sabetha:
+		return "Sabetha's Coffer";
+	case Slothasor:
+		return "Slothasor's Coffer";
+	case Matthias:
+		return "Matthias's Coffer";
+	case Escort:
+		return "McLeod's Coffer";
+	case KeepConstruct:
+		return "Keep Construct's Coffer";
+	case Xera:
+		return "Xera's Coffer";
+	case Cairn:
+		return "Cairn's Coffer";
+	case MursaatOverseer:
+		return "Mursaat Overseer's Coffer";
+	case Samarog:
+		return "Samarog's Coffer";
+	case Deimos:
+		return "Deimos's Coffer";
+	case SoullessHorror:
+		return "Desmina's Coffer";
+	case RiverOfSouls:
+		return "River of Souls Coffer";
+	case BrokenKing:
+		return "Statue of Grenth Coffer";
+	case Dhuum:
+		return "Dhuum's Coffer";
+	case ConjuredAmalgamate:
+		return "Conjured Amalgamate's Coffer";
+	case TwinLargos:
+		return "Twin Largos' Coffer";
+	case Qadim:
+		return "Qadim's Coffer";
+	case Adina:
+		return "Cardinal Adina's Coffer";
+	case Sabir:
+		return "Cardinal Sabir's Coffer";
+	case QadimThePeerless:
+		return "Qadim the Peerless's Coffer";
+	default:
+		return "Unknown";
 	}
 }
