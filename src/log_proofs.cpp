@@ -59,7 +59,7 @@ namespace LogProofs {
             APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded wingman for player: {}", account).c_str());
         } catch (const std::exception& e) {
             APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
-                "tried to load wingman for player with account {} but a subscript out of bounds error occurred. exception details: {}", account, e.what()).c_str());
+                "tried to load wingman for player with account {} but an error occurred. exception details: {}", account, e.what()).c_str());
             return;
         }
     }
@@ -85,7 +85,7 @@ namespace LogProofs {
         }
         catch (const std::exception& e) {
             APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format(
-                "tried to load kpme for player with account {} but a subscript out of bounds error occurred. exception details: {}", account, e.what()).c_str());
+                "tried to load kpme for player with account {} but an error occurred. exception details: {}", account, e.what()).c_str());
             return;
         }
     }

@@ -124,42 +124,52 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 						ImGui::TableNextColumn();
 						ImGui::Text(p.account.c_str());
 						ImGui::TableNextColumn();
-						ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "...");
+						if (p.kpmeState == LogProofs::READY) {
+							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");
+						}
+						else {
+							ImGui::Text("...");
+						}
 						for (std::string proof : *proofsArray) {
 							ImGui::TableNextColumn();
 							if (p.kpmeState == LogProofs::READY) {
-								int amount = 0;
-								if (Settings::IncludeLinkedAccounts) {
-									if (p.kpme.shared.killproofs.contains(proof)) {
-										amount = p.kpme.shared.killproofs.at(proof);
-									}
-									if (proof == "Legendary Insight") {
-										if (p.kpme.shared.killproofs.contains("Legendary Divination")) {
-											amount += p.kpme.shared.killproofs.at("Legendary Divination");
+								if (!p.kpme.id.empty()) {
+									int amount = 0;
+									if (Settings::IncludeLinkedAccounts) {
+										if (p.kpme.shared.killproofs.contains(proof)) {
+											amount = p.kpme.shared.killproofs.at(proof);
+										}
+										if (proof == "Legendary Insight") {
+											if (p.kpme.shared.killproofs.contains("Legendary Divination")) {
+												amount += p.kpme.shared.killproofs.at("Legendary Divination");
+											}
+										}
+										if (proof == "Unstable Fractal Essence") {
+											if (p.kpme.shared.killproofs.contains("Unstable Cosmic Essence")) {
+												amount += p.kpme.shared.killproofs.at("Unstable Cosmic Essence") * 5;
+											}
 										}
 									}
-									if (proof == "Unstable Fractal Essence") {
-										if (p.kpme.shared.killproofs.contains("Unstable Cosmic Essence")) {
-											amount += p.kpme.shared.killproofs.at("Unstable Cosmic Essence") * 5;
+									if (amount == 0) {
+										if (p.kpme.self.killproofs.contains(proof)) {
+											amount = p.kpme.self.killproofs.at(proof);
+										}
+										if (proof == "Legendary Insight") {
+											if (p.kpme.self.killproofs.contains("Legendary Divination")) {
+												amount += p.kpme.self.killproofs.at("Legendary Divination");
+											}
+										}
+										if (proof == "Unstable Fractal Essence") {
+											if (p.kpme.self.killproofs.contains("Unstable Cosmic Essence")) {
+												amount += p.kpme.self.killproofs.at("Unstable Cosmic Essence") * 5;
+											}
 										}
 									}
+									ImGui::Text("%i", amount);
 								}
-								if (amount == 0) {
-									if (p.kpme.self.killproofs.contains(proof)) {
-										amount = p.kpme.self.killproofs.at(proof);
-									}
-									if (proof == "Legendary Insight") {
-										if (p.kpme.self.killproofs.contains("Legendary Divination")) {
-											amount += p.kpme.self.killproofs.at("Legendary Divination");
-										}
-									}
-									if (proof == "Unstable Fractal Essence") {
-										if (p.kpme.self.killproofs.contains("Unstable Cosmic Essence")) {
-											amount += p.kpme.self.killproofs.at("Unstable Cosmic Essence") * 5;
-										}
-									}
+								else {
+									ImGui::Text("-");
 								}
-								ImGui::Text("%i", amount);
 							}
 							else {
 								ImGui::Text("...");
@@ -216,28 +226,38 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 						ImGui::TableNextColumn();
 						ImGui::Text(p.account.c_str());
 						ImGui::TableNextColumn();
-						ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "...");
+						if (p.kpmeState == LogProofs::READY) {
+							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");
+						}
+						else {
+							ImGui::Text("...");
+						}
 						for (Boss boss : *bossesArray) {
 							ImGui::TableNextColumn();
 							if (p.kpmeState == LogProofs::READY) {
-								int amount = 0;
-								if (Settings::IncludeLinkedAccounts) {
-									if (p.kpme.shared.tokens.contains(GetKpMeBossToken(boss))) {
-										amount = p.kpme.shared.tokens.at(GetKpMeBossToken(boss));
+								if (!p.kpme.id.empty()) {
+									int amount = 0;
+									if (Settings::IncludeLinkedAccounts) {
+										if (p.kpme.shared.tokens.contains(GetKpMeBossToken(boss))) {
+											amount = p.kpme.shared.tokens.at(GetKpMeBossToken(boss));
+										}
+										if (p.kpme.shared.coffers.contains(GetKpMeBossCoffer(boss))) {
+											amount += p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss)) * 3;  // 1 Coffer == 3 Tokens
+										}
 									}
-									if (p.kpme.shared.coffers.contains(GetKpMeBossCoffer(boss))) {
-										amount += p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss)) * 3;  // 1 Coffer == 3 Tokens
+									if (amount == 0) {
+										if (p.kpme.self.tokens.contains(GetKpMeBossToken(boss))) {
+											amount = p.kpme.self.tokens.at(GetKpMeBossToken(boss));
+										}
+										if (p.kpme.self.coffers.contains(GetKpMeBossCoffer(boss))) {
+											amount += p.kpme.self.coffers.at(GetKpMeBossCoffer(boss)) * 3;  // 1 Coffer == 3 Tokens
+										}
 									}
+									ImGui::Text("%i", amount);
 								}
-								if (amount == 0) {
-									if (p.kpme.self.tokens.contains(GetKpMeBossToken(boss))) {
-										amount = p.kpme.self.tokens.at(GetKpMeBossToken(boss));
-									}
-									if (p.kpme.self.coffers.contains(GetKpMeBossCoffer(boss))) {
-										amount += p.kpme.self.coffers.at(GetKpMeBossCoffer(boss))  * 3;  // 1 Coffer == 3 Tokens
-									}
+								else {
+									ImGui::Text("-");
 								}
-								ImGui::Text("%i", amount);
 							}
 							else {
 								ImGui::Text("...");
@@ -293,22 +313,32 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 						ImGui::TableNextColumn();
 						ImGui::Text(p.account.c_str());
 						ImGui::TableNextColumn();
-						ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "...");
+						if (p.kpmeState == LogProofs::READY) {
+							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");
+						}
+						else {
+							ImGui::Text("...");
+						}
 						for (Boss boss : *bossesArray) {
 							ImGui::TableNextColumn();
 							if (p.kpmeState == LogProofs::READY) {
-								int amount = 0;
-								if (Settings::IncludeLinkedAccounts) {
-									if (p.kpme.shared.coffers.contains(GetKpMeBossCoffer(boss))) {
-										amount = p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss));
+								if (!p.kpme.id.empty()) {
+									int amount = 0;
+									if (Settings::IncludeLinkedAccounts) {
+										if (p.kpme.shared.coffers.contains(GetKpMeBossCoffer(boss))) {
+											amount = p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss));
+										}
 									}
-								}
-								if (amount == 0) {
-									if (p.kpme.self.coffers.contains(GetKpMeBossCoffer(boss))) {
-										amount = p.kpme.self.coffers.at(GetKpMeBossCoffer(boss));
+									if (amount == 0) {
+										if (p.kpme.self.coffers.contains(GetKpMeBossCoffer(boss))) {
+											amount = p.kpme.self.coffers.at(GetKpMeBossCoffer(boss));
+										}
 									}
+									ImGui::Text("%i", amount);
 								}
-								ImGui::Text("%i", amount);
+								else {
+									ImGui::Text("-");
+								}
 							}
 							else {
 								ImGui::Text("...");

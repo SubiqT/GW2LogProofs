@@ -174,6 +174,8 @@ namespace Kpme {
         }
         catch (json::parse_error& ex) {
             APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("failed to parse kpme response. \nexception details: {}", ex.what()).c_str());
+            r = { "", {}, {} };
+            return;
         }
     }
 
@@ -182,8 +184,11 @@ namespace Kpme {
         const char* cUrl = url.c_str();
         APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, cUrl);
         std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
-        std::string response = HTTPClient::GetRequest(wUrl.c_str());
-        json j = json::parse(response);
+        std::string kpmeResponse = HTTPClient::GetRequest(wUrl.c_str());
+        if (kpmeResponse == "An error occured.") {
+            return KpmeResponse{ "", {}, {} };
+        }
+        json j = json::parse(kpmeResponse);
         return j.template get<KpmeResponse>();
     }
 }
