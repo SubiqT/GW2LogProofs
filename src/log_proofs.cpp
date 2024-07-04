@@ -191,47 +191,76 @@ namespace LogProofs {
 
     /* Unofficial Extras */
     void UnExSquadEventHandler(void* eventArgs) {
-        SquadUpdate* squadUpdate = (SquadUpdate*)eventArgs;
-        unofficalExtrasEnabled = true;
-        std::string account = StripAccount(squadUpdate->UserInfo->AccountName);
-        int role = int(squadUpdate->UserInfo->Role);
-        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("unex: received event for account: {} - role: {}", account, role).c_str());
-        if (role == 5) {
-            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: {} has left the squad or party", account, role).c_str());
-            if (selfAccountName == account) ClearPlayers();
-            else RemovePlayer(account);
+        try {
+            SquadUpdate* squadUpdate = (SquadUpdate*)eventArgs;
+            unofficalExtrasEnabled = true;
+            if (!squadUpdate) return;
+            if (!squadUpdate->UserInfo) return;
+            if (!squadUpdate->UserInfo->AccountName) return;
+            std::string account = StripAccount(squadUpdate->UserInfo->AccountName);
+            int role = int(squadUpdate->UserInfo->Role);
+            APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("unex: received event for account: {} - role: {}", account, role).c_str());
+            if (role == 5) {
+                APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: {} has left the squad or party", account, role).c_str());
+                if (selfAccountName == account) ClearPlayers();
+                else RemovePlayer(account);
+            }
+            if (role <= 2) {
+                APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: detected player with account {} in squad or party", account, role).c_str());
+                AddPlayer(account);
+            }
         }
-        if (role <= 2) {
-            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: detected player with account {} in squad or party", account, role).c_str());
-            AddPlayer(account);
+        catch (const std::exception e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An error occurred in UnExSquadEventHandler: \n{}", e.what()).c_str());
         }
     }
 
     /* Arcdps */
     void ArcSquadJoinEventHandler(void* eventArgs) {
-        EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
-        std::string accountName = StripAccount(evAgentUpdateData->account);
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: detected player with account {} in squad or party", accountName).c_str());
-        AddPlayer(evAgentUpdateData->id, accountName);
+        try {
+            EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
+            std::string accountName = StripAccount(evAgentUpdateData->account);
+            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: detected player with account {} in squad or party", accountName).c_str());
+            AddPlayer(evAgentUpdateData->id, accountName);
+        }
+        catch (const std::exception e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An error occurred in ArcSquadJoinEventHandler: \n{}", e.what()).c_str());
+        }
     }
 
     void ArcSquadLeaveEventHandler(void* eventArgs) {
-        EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: {} has left the squad or party", evAgentUpdateData->id).c_str());
-        RemovePlayer(evAgentUpdateData->id);
+        try {
+            if (unofficalExtrasEnabled) return;
+            EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
+            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: {} has left the squad or party", evAgentUpdateData->id).c_str());
+            RemovePlayer(evAgentUpdateData->id);
+        }
+        catch (const std::exception e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An error occurred in ArcSquadLeaveEventHandler: \n{}", e.what()).c_str());
+        }
     }
 
     void ArcSelfLeaveEventHandler(void* eventArgs) {
-        EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
-        if (unofficalExtrasEnabled) return;
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: {} has left the squad or party", selfAccountName).c_str());
-        ClearPlayers();
+        try {
+            if (unofficalExtrasEnabled) return;
+            EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
+            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: {} has left the squad or party", selfAccountName).c_str());
+            ClearPlayers();
+        }
+        catch (const std::exception e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An error occurred in ArcSelfLeaveEventHandler: \n{}", e.what()).c_str());
+        }
     }
 
     void ArcSelfDetectedEventHandler(void* eventArgs) {
-        EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
-        selfAccountName = StripAccount(evAgentUpdateData->account);
-        APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: self detected with id {} account: {}", evAgentUpdateData->id, selfAccountName).c_str());
-        AddPlayer(evAgentUpdateData->id, selfAccountName);
+        try {
+            EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*)eventArgs;
+            selfAccountName = StripAccount(evAgentUpdateData->account);
+            APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: self detected with id {} account: {}", evAgentUpdateData->id, selfAccountName).c_str());
+            AddPlayer(evAgentUpdateData->id, selfAccountName);
+        }
+        catch (const std::exception e) {
+            APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An error occurred in ArcSelfDetectedEventHandler: \n{}", e.what()).c_str());
+        }
     }
 }
