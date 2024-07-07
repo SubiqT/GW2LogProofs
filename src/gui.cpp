@@ -29,6 +29,36 @@ static ImGuiTableFlags tableFlags = (
 
 std::vector<std::string> dataSources = { "Wingman", "Kpme" };
 
+void DrawWingmanAccountName(LogProofs::Player aPlayer)
+{
+	if (!aPlayer.wingman.account.empty())
+	{
+		if (ImGui::TextURL(aPlayer.account.c_str()))
+		{
+			ShellExecuteA(0, 0, ("https://gw2wingman.nevermindcreations.de/kp/" + aPlayer.account).c_str(), 0, 0, SW_SHOW);
+		}
+	}
+	else
+	{
+		ImGui::Text(aPlayer.account.c_str());
+	}
+}
+
+void DrawKpmeAccountName(LogProofs::Player aPlayer)
+{
+	if (!aPlayer.kpme.id.empty())
+	{
+		if (ImGui::TextURL(aPlayer.account.c_str()))
+		{
+			ShellExecuteA(0, 0, ("https://killproof.me/proof/" + aPlayer.kpme.id).c_str(), 0, 0, SW_SHOW);
+		}
+	}
+	else
+	{
+		ImGui::Text(aPlayer.account.c_str());
+	}
+}
+
 void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray , bool isLegendary) {
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 1, tableFlags)) {
@@ -60,7 +90,7 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
 						ImGui::TableNextColumn();
-						ImGui::Text(p.account.c_str());
+						DrawWingmanAccountName(p);
 						for (Boss& boss : *bossesArray) {
 							ImGui::TableNextColumn();
 							if (p.wingmanState == LogProofs::READY) {
@@ -91,21 +121,6 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 			
 		}
 		ImGui::EndTabItem();
-	}
-}
-
-void DrawKpmeAccountName(LogProofs::Player aPlayer)
-{
-	if (!aPlayer.kpme.id.empty())
-	{
-		if (ImGui::TextURL(aPlayer.account.c_str()))
-		{
-			ShellExecuteA(0, 0, ("https://killproof.me/proof/" + aPlayer.kpme.id).c_str(), 0, 0, SW_SHOW);
-		}
-	}
-	else
-	{
-		ImGui::Text(aPlayer.account.c_str());
 	}
 }
 
