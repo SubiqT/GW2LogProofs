@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "imgui/imgui.h"
+#include "imgui_extensions.h"
 #include "shared.h"
 #include "log_proofs.h"
 #include "bosses.h"
@@ -93,6 +94,21 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 	}
 }
 
+void DrawKpmeAccountName(LogProofs::Player aPlayer)
+{
+	if (!aPlayer.kpme.id.empty())
+	{
+		if (ImGui::TextURL(aPlayer.account.c_str()))
+		{
+			ShellExecuteA(0, 0, ("https://killproof.me/proof/" + aPlayer.kpme.id).c_str(), 0, 0, SW_SHOW);
+		}
+	}
+	else
+	{
+		ImGui::Text(aPlayer.account.c_str());
+	}
+}
+
 void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<std::string>* proofsArray) {
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(proofsArray->size()) + 2, tableFlags)) {
@@ -127,7 +143,7 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
 						ImGui::TableNextColumn();
-						ImGui::Text(p.account.c_str());
+						DrawKpmeAccountName(p);
 						ImGui::TableNextColumn();
 						if (p.kpmeState == LogProofs::READY) {
 							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");
@@ -194,7 +210,6 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 	}
 }
 
-
 void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray) {
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 2, tableFlags)) {
@@ -229,7 +244,7 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
 						ImGui::TableNextColumn();
-						ImGui::Text(p.account.c_str());
+						DrawKpmeAccountName(p);
 						ImGui::TableNextColumn();
 						if (p.kpmeState == LogProofs::READY) {
 							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");
@@ -322,7 +337,7 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
 						ImGui::TableNextColumn();
-						ImGui::Text(p.account.c_str());
+						DrawKpmeAccountName(p);
 						ImGui::TableNextColumn();
 						if (p.kpmeState == LogProofs::READY) {
 							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");

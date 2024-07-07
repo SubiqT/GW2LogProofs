@@ -27,6 +27,7 @@
     <ClCompile Include="src\kp_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\imgui_extensions.h" />
     <ClInclude Include="src\arcdps\arcdps.h" />
     <ClInclude Include="src\bosses.h" />
     <ClInclude Include="src\gui.h" />

@@ -114,6 +114,9 @@
     <ClInclude Include="src\log_proofs.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\imgui_extensions.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="submodules">
