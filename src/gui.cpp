@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
 #include "imgui_extensions.h"
 #include "shared.h"
 #include "log_proofs.h"
@@ -61,9 +62,11 @@ void DrawKpmeAccountName(LogProofs::Player aPlayer)
 }
 
 void HighlightColumnOnHover() {
-	if (ImGui::TableGetColumnFlags(ImGui::TableGetColumnIndex()) & ImGuiTableColumnFlags_IsHovered) {
-		ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, hoverColour);
-	}
+	// Disabled until I find a solution for detecting row hover
+	
+	//if (ImGui::TableGetColumnFlags(ImGui::TableGetColumnIndex()) & ImGuiTableColumnFlags_IsHovered) {
+	//	ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, hoverColour);
+	//}
 }
 
 void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray , bool isLegendary) {
