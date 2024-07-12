@@ -28,6 +28,7 @@ static ImGuiTableFlags tableFlags = (
 	);
 
 std::vector<std::string> dataSources = { "Wingman", "Kpme" };
+ImU32 hoverColour = 4284572159;
 
 void DrawWingmanAccountName(LogProofs::Player aPlayer)
 {
@@ -59,6 +60,12 @@ void DrawKpmeAccountName(LogProofs::Player aPlayer)
 	}
 }
 
+void HighlightColumnOnHover() {
+	if (ImGui::TableGetColumnFlags(ImGui::TableGetColumnIndex()) & ImGuiTableColumnFlags_IsHovered) {
+		ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, hoverColour);
+	}
+}
+
 void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray , bool isLegendary) {
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 1, tableFlags)) {
@@ -69,9 +76,11 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 			ImGui::TableSetupScrollFreeze(1, 1);
 			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 			ImGui::TableNextColumn();
+			HighlightColumnOnHover();
 			ImGui::Text("Account");
 			for (Boss& boss : *bossesArray) {
 				ImGui::TableNextColumn();
+				HighlightColumnOnHover();
 				Texture* texture = GetBossTexture(boss);
 				if (texture != nullptr) {
 					ImGui::Image((void*)texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
@@ -93,9 +102,11 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 							continue;
 						}
 						ImGui::TableNextColumn();
+						HighlightColumnOnHover();
 						DrawWingmanAccountName(p);
 						for (Boss& boss : *bossesArray) {
 							ImGui::TableNextColumn();
+							HighlightColumnOnHover();
 							if (p.wingmanState == LogProofs::READY) {
 								if (!p.wingman.account.empty()) {
 									if (isLegendary) {
@@ -118,6 +129,7 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 			}
 			if (LogProofs::players.size() == 0) {
 				ImGui::TableNextColumn();
+				HighlightColumnOnHover();
 				ImGui::Text("No players found... ");
 			}
 			ImGui::EndTable();
@@ -138,11 +150,14 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 			ImGui::TableSetupScrollFreeze(1, 1);
 			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 			ImGui::TableNextColumn();
+			HighlightColumnOnHover();
 			ImGui::Text("Account");
 			ImGui::TableNextColumn();
+			HighlightColumnOnHover();
 			ImGui::Text("Id");
 			for (std::string proof : *proofsArray) {
 				ImGui::TableNextColumn();
+				HighlightColumnOnHover();
 				Texture* texture = GetCurrencyTexture(proof);
 				if (texture != nullptr) {
 					ImGui::Image((void*)texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
@@ -164,8 +179,10 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 							continue;
 						}
 						ImGui::TableNextColumn();
+						HighlightColumnOnHover();
 						DrawKpmeAccountName(p);
 						ImGui::TableNextColumn();
+						HighlightColumnOnHover();
 						if (p.kpmeState == LogProofs::READY) {
 							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");
 						}
@@ -174,6 +191,7 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 						}
 						for (std::string proof : *proofsArray) {
 							ImGui::TableNextColumn();
+							HighlightColumnOnHover();
 							if (p.kpmeState == LogProofs::READY) {
 								if (!p.kpme.id.empty()) {
 									int amount = 0;
@@ -222,6 +240,7 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 			}
 			if (LogProofs::players.size() == 0) {
 				ImGui::TableNextColumn();
+				HighlightColumnOnHover();
 				ImGui::Text("No players found... ");
 			}
 			ImGui::EndTable();
@@ -242,11 +261,14 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 			ImGui::TableSetupScrollFreeze(1, 1);
 			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 			ImGui::TableNextColumn();
+			HighlightColumnOnHover();
 			ImGui::Text("Account");
 			ImGui::TableNextColumn();
+			HighlightColumnOnHover();
 			ImGui::Text("Id");
 			for (Boss& boss : *bossesArray) {
 				ImGui::TableNextColumn();
+				HighlightColumnOnHover();
 				Texture* texture = GetBossTexture(boss);
 				if (texture != nullptr) {
 					ImGui::Image((void*)texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
@@ -268,8 +290,10 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 							continue;
 						}
 						ImGui::TableNextColumn();
+						HighlightColumnOnHover();
 						DrawKpmeAccountName(p);
 						ImGui::TableNextColumn();
+						HighlightColumnOnHover();
 						if (p.kpmeState == LogProofs::READY) {
 							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");
 						}
@@ -278,6 +302,7 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 						}
 						for (Boss boss : *bossesArray) {
 							ImGui::TableNextColumn();
+							HighlightColumnOnHover();
 							if (p.kpmeState == LogProofs::READY) {
 								if (!p.kpme.id.empty()) {
 									int amount = 0;
@@ -318,6 +343,7 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 			}
 			if (LogProofs::players.size() == 0) {
 				ImGui::TableNextColumn();
+				HighlightColumnOnHover();
 				ImGui::Text("No players found... ");
 			}
 			ImGui::EndTable();
@@ -338,11 +364,14 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 			ImGui::TableSetupScrollFreeze(1, 1);
 			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 			ImGui::TableNextColumn();
+			HighlightColumnOnHover();
 			ImGui::Text("Account");
 			ImGui::TableNextColumn();
+			HighlightColumnOnHover();
 			ImGui::Text("Id");
 			for (Boss& boss : *bossesArray) {
 				ImGui::TableNextColumn();
+				HighlightColumnOnHover();
 				Texture* texture = GetBossTexture(boss);
 				if (texture != nullptr) {
 					ImGui::Image((void*)texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
@@ -364,8 +393,10 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 							continue;
 						}
 						ImGui::TableNextColumn();
+						HighlightColumnOnHover();
 						DrawKpmeAccountName(p);
 						ImGui::TableNextColumn();
+						HighlightColumnOnHover();
 						if (p.kpmeState == LogProofs::READY) {
 							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");
 						}
@@ -374,6 +405,7 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 						}
 						for (Boss boss : *bossesArray) {
 							ImGui::TableNextColumn();
+							HighlightColumnOnHover();
 							if (p.kpmeState == LogProofs::READY) {
 								if (!p.kpme.id.empty()) {
 									int amount = 0;
@@ -408,6 +440,7 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 			}
 			if (LogProofs::players.size() == 0) {
 				ImGui::TableNextColumn();
+				HighlightColumnOnHover();
 				ImGui::Text("No players found... ");
 			}
 			ImGui::EndTable();
