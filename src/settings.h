@@ -37,6 +37,7 @@ extern const char* COLUMN_BOSSES_SIZE;
 
 extern const char* SELECTED_DATA_SOURCE;
 extern const char* INCLUDE_LINKED_ACCOUNTS;
+extern const char* INCLUDE_MISSING_ACCOUNTS;
 
 
 namespace Settings
@@ -72,6 +73,7 @@ namespace Settings
 	
 	extern DataSource SelectedDataSource;
 	extern bool IncludeLinkedAccounts;
+	extern bool IncludeMissingAccounts;
 }
 
 #endif

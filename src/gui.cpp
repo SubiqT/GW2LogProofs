@@ -89,6 +89,9 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 				std::scoped_lock lck(LogProofs::Mutex);
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
+						if (!Settings::IncludeMissingAccounts && p.wingman.account.empty()) {
+							continue;
+						}
 						ImGui::TableNextColumn();
 						DrawWingmanAccountName(p);
 						for (Boss& boss : *bossesArray) {
@@ -157,6 +160,9 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 				std::scoped_lock lck(LogProofs::Mutex);
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
+						if (!Settings::IncludeMissingAccounts && p.kpme.id.empty()) {
+							continue;
+						}
 						ImGui::TableNextColumn();
 						DrawKpmeAccountName(p);
 						ImGui::TableNextColumn();
@@ -258,6 +264,9 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 				std::scoped_lock lck(LogProofs::Mutex);
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
+						if (!Settings::IncludeMissingAccounts && p.kpme.id.empty()) {
+							continue;
+						}
 						ImGui::TableNextColumn();
 						DrawKpmeAccountName(p);
 						ImGui::TableNextColumn();
@@ -351,6 +360,9 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 				std::scoped_lock lck(LogProofs::Mutex);
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
+						if (!Settings::IncludeMissingAccounts && p.kpme.id.empty()) {
+							continue;
+						}
 						ImGui::TableNextColumn();
 						DrawKpmeAccountName(p);
 						ImGui::TableNextColumn();
@@ -425,6 +437,12 @@ void RenderWindowLogProofs() {
 			ImGui::EndCombo();
 		}
 
+		ImGui::SameLine();
+		if (ImGui::Checkbox("Missing Accounts", &Settings::IncludeMissingAccounts)) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS] = Settings::IncludeMissingAccounts;
+			Settings::Save(SettingsPath);
+		}
+
 		if (Settings::SelectedDataSource == WINGMAN) {
 			if (ImGui::BeginTabBar("##Wingman", ImGuiTabBarFlags_None)) {
 				if (Settings::ShowTabRaidsNormal) {
@@ -451,7 +469,7 @@ void RenderWindowLogProofs() {
 		
 		if (Settings::SelectedDataSource == KPME) {
 			ImGui::SameLine();
-			if (ImGui::Checkbox("Include Linked Accounts", &Settings::IncludeLinkedAccounts)) {
+			if (ImGui::Checkbox("Linked Accounts", &Settings::IncludeLinkedAccounts)) {
 				Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS] = Settings::IncludeLinkedAccounts;
 				Settings::Save(SettingsPath);
 			}

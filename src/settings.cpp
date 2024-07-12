@@ -32,6 +32,7 @@ const char* COLUMN_BOSSES_SIZE = "ColumnBossesSize";
 
 const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
 const char* INCLUDE_LINKED_ACCOUNTS = "IncludeLinkedAccounts";
+const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
 
 
 namespace Settings
@@ -124,6 +125,9 @@ namespace Settings
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS].get_to<bool>(IncludeLinkedAccounts);
 		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].get_to<bool>(IncludeMissingAccounts);
+		}
 	}
 	void Save(std::filesystem::path filePath) {
 		std::scoped_lock lck(Mutex);
@@ -157,4 +161,5 @@ namespace Settings
 
 	DataSource SelectedDataSource = WINGMAN;
 	bool IncludeLinkedAccounts = false;
+	bool IncludeMissingAccounts = false;
 }
