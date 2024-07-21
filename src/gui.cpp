@@ -101,7 +101,7 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 				std::scoped_lock lck(LogProofs::Mutex);
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
-						if (!Settings::IncludeMissingAccounts && p.wingman.account.empty()) {
+						if (!Settings::IncludeMissingAccounts && p.wingman.account.empty() && p.wingmanState == LogProofs::READY) {
 							continue;
 						}
 						ImGui::TableNextColumn();
@@ -178,7 +178,7 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 				std::scoped_lock lck(LogProofs::Mutex);
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
-						if (!Settings::IncludeMissingAccounts && p.kpme.id.empty()) {
+						if (!Settings::IncludeMissingAccounts && p.kpme.id.empty() && p.kpmeState == LogProofs::READY) {
 							continue;
 						}
 						ImGui::TableNextColumn();
@@ -289,7 +289,7 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 				std::scoped_lock lck(LogProofs::Mutex);
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
-						if (!Settings::IncludeMissingAccounts && p.kpme.id.empty()) {
+						if (!Settings::IncludeMissingAccounts && p.kpme.id.empty() && p.kpmeState == LogProofs::READY) {
 							continue;
 						}
 						ImGui::TableNextColumn();
@@ -392,7 +392,7 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 				std::scoped_lock lck(LogProofs::Mutex);
 				if (LogProofs::players.size() > 0) {
 					for (LogProofs::Player p : LogProofs::players) {
-						if (!Settings::IncludeMissingAccounts && p.kpme.id.empty()) {
+						if (!Settings::IncludeMissingAccounts && p.kpme.id.empty() && p.kpmeState == LogProofs::READY) {
 							continue;
 						}
 						ImGui::TableNextColumn();
