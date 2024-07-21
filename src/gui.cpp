@@ -146,7 +146,7 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(proofsArray->size()) + 2, tableFlags)) {
 			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
-			ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 30.0f);
+			ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed, Settings::ColumnSizeKpmeId);
 			for (std::string proof : *proofsArray) {
 				ImGui::TableSetupColumn(proof.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
 			}
@@ -257,7 +257,7 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 2, tableFlags)) {
 			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
-			ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 30.0f);
+			ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed, Settings::ColumnSizeKpmeId);
 			for (Boss boss : *bossesArray) {
 				ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
 			}
@@ -360,7 +360,7 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 2, tableFlags)) {
 			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
-			ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 30.0f);
+			ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed, Settings::ColumnSizeKpmeId);
 			for (Boss boss : *bossesArray) {
 				ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
 			}
@@ -617,6 +617,10 @@ void DrawColumnOptions() {
 	}
 	if (ImGui::SliderFloat("Bosses Size", &Settings::ColumnSizeBosses, 8.0f, 128.0f, "%.3f px")) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE] = Settings::ColumnSizeBosses;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::SliderFloat("Kpme Id Size", &Settings::ColumnSizeKpmeId, 8.0f, 128.0f, "%.3f px")) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE] = Settings::ColumnSizeKpmeId;
 		Settings::Save(SettingsPath);
 	}
 }

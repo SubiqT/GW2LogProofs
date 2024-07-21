@@ -34,6 +34,7 @@ extern const char* SHOW_TAB_KPME_STRIKE_CM_COFFERS;
 
 extern const char* COLUMN_ACCOUNT_SIZE;
 extern const char* COLUMN_BOSSES_SIZE;
+extern const char* COLUMN_KPME_ID_SIZE;
 
 extern const char* SELECTED_DATA_SOURCE;
 extern const char* INCLUDE_LINKED_ACCOUNTS;
@@ -70,6 +71,7 @@ namespace Settings
 
 	extern float ColumnSizeAccount;
 	extern float ColumnSizeBosses;
+	extern float ColumnSizeKpmeId;
 	
 	extern DataSource SelectedDataSource;
 	extern bool IncludeLinkedAccounts;

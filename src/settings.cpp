@@ -29,6 +29,7 @@ const char* SHOW_TAB_KPME_STRIKE_CM_COFFERS = "ShowTabKpmeStrikeCMCoffers";
 
 const char* COLUMN_ACCOUNT_SIZE = "ColumnAccountSize";
 const char* COLUMN_BOSSES_SIZE = "ColumnBossesSize";
+const char* COLUMN_KPME_ID_SIZE = "ColumnKpmeIdSize";
 
 const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
 const char* INCLUDE_LINKED_ACCOUNTS = "IncludeLinkedAccounts";
@@ -117,6 +118,9 @@ namespace Settings
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE].get_to<float>(ColumnSizeBosses);
 		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE].get_to<float>(ColumnSizeKpmeId);
+		}
 
 		/* Data settings */
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE].is_null()) {
@@ -158,6 +162,7 @@ namespace Settings
 
 	float ColumnSizeAccount = 200.0f;
 	float ColumnSizeBosses = 32.0f;
+	float ColumnSizeKpmeId = 32.0f;
 
 	DataSource SelectedDataSource = WINGMAN;
 	bool IncludeLinkedAccounts = false;
