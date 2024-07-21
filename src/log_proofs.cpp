@@ -194,20 +194,22 @@ namespace LogProofs {
         try {
             SquadUpdate* squadUpdate = (SquadUpdate*)eventArgs;
             unofficalExtrasEnabled = true;
-            if (!squadUpdate) return;
-            if (!squadUpdate->UserInfo) return;
-            if (!squadUpdate->UserInfo->AccountName) return;
-            std::string account = StripAccount(squadUpdate->UserInfo->AccountName);
-            int role = int(squadUpdate->UserInfo->Role);
-            APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("unex: received event for account: {} - role: {}", account, role).c_str());
-            if (role == 5) {
-                APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: {} has left the squad or party", account).c_str());
-                if (selfAccountName == account) ClearPlayers();
-                else RemovePlayer(account);
-            }
-            if (role <= 2) {
-                APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: detected player with account {} in squad or party", account).c_str());
-                AddPlayer(account);
+            for (size_t i = 0; i < squadUpdate->UsersCount; i++) {
+                if (!squadUpdate) return;
+                if (!squadUpdate->UserInfo) return;
+                if (!squadUpdate->UserInfo[i].AccountName) return;
+                std::string account = StripAccount(squadUpdate->UserInfo[i].AccountName);
+                int role = int(squadUpdate->UserInfo[i].Role);
+                APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("unex: received event for account: {} - role: {}", account, role).c_str());
+                if (role == 5) {
+                    APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: {} has left the squad or party", account).c_str());
+                    if (selfAccountName == account) ClearPlayers();
+                    else RemovePlayer(account);
+                }
+                if (role <= 2) {
+                    APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: detected player with account {} in squad or party", account).c_str());
+                    AddPlayer(account);
+                }
             }
         }
         catch (const std::exception e) {
