@@ -201,12 +201,12 @@ namespace LogProofs {
             int role = int(squadUpdate->UserInfo->Role);
             APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("unex: received event for account: {} - role: {}", account, role).c_str());
             if (role == 5) {
-                APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: {} has left the squad or party", account, role).c_str());
+                APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: {} has left the squad or party", account).c_str());
                 if (selfAccountName == account) ClearPlayers();
                 else RemovePlayer(account);
             }
             if (role <= 2) {
-                APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: detected player with account {} in squad or party", account, role).c_str());
+                APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: detected player with account {} in squad or party", account).c_str());
                 AddPlayer(account);
             }
         }
