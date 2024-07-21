@@ -61,6 +61,20 @@ void DrawKpmeAccountName(LogProofs::Player aPlayer)
 	}
 }
 
+void DrawKpmeId(LogProofs::Player aPlayer) {
+	if (!aPlayer.kpme.id.empty())
+	{
+		if (ImGui::TextURL(aPlayer.kpme.id.c_str()))
+		{
+			ImGui::SetClipboardText(aPlayer.kpme.id.c_str());
+		}
+	}
+	else
+	{
+		ImGui::Text("-");
+	}
+}
+
 void HighlightColumnOnHover() {
 	// Disabled until I find a solution for detecting row hover
 	
@@ -187,7 +201,7 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 						ImGui::TableNextColumn();
 						HighlightColumnOnHover();
 						if (p.kpmeState == LogProofs::READY) {
-							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");
+							DrawKpmeId(p);
 						}
 						else {
 							ImGui::Text("...");
@@ -298,7 +312,7 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 						ImGui::TableNextColumn();
 						HighlightColumnOnHover();
 						if (p.kpmeState == LogProofs::READY) {
-							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");
+							DrawKpmeId(p);
 						}
 						else {
 							ImGui::Text("...");
@@ -401,7 +415,7 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 						ImGui::TableNextColumn();
 						HighlightColumnOnHover();
 						if (p.kpmeState == LogProofs::READY) {
-							ImGui::Text(!p.kpme.id.empty() ? p.kpme.id.c_str() : "-");
+							DrawKpmeId(p);
 						}
 						else {
 							ImGui::Text("...");
