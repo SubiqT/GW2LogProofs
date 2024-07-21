@@ -23,7 +23,8 @@ std::vector<Boss> sortedFractalCMBosses {
 	SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM,
 	ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM,
 	KanaxaiScytheOfHouseAurkusCM,
-	CerusAndDeimosCM, EparchCM
+	// CerusAndDeimosCM, // Not tracked anymore by arc or wingman
+	EparchCM
 };
 std::vector<Boss> sortedStrikeBosses {
 	IcebroodConstruct, TheVoiceAndTheClaw, FraenirOfJormag, Boneskinner, WhisperOfJormag,
