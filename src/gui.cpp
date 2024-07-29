@@ -12,7 +12,6 @@
 
 static ImGuiWindowFlags windowFlags =  (
 	ImGuiWindowFlags_NoCollapse
-	| ImGuiWindowFlags_NoFocusOnAppearing
 	| ImGuiWindowFlags_NoNav
 	| ImGuiWindowFlags_NoNavFocus
 	| ImGuiWindowFlags_AlwaysAutoResize

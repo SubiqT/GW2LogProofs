@@ -51,10 +51,14 @@ void AddonLoad(AddonAPI* addonApi) {
 	APIDefs->Renderer.Register(ERenderType_Render, AddonRender);
 	APIDefs->Renderer.Register(ERenderType_OptionsRender, AddonOptions);
 
+	APIDefs->UI.RegisterCloseOnEscape("Log Proofs", &Settings::ShowWindowLogProofs);
+
 	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "<c=#00ff00>Log Proofs</c> was loaded.");
 }
 
 void AddonUnload() {
+	APIDefs->UI.DeregisterCloseOnEscape("Log Proofs");
+
 	APIDefs->Renderer.Deregister(AddonOptions);
 	APIDefs->Renderer.Deregister(AddonRender);
 
