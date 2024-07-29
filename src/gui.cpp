@@ -641,12 +641,12 @@ void DrawColumnOptions() {
 
 void RegisterQuickAccessShortcut() {
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "registering quick access shortcut");
-	APIDefs->AddShortcut("SHORTCUT_LOG_PROOFS", "TEX_LOG_NORMAL", "TEX_LOG_HOVER", KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS, "Toggle Log Proofs Window");
+	APIDefs->QuickAccess.Add("SHORTCUT_LOG_PROOFS", "TEX_LOG_NORMAL", "TEX_LOG_HOVER", KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS, "Toggle Log Proofs Window");
 }
 
 void DeregisterQuickAccessShortcut() {
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "deregistering quick access shortcut");
-	APIDefs->RemoveShortcut("SHORTCUT_LOG_PROOFS");
+	APIDefs->QuickAccess.Remove("SHORTCUT_LOG_PROOFS");
 }
 
 void RenderWindowSettings() {

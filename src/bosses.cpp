@@ -189,111 +189,111 @@ Texture* GetBossTexture(Boss boss) {
 	switch (boss) {
 	/* Raids */
 	case ValeGuardian:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_VALE_GUARDIAN", IDB_VALE_GUARDIAN, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_VALE_GUARDIAN", IDB_VALE_GUARDIAN, hSelf);
 	case Gorseval:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_GORSEVAL", IDB_GORSEVAL, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_GORSEVAL", IDB_GORSEVAL, hSelf);
 	case Sabetha:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_SABETHA", IDB_SABETHA, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_SABETHA", IDB_SABETHA, hSelf);
 	case Slothasor:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_SLOTHASOR", IDB_SLOTHASOR, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_SLOTHASOR", IDB_SLOTHASOR, hSelf);
 	case BanditTrio:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_NARELLA", IDB_NARELLA, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_NARELLA", IDB_NARELLA, hSelf);
 	case Matthias:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_MATTHIAS", IDB_MATTHIAS, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_MATTHIAS", IDB_MATTHIAS, hSelf);
 	case Escort:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_ESCORT", IDB_ESCORT, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_ESCORT", IDB_ESCORT, hSelf);
 	case KeepConstruct:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_KEEP_CONSTRUCT", IDB_KEEP_CONSTRUCT, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_KEEP_CONSTRUCT", IDB_KEEP_CONSTRUCT, hSelf);
 	case TwistedCastle:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_TWISTED_CASTLE", IDB_TWISTED_CASTLE, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_TWISTED_CASTLE", IDB_TWISTED_CASTLE, hSelf);
 	case Xera:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_XERA", IDB_XERA, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_XERA", IDB_XERA, hSelf);
 	case Cairn:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_CAIRN", IDB_CAIRN, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_CAIRN", IDB_CAIRN, hSelf);
 	case MursaatOverseer:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_MURSAAT_OVERSEER", IDB_MURSAAT_OVERSEER, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_MURSAAT_OVERSEER", IDB_MURSAAT_OVERSEER, hSelf);
 	case Samarog:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_SAMAROG", IDB_SAMAROG, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_SAMAROG", IDB_SAMAROG, hSelf);
 	case Deimos:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_DEIMOS", IDB_DEIMOS, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_DEIMOS", IDB_DEIMOS, hSelf);
 	case SoullessHorror:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_SOULLESS_HORROR", IDB_SOULLESS_HORROR, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_SOULLESS_HORROR", IDB_SOULLESS_HORROR, hSelf);
 	case RiverOfSouls:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_RIVER_OF_SOULS", IDB_RIVER_OF_SOULS, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_RIVER_OF_SOULS", IDB_RIVER_OF_SOULS, hSelf);
 	case BrokenKing:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_BROKEN_KING", IDB_BROKEN_KING, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_BROKEN_KING", IDB_BROKEN_KING, hSelf);
 	case EaterOfSouls:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_EATER_OF_SOULS", IDB_EATER_OF_SOULS, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_EATER_OF_SOULS", IDB_EATER_OF_SOULS, hSelf);
 	case Eyes:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_EYES_OF_FATE", IDB_EYES_OF_FATE, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_EYES_OF_FATE", IDB_EYES_OF_FATE, hSelf);
 	case Dhuum:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_DHUUM", IDB_DHUUM, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_DHUUM", IDB_DHUUM, hSelf);
 	case ConjuredAmalgamate:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_CONJURED_AMALGAMATE", IDB_CONJURED_AMALGAMATE, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_CONJURED_AMALGAMATE", IDB_CONJURED_AMALGAMATE, hSelf);
 	case TwinLargos:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_KENUTT", IDB_KENUTT, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_KENUTT", IDB_KENUTT, hSelf);
 	case Qadim:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_QADIM", IDB_QADIM, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_QADIM", IDB_QADIM, hSelf);
 	case Adina:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_ADINA", IDB_ADINA, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_ADINA", IDB_ADINA, hSelf);
 	case Sabir:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_SABIR", IDB_SABIR, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_SABIR", IDB_SABIR, hSelf);
 	case QadimThePeerless:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_QADIM_THE_PEERLESS", IDB_QADIM_THE_PEERLESS, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_QADIM_THE_PEERLESS", IDB_QADIM_THE_PEERLESS, hSelf);
 	/* Fractals */
 	case MAMA:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_MAMA", IDB_MAMA, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_MAMA", IDB_MAMA, hSelf);
 	case SiaxTheCorrupted:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_SIAX", IDB_SIAX, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_SIAX", IDB_SIAX, hSelf);
 	case EnsolyssOfTheEndlessTorment:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_ENSOLYSS", IDB_ENSOLYSS, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_ENSOLYSS", IDB_ENSOLYSS, hSelf);
 	case SkorvaldTheShattered:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_SKORVALD", IDB_SKORVALD, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_SKORVALD", IDB_SKORVALD, hSelf);
 	case Artsariiv:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_ARTSARIIV", IDB_ARTSARIIV, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_ARTSARIIV", IDB_ARTSARIIV, hSelf);
 	case Arkk:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_ARKK", IDB_ARKK, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_ARKK", IDB_ARKK, hSelf);
 	case ElementalAiKeeperOfThePeak:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_ELEMENTAL_AI_LIGHT", IDB_ELEMENTAL_AI_LIGHT, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_ELEMENTAL_AI_LIGHT", IDB_ELEMENTAL_AI_LIGHT, hSelf);
 	case DarkAiKeeperOfThePeak:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_ELEMENTAL_AI_DARK", IDB_ELEMENTAL_AI_DARK, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_ELEMENTAL_AI_DARK", IDB_ELEMENTAL_AI_DARK, hSelf);
 	case ElementalAndDarkAiKeeperOfThePeak:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_ELEMENTAL_AI_LIGHT_AND_DARK", IDB_ELEMENTAL_AI_LIGHT_AND_DARK, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_ELEMENTAL_AI_LIGHT_AND_DARK", IDB_ELEMENTAL_AI_LIGHT_AND_DARK, hSelf);
 	case KanaxaiScytheOfHouseAurkus:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_KANAXAI", IDB_KANAXAI, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_KANAXAI", IDB_KANAXAI, hSelf);
 	case CerusAndDeimos:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_CERUS_AND_DEIMOS", IDB_CERUS_AND_DEIMOS, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_CERUS_AND_DEIMOS", IDB_CERUS_AND_DEIMOS, hSelf);
 	case Eparch:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_EPARCH", IDB_EPARCH, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_EPARCH", IDB_EPARCH, hSelf);
 	/* Strikes */
 	case IcebroodConstruct:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_ICEBROOD_CONSTRUCT", IDB_ICEBROOD_CONSTRUCT, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_ICEBROOD_CONSTRUCT", IDB_ICEBROOD_CONSTRUCT, hSelf);
 	case TheVoiceAndTheClaw:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_KODANS", IDB_KODANS, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_KODANS", IDB_KODANS, hSelf);
 	case FraenirOfJormag:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_FRAENIR_OF_JORMAG", IDB_FRAENIR_OF_JORMAG, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_FRAENIR_OF_JORMAG", IDB_FRAENIR_OF_JORMAG, hSelf);
 	case Boneskinner:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_BONESKINNER", IDB_BONESKINNER, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_BONESKINNER", IDB_BONESKINNER, hSelf);
 	case WhisperOfJormag:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_WHISPER_OF_JORMAG", IDB_WHISPER_OF_JORMAG, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_WHISPER_OF_JORMAG", IDB_WHISPER_OF_JORMAG, hSelf);
 	case Freezie:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_FREEZIE", IDB_FREEZIE, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_FREEZIE", IDB_FREEZIE, hSelf);
 	case CaptainMaiTrin:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_CAPTAIN_MAI_TRIN", IDB_CAPTAIN_MAI_TRIN, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_CAPTAIN_MAI_TRIN", IDB_CAPTAIN_MAI_TRIN, hSelf);
 	case Ankka:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_ANKKA", IDB_ANKKA, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_ANKKA", IDB_ANKKA, hSelf);
 	case MinisterLi:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_MINISTER_LI", IDB_MINISTER_LI, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_MINISTER_LI", IDB_MINISTER_LI, hSelf);
 	case VoidAmalgamate:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_HARVEST_TEMPLE", IDB_HARVEST_TEMPLE, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_HARVEST_TEMPLE", IDB_HARVEST_TEMPLE, hSelf);
 	case OldLionsCourt:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_WATCHKNIGHT_MARK_II", IDB_WATCHKNIGHT_MARK_II, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_WATCHKNIGHT_MARK_II", IDB_WATCHKNIGHT_MARK_II, hSelf);
 	case Dagda:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_DAGDA", IDB_DAGDA, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_DAGDA", IDB_DAGDA, hSelf);
 	case Cerus:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_CERUS", IDB_CERUS, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_CERUS", IDB_CERUS, hSelf);
 	default:
-		return APIDefs->GetTextureOrCreateFromResource("TEX_UNDER_CONSTRUCTION", IDB_UNDER_CONSTRUCTION, hSelf);
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_UNDER_CONSTRUCTION", IDB_UNDER_CONSTRUCTION, hSelf);
 	}
 }
 
@@ -433,9 +433,9 @@ std::string GetKpMeBossCoffer(Boss boss) {
 }
 
 Texture* GetCurrencyTexture(std::string name) {
-	if (name == "Legendary Insight") return APIDefs->GetTextureOrCreateFromResource("TEX_LEGENDARY_INSIGHT", IDB_LEGENDARY_INSIGHT, hSelf);
-	if (name == "Legendary Divination") return APIDefs->GetTextureOrCreateFromResource("TEX_LEGENDARY_DIVINATION", IDB_LEGENDARY_DIVINATION, hSelf);
-	if (name == "Unstable Fractal Essence") return APIDefs->GetTextureOrCreateFromResource("TEX_UNSTABLE_FRACTAL_ESSENCE", IDB_UNSTABLE_FRACTAL_ESSENCE, hSelf);
-	if (name == "Boneskinner Ritual Vial") return APIDefs->GetTextureOrCreateFromResource("TEX_BONESKINNER_RITUAL_VIAL", IDB_BONESKINNER_RITUAL_VIAL, hSelf);
-	return APIDefs->GetTextureOrCreateFromResource("TEX_UNDER_CONSTRUCTION", IDB_UNDER_CONSTRUCTION, hSelf);
+	if (name == "Legendary Insight") return APIDefs->Textures.GetOrCreateFromResource("TEX_LEGENDARY_INSIGHT", IDB_LEGENDARY_INSIGHT, hSelf);
+	if (name == "Legendary Divination") return APIDefs->Textures.GetOrCreateFromResource("TEX_LEGENDARY_DIVINATION", IDB_LEGENDARY_DIVINATION, hSelf);
+	if (name == "Unstable Fractal Essence") return APIDefs->Textures.GetOrCreateFromResource("TEX_UNSTABLE_FRACTAL_ESSENCE", IDB_UNSTABLE_FRACTAL_ESSENCE, hSelf);
+	if (name == "Boneskinner Ritual Vial") return APIDefs->Textures.GetOrCreateFromResource("TEX_BONESKINNER_RITUAL_VIAL", IDB_BONESKINNER_RITUAL_VIAL, hSelf);
+	return APIDefs->Textures.GetOrCreateFromResource("TEX_UNDER_CONSTRUCTION", IDB_UNDER_CONSTRUCTION, hSelf);
 }
