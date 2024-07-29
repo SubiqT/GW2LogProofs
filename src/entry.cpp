@@ -28,43 +28,47 @@ void AddonLoad(AddonAPI* addonApi) {
 	ImGui::SetCurrentContext((ImGuiContext*)APIDefs->ImguiContext); // cast to ImGuiContext*
 	ImGui::SetAllocatorFunctions((void* (*)(size_t, void*))APIDefs->ImguiMalloc, (void(*)(void*, void*))APIDefs->ImguiFree); // on imgui 1.80+
 
-	NexusLink = (NexusLinkData*)APIDefs->GetResource("DL_NEXUS_LINK");
+	NexusLink = (NexusLinkData*)APIDefs->DataLink.Get("DL_NEXUS_LINK");
 
-	AddonPath = APIDefs->GetAddonDirectory("log_proofs");
-	SettingsPath = APIDefs->GetAddonDirectory("log_proofs/settings.json");
+	AddonPath = APIDefs->Paths.GetAddonDirectory("log_proofs");
+	SettingsPath = APIDefs->Paths.GetAddonDirectory("log_proofs/settings.json");
 	std::filesystem::create_directory(AddonPath);
 	Settings::Load(SettingsPath);
 	
-	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_NORMAL", IDB_LOG_NORMAL, hSelf);
-	APIDefs->GetTextureOrCreateFromResource("TEX_LOG_HOVER", IDB_LOG_HOVER, hSelf);
-	APIDefs->RegisterKeybindWithString(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS, ToggleShowWindowLogProofs, "(null)");
+	APIDefs->Textures.GetOrCreateFromResource("TEX_LOG_NORMAL", IDB_LOG_NORMAL, hSelf);
+	APIDefs->Textures.GetOrCreateFromResource("TEX_LOG_HOVER", IDB_LOG_HOVER, hSelf);
+	APIDefs->InputBinds.RegisterWithString(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS, ToggleShowWindowLogProofs, "(null)");
 	if (Settings::ShowQuickAccessShortcut) RegisterQuickAccessShortcut();
 
-	APIDefs->SubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
-	APIDefs->SubscribeEvent("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
-	APIDefs->SubscribeEvent("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
-	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
-	APIDefs->SubscribeEvent("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
-	APIDefs->RaiseEvent("EV_REPLAY_ARCDPS_SELF_JOIN", nullptr);
-	APIDefs->RaiseEvent("EV_REPLAY_ARCDPS_SQUAD_JOIN", nullptr);
+	APIDefs->Events.Subscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
+	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
+	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
+	APIDefs->Events.Subscribe("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
+	APIDefs->Events.Subscribe("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
+	APIDefs->Events.Raise("EV_REPLAY_ARCDPS_SELF_JOIN", nullptr);
+	APIDefs->Events.Raise("EV_REPLAY_ARCDPS_SQUAD_JOIN", nullptr);
 
-	APIDefs->RegisterRender(ERenderType_Render, AddonRender);
-	APIDefs->RegisterRender(ERenderType_OptionsRender, AddonOptions);
+	APIDefs->Renderer.Register(ERenderType_Render, AddonRender);
+	APIDefs->Renderer.Register(ERenderType_OptionsRender, AddonOptions);
+
+	APIDefs->UI.RegisterCloseOnEscape("Log Proofs", &Settings::ShowWindowLogProofs);
 
 	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "<c=#00ff00>Log Proofs</c> was loaded.");
 }
 
 void AddonUnload() {
-	APIDefs->DeregisterRender(AddonOptions);
-	APIDefs->DeregisterRender(AddonRender);
+	APIDefs->UI.DeregisterCloseOnEscape("Log Proofs");
+
+	APIDefs->Renderer.Deregister(AddonOptions);
+	APIDefs->Renderer.Deregister(AddonRender);
 
 	if (&Settings::ShowQuickAccessShortcut) DeregisterQuickAccessShortcut();
-	APIDefs->DeregisterKeybind(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
-	APIDefs->UnsubscribeEvent("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
-	APIDefs->UnsubscribeEvent("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
-	APIDefs->UnsubscribeEvent("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
-	APIDefs->UnsubscribeEvent("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
-	APIDefs->UnsubscribeEvent("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
+	APIDefs->InputBinds.Deregister(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
+	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
+	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
+	APIDefs->Events.Unsubscribe("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
+	APIDefs->Events.Unsubscribe("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
+	APIDefs->Events.Unsubscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
 
 	LogProofs::threadpool.shutdown();
 
