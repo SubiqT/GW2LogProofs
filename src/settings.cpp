@@ -1,10 +1,11 @@
 #include "settings.h"
-
 #include "shared.h"
 
 #include <filesystem>
 #include <fstream>
 #include <format>
+
+#include "imgui/imgui.h"
 
 const char* SHOW_QUICK_ACCESS_SHORTCUT = "ShowQuickAccessShortcut";
 const char* WINDOW_LOG_PROOFS_KEY = "WindowLogProofs";
@@ -34,6 +35,9 @@ const char* COLUMN_KPME_ID_SIZE = "ColumnKpmeIdSize";
 const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
 const char* INCLUDE_LINKED_ACCOUNTS = "IncludeLinkedAccounts";
 const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
+
+const char* HOVER_ENABLED = "HoverEnabled";
+const char* HOVER_COLOUR = "HoverColour";
 
 
 namespace Settings
@@ -132,6 +136,15 @@ namespace Settings
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].get_to<bool>(IncludeMissingAccounts);
 		}
+
+		/* Hover settings */
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED].get_to<bool>(hoverEnabled);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR].get_to<ImU32>(hoverColour);
+			hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
+		}
 	}
 	void Save(std::filesystem::path filePath) {
 		std::scoped_lock lck(Mutex);
@@ -167,4 +180,8 @@ namespace Settings
 	DataSource SelectedDataSource = WINGMAN;
 	bool IncludeLinkedAccounts = false;
 	bool IncludeMissingAccounts = false;
+
+	bool hoverEnabled = true;
+	ImU32 hoverColour = 4285558896;
+	ImVec4 hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
 }

@@ -28,7 +28,6 @@ static ImGuiTableFlags tableFlags = (
 	);
 
 std::vector<std::string> dataSources = { "Wingman", "Kpme" };
-ImU32 hoverColour = 4284572159;
 
 void DrawWingmanAccountName(LogProofs::Player aPlayer)
 {
@@ -75,11 +74,31 @@ void DrawKpmeId(LogProofs::Player aPlayer) {
 }
 
 void HighlightColumnOnHover() {
-	// Disabled until I find a solution for detecting row hover
-	
-	//if (ImGui::TableGetColumnFlags(ImGui::TableGetColumnIndex()) & ImGuiTableColumnFlags_IsHovered) {
-	//	ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, hoverColour);
-	//}
+	if (!Settings::hoverEnabled) return;
+	if (ImGui::TableGetColumnFlags(ImGui::TableGetColumnIndex()) & ImGuiTableColumnFlags_IsHovered) {
+		ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, Settings::hoverColour);
+	}
+}
+
+void HighlightRowOnHover(ImGuiTable* table) {
+	if (!Settings::hoverEnabled) return;
+	ImRect rowRect(
+		table->WorkRect.Min.x,
+		table->RowPosY1,
+		table->WorkRect.Max.x,
+		table->RowPosY2
+	);
+	rowRect.ClipWith(table->BgClipRect);
+
+	bool rowHovered = (
+		ImGui::IsMouseHoveringRect(rowRect.Min, rowRect.Max, false) &&
+		ImGui::IsWindowHovered(ImGuiHoveredFlags_None) &&
+		!ImGui::IsAnyItemHovered()
+	);
+
+	if (rowHovered) {
+		table->RowBgColor[1] = ImGui::GetColorU32(Settings::hoverColour);
+	}
 }
 
 void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray , bool isLegendary) {
@@ -92,7 +111,6 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 			ImGui::TableSetupScrollFreeze(1, 1);
 			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 			ImGui::TableNextColumn();
-			HighlightColumnOnHover();
 			ImGui::Text("Account");
 			for (Boss& boss : *bossesArray) {
 				ImGui::TableNextColumn();
@@ -118,7 +136,6 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 							continue;
 						}
 						ImGui::TableNextColumn();
-						HighlightColumnOnHover();
 						DrawWingmanAccountName(p);
 						for (Boss& boss : *bossesArray) {
 							ImGui::TableNextColumn();
@@ -140,6 +157,7 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 								ImGui::Text("...");
 							}
 						}
+						HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 					}
 				}
 			}
@@ -166,7 +184,6 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 			ImGui::TableSetupScrollFreeze(1, 1);
 			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 			ImGui::TableNextColumn();
-			HighlightColumnOnHover();
 			ImGui::Text("Account");
 			ImGui::TableNextColumn();
 			HighlightColumnOnHover();
@@ -195,7 +212,6 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 							continue;
 						}
 						ImGui::TableNextColumn();
-						HighlightColumnOnHover();
 						DrawKpmeAccountName(p);
 						ImGui::TableNextColumn();
 						HighlightColumnOnHover();
@@ -250,13 +266,13 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 							else {
 								ImGui::Text("...");
 							}
+							HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 						}
 					}
 				}
 			}
 			if (LogProofs::players.size() == 0) {
 				ImGui::TableNextColumn();
-				HighlightColumnOnHover();
 				ImGui::Text("No players found... ");
 			}
 			ImGui::EndTable();
@@ -277,7 +293,6 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 			ImGui::TableSetupScrollFreeze(1, 1);
 			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 			ImGui::TableNextColumn();
-			HighlightColumnOnHover();
 			ImGui::Text("Account");
 			ImGui::TableNextColumn();
 			HighlightColumnOnHover();
@@ -354,12 +369,12 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 								ImGui::Text("...");
 							}
 						}
+						HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 					}
 				}
 			}
 			if (LogProofs::players.size() == 0) {
 				ImGui::TableNextColumn();
-				HighlightColumnOnHover();
 				ImGui::Text("No players found... ");
 			}
 			ImGui::EndTable();
@@ -380,7 +395,6 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 			ImGui::TableSetupScrollFreeze(1, 1);
 			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 			ImGui::TableNextColumn();
-			HighlightColumnOnHover();
 			ImGui::Text("Account");
 			ImGui::TableNextColumn();
 			HighlightColumnOnHover();
@@ -451,12 +465,12 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 								ImGui::Text("...");
 							}
 						}
+						HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 					}
 				}
 			}
 			if (LogProofs::players.size() == 0) {
 				ImGui::TableNextColumn();
-				HighlightColumnOnHover();
 				ImGui::Text("No players found... ");
 			}
 			ImGui::EndTable();
@@ -528,7 +542,7 @@ void RenderWindowLogProofs() {
 				}
 				if (Settings::ShowTabKpmeRaidTokens) {
 					DrawKpmeTokensTab("Raid Tokens", "kpmeRaidsTable", &sortedKpmeRaidBosses);
-				}
+	}
 				if (Settings::ShowTabKpmeStrikeCoffers) {
 					DrawKpmeCoffersTab("Strike Coffers", "kpmeStrikesTable", &sortedKpmeStrikeBosses);
 				}
@@ -638,6 +652,19 @@ void DrawColumnOptions() {
 	}
 }
 
+void DrawHoverOptions() {
+	ImGui::Text("Hover");
+	if (ImGui::Checkbox("Enabled##HoverEnabled", &Settings::hoverEnabled)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED] = Settings::hoverEnabled;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::ColorPicker4("HoverColour##HoverColourPicker", (float*)&Settings::hoverColourBuffer)) {
+		Settings::hoverColour = ImGui::ColorConvertFloat4ToU32(Settings::hoverColourBuffer);
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR] = Settings::hoverColour;
+		Settings::Save(SettingsPath);
+	}
+}
+
 void RegisterQuickAccessShortcut() {
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "registering quick access shortcut");
 	APIDefs->QuickAccess.Add("SHORTCUT_LOG_PROOFS", "TEX_LOG_NORMAL", "TEX_LOG_HOVER", KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS, "Toggle Log Proofs Window");
@@ -662,5 +689,6 @@ void RenderWindowSettings() {
 	DrawWindowSizingOptions();
 	DrawColumnOptions();
 	DrawTabsOptions();
+	DrawHoverOptions();
 }
 

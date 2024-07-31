@@ -3,6 +3,8 @@
 
 #include <mutex>
 
+#include "imgui/imgui.h"
+
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
@@ -40,6 +42,9 @@ extern const char* SELECTED_DATA_SOURCE;
 extern const char* INCLUDE_LINKED_ACCOUNTS;
 extern const char* INCLUDE_MISSING_ACCOUNTS;
 
+extern const char* HOVER_ENABLED;
+extern const char* HOVER_COLOUR;
+
 
 namespace Settings
 {
@@ -76,6 +81,10 @@ namespace Settings
 	extern DataSource SelectedDataSource;
 	extern bool IncludeLinkedAccounts;
 	extern bool IncludeMissingAccounts;
+
+	extern bool hoverEnabled;
+	extern ImU32 hoverColour;
+	extern ImVec4 hoverColourBuffer;
 }
 
 #endif
