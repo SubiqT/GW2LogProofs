@@ -482,6 +482,11 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 
 void RenderWindowLogProofs() {
 	if (!Settings::ShowWindowLogProofs) {
+		if (Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] != Settings::ShowWindowLogProofs)
+		{
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
+			Settings::Save(SettingsPath);
+		}
 		return;
 	}
 	ImGui::SetNextWindowSizeConstraints(ImVec2(Settings::MinWindowWidth, Settings::MinWindowHeight), ImVec2(Settings::MaxWindowWidth,Settings::MaxWindowHeight));
