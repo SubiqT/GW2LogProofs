@@ -71,6 +71,7 @@
     <Image Include="resources\Cerus_And_Deimos.png" />
     <Image Include="resources\Conjured_Amalgamate.png" />
     <Image Include="resources\Dagda.png" />
+    <Image Include="resources\Decima.png" />
     <Image Include="resources\Deimos.png" />
     <Image Include="resources\Dhuum.png" />
     <Image Include="resources\Eater_Of_Souls.png" />
@@ -84,6 +85,7 @@
     <Image Include="resources\Fraenir_Of_Jormag.png" />
     <Image Include="resources\Freezie.png" />
     <Image Include="resources\Gorseval.png" />
+    <Image Include="resources\Greer.png" />
     <Image Include="resources\Harvest_Temple.png" />
     <Image Include="resources\Icebrood_Construct.png" />
     <Image Include="resources\Kanaxai.png" />
@@ -111,8 +113,8 @@
     <Image Include="resources\Slothasor.png" />
     <Image Include="resources\Soulless_Horror.png" />
     <Image Include="resources\Twisted_Castle.png" />
-    <Image Include="resources\UnderConstruction.png" />
     <Image Include="resources\Unstable_Fractal_Essense.png" />
+    <Image Include="resources\Ura.png" />
     <Image Include="resources\Vale_Guardian.png" />
     <Image Include="resources\Watchknight_Mark_II.png" />
     <Image Include="resources\Whisper_of_Jormag.png" />
@@ -173,7 +175,6 @@
     <Image Include="src\resources\Slothasor.png" />
     <Image Include="src\resources\Soulless_Horror.png" />
     <Image Include="src\resources\Twisted_Castle.png" />
-    <Image Include="src\resources\Under_Construction.png" />
     <Image Include="src\resources\Unstable_Fractal_Essence.png" />
     <Image Include="src\resources\Vale_Guardian.png" />
     <Image Include="src\resources\Watchknight_Mark_II.png" />

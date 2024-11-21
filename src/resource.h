@@ -51,7 +51,6 @@
 #define IDB_FRAENIR_OF_JORMAG           148
 #define IDB_FREEZIE                     149
 #define IDB_HARVEST_TEMPLE              150
-#define IDB_PNG9                        151
 #define IDB_ICEBROOD_CONSTRUCT          151
 #define IDB_KODANS                      153
 #define IDB_MINISTER_LI                 154
@@ -65,12 +64,15 @@
 #define IDB_LEGENDARY_INSIGHT           162
 #define IDB_UNSTABLE_FRACTAL_ESSENSE    163
 #define IDB_UNSTABLE_FRACTAL_ESSENCE    163
+#define IDB_DECIMA                      164
+#define IDB_GREER                       165
+#define IDB_URA                         166
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        164
+#define _APS_NEXT_RESOURCE_VALUE        167
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101

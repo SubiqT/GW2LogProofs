@@ -9,7 +9,8 @@ std::vector<Boss> sortedRaidBosses {
 	Cairn, MursaatOverseer, Samarog, Deimos,
 	SoullessHorror, RiverOfSouls, BrokenKing, EaterOfSouls, Eyes, Dhuum,
 	ConjuredAmalgamate, TwinLargos, Qadim,
-	Adina, Sabir, QadimThePeerless
+	Adina, Sabir, QadimThePeerless,
+	Greer, Decima, Ura
 };
 std::vector<Boss> sortedRaidCmBosses {
 	KeepConstructCM,
@@ -57,7 +58,8 @@ std::vector<Boss> sortedKpmeRaidBosses {
 	Cairn, MursaatOverseer, Samarog, Deimos,
 	SoullessHorror, RiverOfSouls, BrokenKing, Dhuum,
 	ConjuredAmalgamate, TwinLargos, Qadim,
-	Adina, Sabir, QadimThePeerless
+	Adina, Sabir, QadimThePeerless,
+	Greer, Decima, Ura
 };
 
 std::vector<Boss> sortedKpmeStrikeBosses {
@@ -127,6 +129,12 @@ const char* GetBossName(Boss boss) {
 		return "Sabir";
 	case QadimThePeerless:
 		return "Qadim the Peerless";
+	case Greer:
+		return "Greer";
+	case Decima:
+		return "Decima";
+	case Ura:
+		return "Ura";
 	/* Fractals */
 	case MAMA:
 		return "MAMA";
@@ -240,6 +248,12 @@ Texture* GetBossTexture(Boss boss) {
 		return APIDefs->Textures.GetOrCreateFromResource("TEX_SABIR", IDB_SABIR, hSelf);
 	case QadimThePeerless:
 		return APIDefs->Textures.GetOrCreateFromResource("TEX_QADIM_THE_PEERLESS", IDB_QADIM_THE_PEERLESS, hSelf);
+	case Greer:
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_GREER", IDB_GREER, hSelf);
+	case Decima:
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_DECIMA", IDB_DECIMA, hSelf);
+	case Ura:
+		return APIDefs->Textures.GetOrCreateFromResource("TEX_URA", IDB_URA, hSelf);
 	/* Fractals */
 	case MAMA:
 		return APIDefs->Textures.GetOrCreateFromResource("TEX_MAMA", IDB_MAMA, hSelf);
@@ -345,6 +359,12 @@ std::string GetKpMeBossToken(Boss boss) {
 		return "Cardinal Sabir's Token";
 	case QadimThePeerless:
 		return "Ether Djinn's Token";
+	case Greer:
+		return "Greer's Token";
+	case Decima:
+		return "Decima's Token";
+	case Ura:
+		return "Ura's Token";
 	default:
 		return "Unknown";
 	}
@@ -397,6 +417,12 @@ std::string GetKpMeBossCoffer(Boss boss) {
 		return "Cardinal Sabir's Coffer";
 	case QadimThePeerless:
 		return "Qadim the Peerless's Coffer";
+	case Greer:
+		return "Greer's Coffer";
+	case Decima:
+		return "Decima's Coffer";
+	case Ura:
+		return "Ura's Coffer";
 		/* Strikes */
 	case CaptainMaiTrin:
 		return "Mai Trin's Coffer";

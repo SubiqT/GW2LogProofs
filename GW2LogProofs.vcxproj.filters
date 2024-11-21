@@ -486,12 +486,6 @@
     <Image Include="src\resources\Eparch.png">
       <Filter>resources</Filter>
     </Image>
-    <Image Include="resources\UnderConstruction.png">
-      <Filter>resources</Filter>
-    </Image>
-    <Image Include="src\resources\Under_Construction.png">
-      <Filter>resources</Filter>
-    </Image>
     <Image Include="resources\Boneskinner_Ritual_Vial.png">
       <Filter>resources</Filter>
     </Image>
@@ -514,6 +508,15 @@
       <Filter>resources</Filter>
     </Image>
     <Image Include="src\resources\Unstable_Fractal_Essence.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Decima.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Greer.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Ura.png">
       <Filter>resources</Filter>
     </Image>
   </ItemGroup>

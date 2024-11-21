@@ -46,6 +46,9 @@ enum Boss {
 	SabirCM = -21964,
 	QadimThePeerless = 22000,
 	QadimThePeerlessCM = -22000,
+	Greer = 26725,
+	Decima = 26774,
+	Ura = 26712,
 	/* Fractals  */
 	MAMA = 17021,
 	MAMACM = -17021,
