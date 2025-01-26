@@ -236,11 +236,6 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 												amount += p.kpme.shared.killproofs.at("Legendary Divination");
 											}
 										}
-										if (proof == "Unstable Fractal Essence") {
-											if (p.kpme.shared.killproofs.contains("Unstable Cosmic Essence")) {
-												amount += p.kpme.shared.killproofs.at("Unstable Cosmic Essence") * 5;
-											}
-										}
 									}
 									if (amount == 0) {
 										if (p.kpme.self.killproofs.contains(proof)) {
@@ -249,11 +244,6 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 										if (proof == "Legendary Insight") {
 											if (p.kpme.self.killproofs.contains("Legendary Divination")) {
 												amount += p.kpme.self.killproofs.at("Legendary Divination");
-											}
-										}
-										if (proof == "Unstable Fractal Essence") {
-											if (p.kpme.self.killproofs.contains("Unstable Cosmic Essence")) {
-												amount += p.kpme.self.killproofs.at("Unstable Cosmic Essence") * 5;
 											}
 										}
 									}
