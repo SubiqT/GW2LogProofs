@@ -12,12 +12,16 @@ std::vector<Boss> sortedRaidBosses {
 	Adina, Sabir, QadimThePeerless,
 	Greer, Decima, Ura
 };
-std::vector<Boss> sortedRaidCmBosses {
+std::vector<Boss> sortedRaidCmBosses{
 	KeepConstructCM,
 	CairnCM, MursaatOverseerCM, SamarogCM, DeimosCM,
 	SoullessHorrorCM, DhuumCM,
 	ConjuredAmalgamateCM, TwinLargosCM, QadimCM,
-	AdinaCM, SabirCM, QadimThePeerlessCM
+	AdinaCM, SabirCM, QadimThePeerlessCM,
+	GreerCM, DecimaCM, UraCM
+};
+std::vector<Boss> sortedRaidLmBosses{
+	UraCM
 };
 std::vector<Boss> sortedFractalCMBosses {
 	MAMACM, SiaxTheCorruptedCM, EnsolyssOfTheEndlessTormentCM,
@@ -60,6 +64,10 @@ std::vector<Boss> sortedKpmeRaidBosses {
 	ConjuredAmalgamate, TwinLargos, Qadim,
 	Adina, Sabir, QadimThePeerless,
 	Greer, Decima, Ura
+};
+
+std::vector<Boss> sortedKpmeRaidCMBosses{
+	GreerCM, DecimaCM, UraCM
 };
 
 std::vector<Boss> sortedKpmeStrikeBosses {
@@ -423,6 +431,13 @@ std::string GetKpMeBossCoffer(Boss boss) {
 		return "Decima's Coffer";
 	case Ura:
 		return "Ura's Coffer";
+		/* Raid CMs */
+	case GreerCM:
+		return "Greer's Magnificent Coffer";
+	case DecimaCM:
+		return "Decima's Magnificent Coffer";
+	case UraCM:
+		return "Ura's Magnificent Coffer";
 		/* Strikes */
 	case CaptainMaiTrin:
 		return "Mai Trin's Coffer";

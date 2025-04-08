@@ -47,8 +47,11 @@ enum Boss {
 	QadimThePeerless = 22000,
 	QadimThePeerlessCM = -22000,
 	Greer = 26725,
+	GreerCM = -26725,
 	Decima = 26774,
+	DecimaCM = -26774,
 	Ura = 26712,
+	UraCM = -26712,
 	/* Fractals  */
 	MAMA = 17021,
 	MAMACM = -17021,
@@ -99,6 +102,7 @@ enum Boss {
 
 extern std::vector<Boss> sortedRaidBosses;
 extern std::vector<Boss> sortedRaidCmBosses;
+extern std::vector<Boss> sortedRaidLmBosses;
 extern std::vector<Boss> sortedFractalCMBosses;
 extern std::vector<Boss> sortedStrikeBosses;
 extern std::vector<Boss> sortedStrikeCMBosses;
@@ -106,6 +110,7 @@ extern std::vector<Boss> sortedStrikeLMBosses;
 
 extern std::vector<std::string> sortedKpmeSummary;
 extern std::vector<Boss> sortedKpmeRaidBosses;
+extern std::vector<Boss> sortedKpmeRaidCMBosses;
 extern std::vector<Boss> sortedKpmeStrikeBosses;
 extern std::vector<Boss> sortedKpmeStrikeCMBosses;
 

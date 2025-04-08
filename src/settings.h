@@ -24,6 +24,7 @@ extern const char* MAX_WINDOW_HEIGHT;
 
 extern const char* SHOW_TAB_RAIDS_NORMAL;
 extern const char* SHOW_TAB_RAIDS_CM;
+extern const char* SHOW_TAB_RAIDS_LM;
 extern const char* SHOW_TAB_FRACTALS_CM;
 extern const char* SHOW_TAB_STRIKES_NORMAL;
 extern const char* SHOW_TAB_STRIKES_CM;
@@ -31,6 +32,7 @@ extern const char* SHOW_TAB_STRIKES_LM;
 
 extern const char* SHOW_TAB_KPME_SUMMARY;
 extern const char* SHOW_TAB_KPME_RAID_TOKENS;
+extern const char* SHOW_TAB_KPME_RAID_CM_COFFERS;
 extern const char* SHOW_TAB_KPME_STRIKE_COFFERS;
 extern const char* SHOW_TAB_KPME_STRIKE_CM_COFFERS;
 
@@ -64,6 +66,7 @@ namespace Settings
 
 	extern bool ShowTabRaidsNormal;
 	extern bool ShowTabRaidsCM;
+	extern bool ShowTabRaidsLM;
 	extern bool ShowTabFractalsCM;
 	extern bool ShowTabStrikesNormal;
 	extern bool ShowTabStrikesCM;
@@ -71,6 +74,7 @@ namespace Settings
 
 	extern bool ShowTabKpmeSummary;
 	extern bool ShowTabKpmeRaidTokens;
+	extern bool ShowTabKpmeRaidCMCoffers;
 	extern bool ShowTabKpmeStrikeCoffers;
 	extern bool ShowTabKpmeStrikeCMCoffers;
 
