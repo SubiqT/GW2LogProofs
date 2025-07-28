@@ -1,0 +1,13 @@
+# Exclude git submodules from clang-format
+src/nexus/
+src/imgui/
+src/unofficial_extras/
+src/arcdps_extension/
+
+# Exclude build directories
+GW2LogProofs/x64/
+x64/
+
+# Exclude generated files
+src/resource.aps
+src/RDa02508

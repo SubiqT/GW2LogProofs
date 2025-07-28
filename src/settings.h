@@ -47,11 +47,9 @@ extern const char* INCLUDE_MISSING_ACCOUNTS;
 extern const char* HOVER_ENABLED;
 extern const char* HOVER_COLOUR;
 
-
-namespace Settings
-{
+namespace Settings {
 	extern std::mutex Mutex;
-	extern json	Settings;
+	extern json Settings;
 
 	void Load(std::filesystem::path filePath);
 	void Save(std::filesystem::path filePath);
@@ -81,7 +79,7 @@ namespace Settings
 	extern float ColumnSizeAccount;
 	extern float ColumnSizeBosses;
 	extern float ColumnSizeKpmeId;
-	
+
 	extern DataSource SelectedDataSource;
 	extern bool IncludeLinkedAccounts;
 	extern bool IncludeMissingAccounts;
@@ -89,6 +87,6 @@ namespace Settings
 	extern bool hoverEnabled;
 	extern ImU32 hoverColour;
 	extern ImVec4 hoverColourBuffer;
-}
+} // namespace Settings
 
 #endif

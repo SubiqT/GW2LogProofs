@@ -2,8 +2,8 @@
 #include "shared.h"
 
 #include <filesystem>
-#include <fstream>
 #include <format>
+#include <fstream>
 
 #include "imgui/imgui.h"
 
@@ -41,14 +41,13 @@ const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
 const char* HOVER_ENABLED = "HoverEnabled";
 const char* HOVER_COLOUR = "HoverColour";
 
-
-namespace Settings
-{
+namespace Settings {
 	std::mutex Mutex;
 	json Settings = json::object();
 
 	void Load(std::filesystem::path filePath) {
-		if (!std::filesystem::exists(filePath)) return;
+		if (!std::filesystem::exists(filePath))
+			return;
 
 		try {
 			std::scoped_lock lck(Mutex);
@@ -194,4 +193,4 @@ namespace Settings
 	bool hoverEnabled = true;
 	ImU32 hoverColour = 4285558896;
 	ImVec4 hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
-}
+} // namespace Settings

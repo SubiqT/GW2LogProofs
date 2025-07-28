@@ -1,13 +1,13 @@
 #include <Windows.h>
 
-#include "nexus/Nexus.h"
 #include "imgui/imgui.h"
+#include "nexus/Nexus.h"
 
-#include "shared.h"
-#include "log_proofs.h"
 #include "gui.h"
-#include "settings.h"
+#include "log_proofs.h"
 #include "resource.h"
+#include "settings.h"
+#include "shared.h"
 #include "version.h"
 
 AddonDefinition AddonDef = {};
@@ -25,20 +25,21 @@ void AddonRender() {
 void AddonLoad(AddonAPI* addonApi) {
 	APIDefs = addonApi;
 
-	ImGui::SetCurrentContext((ImGuiContext*)APIDefs->ImguiContext); // cast to ImGuiContext*
-	ImGui::SetAllocatorFunctions((void* (*)(size_t, void*))APIDefs->ImguiMalloc, (void(*)(void*, void*))APIDefs->ImguiFree); // on imgui 1.80+
+	ImGui::SetCurrentContext((ImGuiContext*) APIDefs->ImguiContext);                                                              // cast to ImGuiContext*
+	ImGui::SetAllocatorFunctions((void* (*) (size_t, void*) ) APIDefs->ImguiMalloc, (void (*)(void*, void*)) APIDefs->ImguiFree); // on imgui 1.80+
 
-	NexusLink = (NexusLinkData*)APIDefs->DataLink.Get("DL_NEXUS_LINK");
+	NexusLink = (NexusLinkData*) APIDefs->DataLink.Get("DL_NEXUS_LINK");
 
 	AddonPath = APIDefs->Paths.GetAddonDirectory("log_proofs");
 	SettingsPath = APIDefs->Paths.GetAddonDirectory("log_proofs/settings.json");
 	std::filesystem::create_directory(AddonPath);
 	Settings::Load(SettingsPath);
-	
+
 	APIDefs->Textures.GetOrCreateFromResource("TEX_LOG_NORMAL", IDB_LOG_NORMAL, hSelf);
 	APIDefs->Textures.GetOrCreateFromResource("TEX_LOG_HOVER", IDB_LOG_HOVER, hSelf);
 	APIDefs->InputBinds.RegisterWithString(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS, ToggleShowWindowLogProofs, "(null)");
-	if (Settings::ShowQuickAccessShortcut) RegisterQuickAccessShortcut();
+	if (Settings::ShowQuickAccessShortcut)
+		RegisterQuickAccessShortcut();
 
 	APIDefs->Events.Subscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
 	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
@@ -62,7 +63,8 @@ void AddonUnload() {
 	APIDefs->Renderer.Deregister(AddonOptions);
 	APIDefs->Renderer.Deregister(AddonRender);
 
-	if (&Settings::ShowQuickAccessShortcut) DeregisterQuickAccessShortcut();
+	if (&Settings::ShowQuickAccessShortcut)
+		DeregisterQuickAccessShortcut();
 	APIDefs->InputBinds.Deregister(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
 	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
 	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
@@ -75,7 +77,7 @@ void AddonUnload() {
 	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "<c=#ff0000>Log Proofs</c> was unloaded.");
 }
 
-extern "C" __declspec(dllexport) AddonDefinition * GetAddonDef() {
+extern "C" __declspec(dllexport) AddonDefinition* GetAddonDef() {
 	AddonDef.Signature = -104905;
 	AddonDef.APIVersion = NEXUS_API_VERSION;
 	AddonDef.Name = ADDON_NAME;
@@ -93,12 +95,17 @@ extern "C" __declspec(dllexport) AddonDefinition * GetAddonDef() {
 	return &AddonDef;
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) {
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
 	switch (ul_reason_for_call) {
-	case DLL_PROCESS_ATTACH: hSelf = hModule; break;
-	case DLL_PROCESS_DETACH: break;
-	case DLL_THREAD_ATTACH: break;
-	case DLL_THREAD_DETACH: break;
+		case DLL_PROCESS_ATTACH:
+			hSelf = hModule;
+			break;
+		case DLL_PROCESS_DETACH:
+			break;
+		case DLL_THREAD_ATTACH:
+			break;
+		case DLL_THREAD_DETACH:
+			break;
 	}
 	return TRUE;
 }

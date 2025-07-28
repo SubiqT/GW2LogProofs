@@ -1,107 +1,77 @@
+#include <algorithm>
 #include <format>
 #include <thread>
-#include <algorithm>
 
+#include "bosses.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "imgui_extensions.h"
-#include "shared.h"
 #include "log_proofs.h"
-#include "bosses.h"
 #include "settings.h"
+#include "shared.h"
 
-static ImGuiWindowFlags windowFlags =  (
-	ImGuiWindowFlags_NoCollapse
-	| ImGuiWindowFlags_NoNav
-	| ImGuiWindowFlags_NoNavFocus
-	| ImGuiWindowFlags_AlwaysAutoResize
-);
-static ImGuiTableFlags tableFlags = (
-	ImGuiTableFlags_Borders
-	| ImGuiTableFlags_ContextMenuInBody
-	| ImGuiTableFlags_SizingFixedFit
-	| ImGuiTableFlags_Hideable
-	| ImGuiTableFlags_Sortable
-	| ImGuiTableFlags_RowBg
-	| ImGuiTableFlags_ScrollX
-	| ImGuiTableFlags_ScrollY
-	);
+static ImGuiWindowFlags windowFlags = (ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_AlwaysAutoResize);
+static ImGuiTableFlags tableFlags = (ImGuiTableFlags_Borders | ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY);
 
-std::vector<std::string> dataSources = { "Wingman", "Kpme" };
+std::vector<std::string> dataSources = {"Wingman", "Kpme"};
 
-void DrawWingmanAccountName(LogProofs::Player aPlayer)
-{
-	if (!aPlayer.wingman.account.empty())
-	{
-		if (ImGui::TextURL(aPlayer.account.c_str()))
-		{
+void DrawWingmanAccountName(LogProofs::Player aPlayer) {
+	if (!aPlayer.wingman.account.empty()) {
+		if (ImGui::TextURL(aPlayer.account.c_str())) {
 			ShellExecuteA(0, 0, ("https://gw2wingman.nevermindcreations.de/kp/" + aPlayer.account).c_str(), 0, 0, SW_SHOW);
 		}
-	}
-	else
-	{
+	} else {
 		ImGui::Text(aPlayer.account.c_str());
 	}
 }
 
-void DrawKpmeAccountName(LogProofs::Player aPlayer)
-{
-	if (!aPlayer.kpme.id.empty())
-	{
-		if (ImGui::TextURL(aPlayer.account.c_str()))
-		{
+void DrawKpmeAccountName(LogProofs::Player aPlayer) {
+	if (!aPlayer.kpme.id.empty()) {
+		if (ImGui::TextURL(aPlayer.account.c_str())) {
 			ShellExecuteA(0, 0, ("https://killproof.me/proof/" + aPlayer.kpme.id).c_str(), 0, 0, SW_SHOW);
 		}
-	}
-	else
-	{
+	} else {
 		ImGui::Text(aPlayer.account.c_str());
 	}
 }
 
 void DrawKpmeId(LogProofs::Player aPlayer) {
-	if (!aPlayer.kpme.id.empty())
-	{
-		if (ImGui::TextURL(aPlayer.kpme.id.c_str()))
-		{
+	if (!aPlayer.kpme.id.empty()) {
+		if (ImGui::TextURL(aPlayer.kpme.id.c_str())) {
 			ImGui::SetClipboardText(aPlayer.kpme.id.c_str());
 		}
-	}
-	else
-	{
+	} else {
 		ImGui::Text("-");
 	}
 }
 
 void HighlightColumnOnHover() {
-	if (!Settings::hoverEnabled) return;
+	if (!Settings::hoverEnabled)
+		return;
 	if (ImGui::TableGetColumnFlags(ImGui::TableGetColumnIndex()) & ImGuiTableColumnFlags_IsHovered) {
 		ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, Settings::hoverColour);
 	}
 }
 
 void HighlightRowOnHover(ImGuiTable* table) {
-	if (!Settings::hoverEnabled) return;
+	if (!Settings::hoverEnabled)
+		return;
 	ImRect rowRect(
-		table->WorkRect.Min.x,
-		table->RowPosY1,
-		table->WorkRect.Max.x,
-		table->RowPosY2
+			table->WorkRect.Min.x,
+			table->RowPosY1,
+			table->WorkRect.Max.x,
+			table->RowPosY2
 	);
 	rowRect.ClipWith(table->BgClipRect);
 
-	bool rowHovered = (
-		ImGui::IsMouseHoveringRect(rowRect.Min, rowRect.Max, false) &&
-		ImGui::IsWindowHovered(ImGuiHoveredFlags_None) &&
-		!ImGui::IsAnyItemHovered()
-	);
+	bool rowHovered = (ImGui::IsMouseHoveringRect(rowRect.Min, rowRect.Max, false) && ImGui::IsWindowHovered(ImGuiHoveredFlags_None) && !ImGui::IsAnyItemHovered());
 
 	if (rowHovered) {
 		table->RowBgColor[1] = ImGui::GetColorU32(Settings::hoverColour);
 	}
 }
 
-void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray , bool isLegendary) {
+void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>* bossesArray, bool isLegendary) {
 	if (ImGui::BeginTabItem(tabName)) {
 		if (ImGui::BeginTable(tableName, int(bossesArray->size()) + 1, tableFlags)) {
 			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
@@ -117,9 +87,8 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 				HighlightColumnOnHover();
 				Texture* texture = GetBossTexture(boss);
 				if (texture != nullptr) {
-					ImGui::Image((void*)texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
-				}
-				else {
+					ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+				} else {
 					ImGui::Text(GetBossName(boss));
 				}
 				if (ImGui::IsItemHovered()) {
@@ -144,16 +113,13 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 								if (!p.wingman.account.empty()) {
 									if (isLegendary) {
 										ImGui::Text("%i", p.wingman.kp[std::format("-{}", int(boss))]);
-									}
-									else {
+									} else {
 										ImGui::Text("%i", p.wingman.kp[std::format("{}", int(boss))]);
 									}
-								}
-								else {
+								} else {
 									ImGui::Text("-");
 								}
-							}
-							else {
+							} else {
 								ImGui::Text("...");
 							}
 						}
@@ -167,7 +133,6 @@ void DrawBossesTab(const char* tabName, const char* tableName, std::vector<Boss>
 				ImGui::Text("No players found... ");
 			}
 			ImGui::EndTable();
-			
 		}
 		ImGui::EndTabItem();
 	}
@@ -193,9 +158,8 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 				HighlightColumnOnHover();
 				Texture* texture = GetCurrencyTexture(proof);
 				if (texture != nullptr) {
-					ImGui::Image((void*)texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
-				}
-				else {
+					ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+				} else {
 					ImGui::Text(proof.c_str());
 				}
 				if (ImGui::IsItemHovered()) {
@@ -217,8 +181,7 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 						HighlightColumnOnHover();
 						if (p.kpmeState == LogProofs::READY) {
 							DrawKpmeId(p);
-						}
-						else {
+						} else {
 							ImGui::Text("...");
 						}
 						for (std::string proof : *proofsArray) {
@@ -248,12 +211,10 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 										}
 									}
 									ImGui::Text("%i", amount);
-								}
-								else {
+								} else {
 									ImGui::Text("-");
 								}
-							}
-							else {
+							} else {
 								ImGui::Text("...");
 							}
 							HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
@@ -266,7 +227,6 @@ void DrawKpmeSummaryTab(const char* tabName, const char* tableName, std::vector<
 				ImGui::Text("No players found... ");
 			}
 			ImGui::EndTable();
-
 		}
 		ImGui::EndTabItem();
 	}
@@ -292,9 +252,8 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 				HighlightColumnOnHover();
 				Texture* texture = GetBossTexture(boss);
 				if (texture != nullptr) {
-					ImGui::Image((void*)texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
-				}
-				else {
+					ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+				} else {
 					ImGui::Text(GetKpMeBossToken(boss).c_str());
 				}
 				if (ImGui::IsItemHovered()) {
@@ -317,8 +276,7 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 						HighlightColumnOnHover();
 						if (p.kpmeState == LogProofs::READY) {
 							DrawKpmeId(p);
-						}
-						else {
+						} else {
 							ImGui::Text("...");
 						}
 						for (Boss boss : *bossesArray) {
@@ -332,10 +290,10 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 											amount = p.kpme.shared.tokens.at(GetKpMeBossToken(boss));
 										}
 										if (p.kpme.shared.coffers.contains(GetKpMeBossCoffer(boss))) {
-											amount += p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss)) * 3;  // 1 Coffer == 3 Tokens
+											amount += p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss)) * 3; // 1 Coffer == 3 Tokens
 										}
 										if (p.kpme.shared.tokens.contains(GetKpMeBossCoffer(boss))) {
-											amount += p.kpme.shared.tokens.at(GetKpMeBossCoffer(boss)) * 3;  // Coffers show under tokens if opened
+											amount += p.kpme.shared.tokens.at(GetKpMeBossCoffer(boss)) * 3; // Coffers show under tokens if opened
 										}
 									}
 									if (amount == 0) {
@@ -343,19 +301,17 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 											amount = p.kpme.self.tokens.at(GetKpMeBossToken(boss));
 										}
 										if (p.kpme.self.coffers.contains(GetKpMeBossCoffer(boss))) {
-											amount += p.kpme.self.coffers.at(GetKpMeBossCoffer(boss)) * 3;  // 1 Coffer == 3 Tokens
+											amount += p.kpme.self.coffers.at(GetKpMeBossCoffer(boss)) * 3; // 1 Coffer == 3 Tokens
 										}
 										if (p.kpme.self.tokens.contains(GetKpMeBossCoffer(boss))) {
-											amount += p.kpme.self.tokens.at(GetKpMeBossCoffer(boss)) * 3;  // Coffers show under tokens if opened
+											amount += p.kpme.self.tokens.at(GetKpMeBossCoffer(boss)) * 3; // Coffers show under tokens if opened
 										}
 									}
 									ImGui::Text("%i", amount);
-								}
-								else {
+								} else {
 									ImGui::Text("-");
 								}
-							}
-							else {
+							} else {
 								ImGui::Text("...");
 							}
 						}
@@ -368,7 +324,6 @@ void DrawKpmeTokensTab(const char* tabName, const char* tableName, std::vector<B
 				ImGui::Text("No players found... ");
 			}
 			ImGui::EndTable();
-
 		}
 		ImGui::EndTabItem();
 	}
@@ -394,9 +349,8 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 				HighlightColumnOnHover();
 				Texture* texture = GetBossTexture(boss);
 				if (texture != nullptr) {
-					ImGui::Image((void*)texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
-				}
-				else {
+					ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+				} else {
 					ImGui::Text(GetKpMeBossCoffer(boss).c_str());
 				}
 				if (ImGui::IsItemHovered()) {
@@ -419,8 +373,7 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 						HighlightColumnOnHover();
 						if (p.kpmeState == LogProofs::READY) {
 							DrawKpmeId(p);
-						}
-						else {
+						} else {
 							ImGui::Text("...");
 						}
 						for (Boss boss : *bossesArray) {
@@ -434,7 +387,7 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 											amount = p.kpme.shared.coffers.at(GetKpMeBossCoffer(boss));
 										}
 										if (p.kpme.shared.tokens.contains(GetKpMeBossCoffer(boss))) {
-											amount = p.kpme.shared.tokens.at(GetKpMeBossCoffer(boss));  // Coffers show under tokens if opened
+											amount = p.kpme.shared.tokens.at(GetKpMeBossCoffer(boss)); // Coffers show under tokens if opened
 										}
 									}
 									if (amount == 0) {
@@ -442,16 +395,14 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 											amount = p.kpme.self.coffers.at(GetKpMeBossCoffer(boss));
 										}
 										if (p.kpme.self.tokens.contains(GetKpMeBossCoffer(boss))) {
-											amount = p.kpme.self.tokens.at(GetKpMeBossCoffer(boss));  // Coffers show under tokens if opened
+											amount = p.kpme.self.tokens.at(GetKpMeBossCoffer(boss)); // Coffers show under tokens if opened
 										}
 									}
 									ImGui::Text("%i", amount);
-								}
-								else {
+								} else {
 									ImGui::Text("-");
 								}
-							}
-							else {
+							} else {
 								ImGui::Text("...");
 							}
 						}
@@ -464,7 +415,6 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 				ImGui::Text("No players found... ");
 			}
 			ImGui::EndTable();
-
 		}
 		ImGui::EndTabItem();
 	}
@@ -472,14 +422,13 @@ void DrawKpmeCoffersTab(const char* tabName, const char* tableName, std::vector<
 
 void RenderWindowLogProofs() {
 	if (!Settings::ShowWindowLogProofs) {
-		if (Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] != Settings::ShowWindowLogProofs)
-		{
+		if (Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] != Settings::ShowWindowLogProofs) {
 			Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
 			Settings::Save(SettingsPath);
 		}
 		return;
 	}
-	ImGui::SetNextWindowSizeConstraints(ImVec2(Settings::MinWindowWidth, Settings::MinWindowHeight), ImVec2(Settings::MaxWindowWidth,Settings::MaxWindowHeight));
+	ImGui::SetNextWindowSizeConstraints(ImVec2(Settings::MinWindowWidth, Settings::MinWindowHeight), ImVec2(Settings::MaxWindowWidth, Settings::MaxWindowHeight));
 	if (ImGui::Begin("Log Proofs", &Settings::ShowWindowLogProofs, windowFlags)) {
 
 		if (ImGui::BeginCombo("Source##DataSource", dataSources[Settings::SelectedDataSource].c_str())) {
@@ -490,7 +439,8 @@ void RenderWindowLogProofs() {
 					Settings::Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE] = Settings::SelectedDataSource;
 					Settings::Save(SettingsPath);
 				}
-				if (is_selected) ImGui::SetItemDefaultFocus();
+				if (is_selected)
+					ImGui::SetItemDefaultFocus();
 			}
 			ImGui::EndCombo();
 		}
@@ -510,7 +460,7 @@ void RenderWindowLogProofs() {
 					DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses, false);
 				}
 				if (Settings::ShowTabRaidsLM) {
-					DrawBossesTab("Raid LMs", "lmRaidsTable", &sortedRaidLmBosses, true);
+					DrawBossesTab("Raid LMs", "lmRaidsTable", &sortedRaidLMBosses, true);
 				}
 				if (Settings::ShowTabFractalsCM) {
 					DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses, false);
@@ -527,7 +477,7 @@ void RenderWindowLogProofs() {
 				ImGui::EndTabBar();
 			}
 		}
-		
+
 		if (Settings::SelectedDataSource == KPME) {
 			ImGui::SameLine();
 			if (ImGui::Checkbox("Linked Accounts", &Settings::IncludeLinkedAccounts)) {
@@ -535,7 +485,7 @@ void RenderWindowLogProofs() {
 				Settings::Save(SettingsPath);
 			}
 			if (ImGui::BeginTabBar("##Kpme", ImGuiTabBarFlags_None)) {
-				if (Settings::ShowTabKpmeSummary) { 
+				if (Settings::ShowTabKpmeSummary) {
 					DrawKpmeSummaryTab("Summary", "kpmeSummaryTable", &sortedKpmeSummary);
 				}
 				if (Settings::ShowTabKpmeRaidTokens) {
@@ -565,7 +515,8 @@ void RenderWindowLogProofs() {
 }
 
 void ToggleShowWindowLogProofs(const char* keybindIdentifier, bool isRelease) {
-	if (isRelease) return;
+	if (isRelease)
+		return;
 	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Keybind {} was pressed.", keybindIdentifier).c_str());
 	Settings::ShowWindowLogProofs = !Settings::ShowWindowLogProofs;
 	Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
@@ -667,7 +618,7 @@ void DrawHoverOptions() {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED] = Settings::hoverEnabled;
 		Settings::Save(SettingsPath);
 	}
-	if (ImGui::ColorPicker4("HoverColour##HoverColourPicker", (float*)&Settings::hoverColourBuffer)) {
+	if (ImGui::ColorPicker4("HoverColour##HoverColourPicker", (float*) &Settings::hoverColourBuffer)) {
 		Settings::hoverColour = ImGui::ColorConvertFloat4ToU32(Settings::hoverColourBuffer);
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR] = Settings::hoverColour;
 		Settings::Save(SettingsPath);
@@ -688,8 +639,10 @@ void RenderWindowSettings() {
 	if (ImGui::Checkbox("Show Quick Access Shortcut", &Settings::ShowQuickAccessShortcut)) {
 		Settings::Settings[SHOW_QUICK_ACCESS_SHORTCUT] = Settings::ShowQuickAccessShortcut;
 		Settings::Save(SettingsPath);
-		if (Settings::ShowQuickAccessShortcut) RegisterQuickAccessShortcut();
-		else DeregisterQuickAccessShortcut();
+		if (Settings::ShowQuickAccessShortcut)
+			RegisterQuickAccessShortcut();
+		else
+			DeregisterQuickAccessShortcut();
 	}
 	if (ImGui::Checkbox("Show Window", &Settings::ShowWindowLogProofs)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
@@ -700,4 +653,3 @@ void RenderWindowSettings() {
 	DrawTabsOptions();
 	DrawHoverOptions();
 }
-
