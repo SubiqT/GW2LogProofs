@@ -18,6 +18,7 @@ const char* MAX_WINDOW_HEIGHT = "MaxWindowHeight";
 
 const char* SHOW_TAB_RAIDS_NORMAL = "ShowTabRaidsNormal";
 const char* SHOW_TAB_RAIDS_CM = "ShowTabRaidsCM";
+const char* SHOW_TAB_RAIDS_LM = "ShowTabRaidsLCM";
 const char* SHOW_TAB_FRACTALS_CM = "ShowTabFractalsCM";
 const char* SHOW_TAB_STRIKES_NORMAL = "ShowTabStrikesNormal";
 const char* SHOW_TAB_STRIKES_CM = "ShowTabStrikesCM";
@@ -25,6 +26,7 @@ const char* SHOW_TAB_STRIKES_LM = "ShowTabStrikesLM";
 
 const char* SHOW_TAB_KPME_SUMMARY = "ShowTabKpmeSummary";
 const char* SHOW_TAB_KPME_RAID_TOKENS = "ShowTabKpmeRaidTokens";
+const char* SHOW_TAB_KPME_RAID_CM_COFFERS = "ShowTabKpmeRaidCMCoffers";
 const char* SHOW_TAB_KPME_STRIKE_COFFERS = "ShowTabKpmeStrikeCoffers";
 const char* SHOW_TAB_KPME_STRIKE_CM_COFFERS = "ShowTabKpmeStrikeCMCoffers";
 
@@ -86,6 +88,9 @@ namespace Settings
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_CM].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_CM].get_to<bool>(ShowTabRaidsCM);
 		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_LM].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_LM].get_to<bool>(ShowTabRaidsLM);
+		}
 
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_CM].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_CM].get_to<bool>(ShowTabFractalsCM);
@@ -107,6 +112,9 @@ namespace Settings
 		}
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_TOKENS].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_TOKENS].get_to<bool>(ShowTabKpmeRaidTokens);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_CM_COFFERS].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_CM_COFFERS].get_to<bool>(ShowTabKpmeRaidCMCoffers);
 		}
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_COFFERS].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_COFFERS].get_to<bool>(ShowTabKpmeStrikeCoffers);
@@ -163,6 +171,7 @@ namespace Settings
 
 	bool ShowTabRaidsNormal = true;
 	bool ShowTabRaidsCM = true;
+	bool ShowTabRaidsLM = true;
 	bool ShowTabFractalsCM = true;
 	bool ShowTabStrikesNormal = true;
 	bool ShowTabStrikesCM = true;
@@ -170,6 +179,7 @@ namespace Settings
 
 	bool ShowTabKpmeSummary = true;
 	bool ShowTabKpmeRaidTokens = true;
+	bool ShowTabKpmeRaidCMCoffers = true;
 	bool ShowTabKpmeStrikeCoffers = true;
 	bool ShowTabKpmeStrikeCMCoffers = true;
 

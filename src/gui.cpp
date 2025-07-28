@@ -509,6 +509,9 @@ void RenderWindowLogProofs() {
 				if (Settings::ShowTabRaidsCM) {
 					DrawBossesTab("Raid CMs", "cmRaidsTable", &sortedRaidCmBosses, false);
 				}
+				if (Settings::ShowTabRaidsLM) {
+					DrawBossesTab("Raid LMs", "lmRaidsTable", &sortedRaidLmBosses, true);
+				}
 				if (Settings::ShowTabFractalsCM) {
 					DrawBossesTab("Fractal CMs", "cmFractalsTable", &sortedFractalCMBosses, false);
 				}
@@ -537,7 +540,10 @@ void RenderWindowLogProofs() {
 				}
 				if (Settings::ShowTabKpmeRaidTokens) {
 					DrawKpmeTokensTab("Raid Tokens", "kpmeRaidsTable", &sortedKpmeRaidBosses);
-	}
+				}
+				if (Settings::ShowTabKpmeRaidCMCoffers) {
+					DrawKpmeCoffersTab("Raid CM Coffers", "kpmeRaidCMsTable", &sortedKpmeRaidCMBosses);
+				}
 				if (Settings::ShowTabKpmeStrikeCoffers) {
 					DrawKpmeCoffersTab("Strike Coffers", "kpmeStrikesTable", &sortedKpmeStrikeBosses);
 				}
@@ -596,6 +602,10 @@ void DrawTabsOptions() {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_CM] = Settings::ShowTabRaidsCM;
 		Settings::Save(SettingsPath);
 	}
+	if (ImGui::Checkbox("Raid LMs", &Settings::ShowTabRaidsLM)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_LM] = Settings::ShowTabRaidsLM;
+		Settings::Save(SettingsPath);
+	}
 	if (ImGui::Checkbox("Fractal CMs", &Settings::ShowTabFractalsCM)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_CM] = Settings::ShowTabRaidsCM;
 		Settings::Save(SettingsPath);
@@ -619,6 +629,10 @@ void DrawTabsOptions() {
 	}
 	if (ImGui::Checkbox("Raid Tokens", &Settings::ShowTabKpmeRaidTokens)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_TOKENS] = Settings::ShowTabKpmeRaidTokens;
+		Settings::Save(SettingsPath);
+	}
+	if (ImGui::Checkbox("Raid CM Coffers", &Settings::ShowTabKpmeRaidCMCoffers)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_CM_COFFERS] = Settings::ShowTabKpmeRaidCMCoffers;
 		Settings::Save(SettingsPath);
 	}
 	if (ImGui::Checkbox("Strike Coffers", &Settings::ShowTabKpmeStrikeCoffers)) {
