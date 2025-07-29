@@ -4,7 +4,7 @@
 #include <string>
 
 namespace HTTPClient {
-    std::string GetRequest(const std::wstring& wUrl);
+	std::string GetRequest(const std::wstring& wUrl);
 }
 
 #endif

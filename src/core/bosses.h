@@ -1,8 +1,8 @@
 #ifndef BOSSES_H
 #define BOSSES_H
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "../nexus/Nexus.h"
 

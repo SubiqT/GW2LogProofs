@@ -5,10 +5,10 @@
 #include <string>
 
 namespace Wingman {
-    struct WingmanResponse {
-        std::string account;
-        std::map<std::string, int> kp;
-    };
-}
+	struct WingmanResponse {
+		std::string account;
+		std::map<std::string, int> kp;
+	};
+} // namespace Wingman
 
 #endif

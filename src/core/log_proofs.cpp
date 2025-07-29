@@ -4,11 +4,11 @@
 
 #include "../arcdps/arcdps.h"
 
-#include "log_proofs.h"
-#include "shared.h"
-#include "../utils/threadpool.hpp"
 #include "../providers/common/provider_registry.h"
+#include "../utils/threadpool.hpp"
+#include "log_proofs.h"
 #include "settings.h"
+#include "shared.h"
 
 namespace LogProofs {
 	std::vector<Player> players;
@@ -41,7 +41,6 @@ namespace LogProofs {
 	}
 
 
-
 	void LoadPlayerData(const std::string& account, const std::string& providerName) {
 		try {
 			auto provider = ProviderRegistry::Instance().CreateProvider(providerName);
@@ -49,24 +48,24 @@ namespace LogProofs {
 				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Provider {} not found", providerName).c_str());
 				return;
 			}
-			
+
 			PlayerProofData data = provider->LoadPlayerData(account);
-			
+
 			std::scoped_lock lck(Mutex);
 			long long index = GetPlayerIndex(account);
 			if (index == -1) {
 				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Player {} not found when loading data", account).c_str());
 				return;
 			}
-			
+
 			players[index].proofData = std::make_unique<PlayerProofData>(data);
 			players[index].state = ::LoadState::READY;
 			players[index].providerName = providerName;
-			
+
 			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Loaded {} data for player: {}", providerName, account).c_str());
 		} catch (const std::exception& e) {
 			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("Error loading {} data for {}: {}", providerName, account, e.what()).c_str());
-			
+
 			std::scoped_lock lck(Mutex);
 			long long index = GetPlayerIndex(account);
 			if (index != -1) {

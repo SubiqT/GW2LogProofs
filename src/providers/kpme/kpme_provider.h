@@ -6,14 +6,14 @@
 
 class KpmeProvider : public IDataProvider {
 public:
-    std::string GetProviderName() const override { return "KPME"; }
-    PlayerProofData LoadPlayerData(const std::string& account) override;
-    bool SupportsLinkedAccounts() const override { return true; }
-    std::vector<std::string> GetSupportedProofTypes() const override;
+	std::string GetProviderName() const override { return "KPME"; }
+	PlayerProofData LoadPlayerData(const std::string& account) override;
+	bool SupportsLinkedAccounts() const override { return true; }
+	std::vector<std::string> GetSupportedProofTypes() const override;
 
 private:
-    Kpme::KpmeClient client_;
-    PlayerProofData ConvertKpmeResponse(const Kpme::KpmeResponse& response);
+	Kpme::KpmeClient client_;
+	PlayerProofData ConvertKpmeResponse(const Kpme::KpmeResponse& response);
 };
 
 #endif

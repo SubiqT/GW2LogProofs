@@ -5,17 +5,17 @@
 #include <memory>
 
 enum class LoadState {
-    LOADING = 0,
-    READY = 1,
-    FAILED = 2
+	LOADING = 0,
+	READY = 1,
+	FAILED = 2
 };
 
 struct Player {
-    uintptr_t id;
-    std::string account;
-    LoadState state;
-    std::unique_ptr<PlayerProofData> proofData;
-    std::string providerName;
+	uintptr_t id;
+	std::string account;
+	LoadState state;
+	std::unique_ptr<PlayerProofData> proofData;
+	std::string providerName;
 };
 
 #endif

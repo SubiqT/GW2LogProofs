@@ -4,10 +4,10 @@
 #include "wingman_types.h"
 
 namespace Wingman {
-    class WingmanClient {
-    public:
-        WingmanResponse GetKp(const std::string& account);
-    };
-}
+	class WingmanClient {
+	public:
+		WingmanResponse GetKp(const std::string& account);
+	};
+} // namespace Wingman
 
 #endif

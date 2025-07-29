@@ -5,18 +5,18 @@
 #include <string>
 
 namespace Kpme {
-    struct KpSummary {
-        std::map<std::string, int> killproofs;
-        std::map<std::string, int> tokens;
-        std::map<std::string, int> coffers;
-        std::map<std::string, std::string> titles;
-    };
+	struct KpSummary {
+		std::map<std::string, int> killproofs;
+		std::map<std::string, int> tokens;
+		std::map<std::string, int> coffers;
+		std::map<std::string, std::string> titles;
+	};
 
-    struct KpmeResponse {
-        std::string id;
-        KpSummary self;
-        KpSummary shared;
-    };
-}
+	struct KpmeResponse {
+		std::string id;
+		KpSummary self;
+		KpSummary shared;
+	};
+} // namespace Kpme
 
 #endif

@@ -8,9 +8,9 @@
 
 #include "../unofficial_extras/Definitions.h"
 
+#include "../providers/common/provider_registry.h"
 #include "../utils/threadpool.hpp"
 #include "player_data.h"
-#include "../providers/common/provider_registry.h"
 
 namespace LogProofs {
 	// Legacy compatibility - will be removed after full migration
