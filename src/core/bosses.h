@@ -117,8 +117,9 @@ extern std::vector<Boss> sortedKpmeStrikeCMBosses;
 
 const char* GetBossName(Boss boss);
 Texture* GetBossTexture(Boss boss);
-std::string GetKpMeBossToken(Boss boss);
-std::string GetKpMeBossCoffer(Boss boss);
 Texture* GetCurrencyTexture(std::string name);
+
+// Initialize boss registry with providers
+void InitializeBossRegistry();
 
 #endif

@@ -12,6 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\bosses.cpp" />
+    <ClCompile Include="src\core\boss_registry.cpp" />
+    <ClCompile Include="src\core\boss_registry_init.cpp" />
+    <ClCompile Include="src\providers\wingman\wingman_boss_provider.cpp" />
+    <ClCompile Include="src\providers\kpme\kpme_boss_provider.cpp" />
     <ClCompile Include="src\entry.cpp" />
     <ClCompile Include="src\ui\gui.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
@@ -37,6 +41,9 @@
     <ClInclude Include="src\ui\imgui_extensions.h" />
     <ClInclude Include="src\arcdps\arcdps.h" />
     <ClInclude Include="src\core\bosses.h" />
+    <ClInclude Include="src\core\boss_registry.h" />
+    <ClInclude Include="src\providers\wingman\wingman_boss_provider.h" />
+    <ClInclude Include="src\providers\kpme\kpme_boss_provider.h" />
     <ClInclude Include="src\ui\gui.h" />
     <ClInclude Include="src\utils\httpclient.h" />
     <ClInclude Include="src\imgui\imconfig.h" />

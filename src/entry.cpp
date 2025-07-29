@@ -3,6 +3,7 @@
 #include "imgui/imgui.h"
 #include "nexus/Nexus.h"
 
+#include "core/bosses.h"
 #include "core/log_proofs.h"
 #include "core/settings.h"
 #include "core/shared.h"
@@ -46,6 +47,8 @@ void AddonLoad(AddonAPI* addonApi) {
 
 	ProviderRegistry::Instance().RegisterProvider("Wingman", []() { return std::make_unique<WingmanProvider>(); });
 	ProviderRegistry::Instance().RegisterProvider("KPME", []() { return std::make_unique<KpmeProvider>(); });
+	
+	InitializeBossRegistry();
 
 	APIDefs->Events.Subscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
 	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
