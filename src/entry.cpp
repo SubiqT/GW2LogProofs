@@ -9,6 +9,9 @@
 #include "settings.h"
 #include "shared.h"
 #include "version.h"
+#include "provider_registry.h"
+#include "providers/wingman_provider.h"
+#include "providers/kpme_provider.h"
 
 AddonDefinition AddonDef = {};
 
@@ -40,6 +43,9 @@ void AddonLoad(AddonAPI* addonApi) {
 	APIDefs->InputBinds.RegisterWithString(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS, ToggleShowWindowLogProofs, "(null)");
 	if (Settings::ShowQuickAccessShortcut)
 		RegisterQuickAccessShortcut();
+
+	ProviderRegistry::Instance().RegisterProvider("Wingman", []() { return std::make_unique<WingmanProvider>(); });
+	ProviderRegistry::Instance().RegisterProvider("KPME", []() { return std::make_unique<KpmeProvider>(); });
 
 	APIDefs->Events.Subscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
 	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);

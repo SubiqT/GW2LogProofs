@@ -25,6 +25,11 @@
     <ClCompile Include="src\unofficial_extras\KeyBindHelper.cpp" />
     <ClCompile Include="src\unofficial_extras\KeyBindsTranslation.cpp" />
     <ClCompile Include="src\kp_loader.cpp" />
+    <ClCompile Include="src\provider_registry.cpp" />
+    <ClCompile Include="src\ui_renderer.cpp" />
+    <ClCompile Include="src\gui_settings.cpp" />
+    <ClCompile Include="src\providers\wingman_provider.cpp" />
+    <ClCompile Include="src\providers\kpme_provider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\imgui_extensions.h" />
@@ -51,6 +56,12 @@
     <ClInclude Include="src\unofficial_extras\KeyBindStructs.h" />
     <ClInclude Include="src\version.h" />
     <ClInclude Include="src\kp_loader.h" />
+    <ClInclude Include="src\data_provider.h" />
+    <ClInclude Include="src\provider_registry.h" />
+    <ClInclude Include="src\player_data.h" />
+    <ClInclude Include="src\ui_renderer.h" />
+    <ClInclude Include="src\providers\wingman_provider.h" />
+    <ClInclude Include="src\providers\kpme_provider.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\resource.rc" />

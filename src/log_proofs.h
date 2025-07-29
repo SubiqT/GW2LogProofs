@@ -10,21 +10,18 @@
 
 #include "kp_loader.h"
 #include "threadpool.hpp"
+#include "player_data.h"
+#include "provider_registry.h"
 
 namespace LogProofs {
+	// Legacy compatibility - will be removed after full migration
 	enum KpState {
 		LOADING = 0,
 		READY = 1
 	};
 
-	struct Player {
-		uintptr_t id;
-		std::string account;
-		KpState wingmanState;
-		KpState kpmeState;
-		Wingman::WingmanResponse wingman;
-		Kpme::KpmeResponse kpme;
-	};
+	// Use generic Player struct from player_data.h
+	using Player = ::Player;
 
 	extern std::vector<Player> players;
 	extern std::string selfAccountName;
@@ -36,6 +33,11 @@ namespace LogProofs {
 	void ArcSquadLeaveEventHandler(void* eventArgs);
 	void ArcSelfLeaveEventHandler(void* eventArgs);
 	void ArcSelfDetectedEventHandler(void* eventArgs);
+
+	// Generic provider-based loading
+	void LoadPlayerData(const std::string& account, const std::string& providerName);
+	void ReloadAllPlayersWithProvider(const std::string& providerName);
+	void ReloadKpmePlayersForLinkedAccounts();
 } // namespace LogProofs
 
 /* Unofficial Extras */
