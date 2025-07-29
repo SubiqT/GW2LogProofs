@@ -1,7 +1,7 @@
 #ifndef PLAYER_DATA_H
 #define PLAYER_DATA_H
 
-#include "data_provider.h"
+#include "../providers/common/data_provider.h"
 #include <memory>
 
 enum class LoadState {

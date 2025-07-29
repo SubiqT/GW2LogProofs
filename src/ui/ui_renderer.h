@@ -1,8 +1,8 @@
 #ifndef UI_RENDERER_H
 #define UI_RENDERER_H
 
-#include "player_data.h"
-#include "bosses.h"
+#include "../core/player_data.h"
+#include "../core/bosses.h"
 
 class UIRenderer {
 public:

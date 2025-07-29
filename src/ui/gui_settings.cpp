@@ -1,6 +1,6 @@
-#include "imgui/imgui.h"
-#include "settings.h"
-#include "shared.h"
+#include "../imgui/imgui.h"
+#include "../core/settings.h"
+#include "../core/shared.h"
 
 void ToggleShowWindowLogProofs(const char* keybindIdentifier, bool isRelease) {
 	if (isRelease)

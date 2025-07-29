@@ -3,7 +3,7 @@
 
 #include <filesystem>
 
-#include "nexus/Nexus.h"
+#include "../nexus/Nexus.h"
 
 extern const char* ADDON_NAME;
 

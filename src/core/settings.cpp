@@ -5,7 +5,7 @@
 #include <format>
 #include <fstream>
 
-#include "imgui/imgui.h"
+#include "../imgui/imgui.h"
 
 const char* SHOW_QUICK_ACCESS_SHORTCUT = "ShowQuickAccessShortcut";
 const char* WINDOW_LOG_PROOFS_KEY = "WindowLogProofs";

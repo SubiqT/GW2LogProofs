@@ -1,8 +1,8 @@
 #ifndef KPME_PROVIDER_H
 #define KPME_PROVIDER_H
 
-#include "../data_provider.h"
-#include "../kp_loader.h"
+#include "../common/data_provider.h"
+#include "kpme_client.h"
 
 class KpmeProvider : public IDataProvider {
 public:
@@ -12,6 +12,7 @@ public:
     std::vector<std::string> GetSupportedProofTypes() const override;
 
 private:
+    Kpme::KpmeClient client_;
     PlayerProofData ConvertKpmeResponse(const Kpme::KpmeResponse& response);
 };
 

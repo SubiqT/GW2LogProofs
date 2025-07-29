@@ -1,7 +1,7 @@
 #include "wingman_provider.h"
 
 PlayerProofData WingmanProvider::LoadPlayerData(const std::string& account) {
-    Wingman::WingmanResponse response = Wingman::GetKp(account);
+    Wingman::WingmanResponse response = client_.GetKp(account);
     return ConvertWingmanResponse(response);
 }
 

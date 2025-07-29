@@ -3,15 +3,15 @@
 #include "imgui/imgui.h"
 #include "nexus/Nexus.h"
 
-#include "gui.h"
-#include "log_proofs.h"
+#include "ui/gui.h"
+#include "core/log_proofs.h"
 #include "resource.h"
-#include "settings.h"
-#include "shared.h"
+#include "core/settings.h"
+#include "core/shared.h"
 #include "version.h"
-#include "provider_registry.h"
-#include "providers/wingman_provider.h"
-#include "providers/kpme_provider.h"
+#include "providers/common/provider_registry.h"
+#include "providers/wingman/wingman_provider.h"
+#include "providers/kpme/kpme_provider.h"
 
 AddonDefinition AddonDef = {};
 

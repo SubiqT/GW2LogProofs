@@ -2,13 +2,12 @@
 #include <queue>
 #include <vector>
 
-#include "arcdps/arcdps.h"
+#include "../arcdps/arcdps.h"
 
-#include "kp_loader.h"
 #include "log_proofs.h"
 #include "shared.h"
-#include "threadpool.hpp"
-#include "provider_registry.h"
+#include "../utils/threadpool.hpp"
+#include "../providers/common/provider_registry.h"
 #include "settings.h"
 
 namespace LogProofs {
@@ -41,49 +40,7 @@ namespace LogProofs {
 		return -1;
 	}
 
-	void LoadWingmanKillProofs(std::string account) {
-		try {
-			Wingman::WingmanResponse res = Wingman::GetKp(account);
-			std::scoped_lock lck(Mutex);
-			long long index = GetPlayerIndex(account);
-			if (index == -1) {
-				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("tried to load wingman for player with account {} but player was not found in players vector.", account).c_str());
-				return;
-			}
-			if (players[index].state != ::LoadState::LOADING) {
-				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("tried to load wingman for player with account {} but player was not in the loading state.", account).c_str());
-				return;
-			}
-			// Legacy function - should use LoadPlayerData instead
-			players.at(index).state = ::LoadState::READY;
-			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded wingman for player: {}", account).c_str());
-		} catch (const std::exception& e) {
-			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("tried to load wingman for player with account {} but an error occurred. exception details: {}", account, e.what()).c_str());
-			return;
-		}
-	}
 
-	void LoadKpmeKillProofs(std::string account) {
-		try {
-			Kpme::KpmeResponse res = Kpme::GetKp(account);
-			std::scoped_lock lck(Mutex);
-			long long index = GetPlayerIndex(account);
-			if (index == -1) {
-				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("tried to load kpme for player with account {} but player was not found in players vector.", account).c_str());
-				return;
-			}
-			if (players[index].state != ::LoadState::LOADING) {
-				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("tried to load kpme for player with account {} but player was not in the loading state.", account).c_str());
-				return;
-			}
-			// Legacy function - should use LoadPlayerData instead
-			players.at(index).state = ::LoadState::READY;
-			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("loaded kpme for player: {}", account).c_str());
-		} catch (const std::exception& e) {
-			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("tried to load kpme for player with account {} but an error occurred. exception details: {}", account, e.what()).c_str());
-			return;
-		}
-	}
 
 	void LoadPlayerData(const std::string& account, const std::string& providerName) {
 		try {

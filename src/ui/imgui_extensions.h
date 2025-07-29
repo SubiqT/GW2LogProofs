@@ -1,7 +1,7 @@
 #ifndef IMGUIEXTENSIONS_H
 #define IMGUIEXTENSIONS_H
 
-#include "imgui/imgui.h"
+#include "../imgui/imgui.h"
 
 namespace ImGui {
 	inline void AddUnderLine(ImColor col_) {

@@ -1,8 +1,8 @@
 #include "kpme_provider.h"
-#include "../settings.h"
+#include "../../core/settings.h"
 
 PlayerProofData KpmeProvider::LoadPlayerData(const std::string& account) {
-    Kpme::KpmeResponse response = Kpme::GetKp(account);
+    Kpme::KpmeResponse response = client_.GetKp(account);
     return ConvertKpmeResponse(response);
 }
 

@@ -1,5 +1,5 @@
 #include "bosses.h"
-#include "resource.h"
+#include "../resource.h"
 #include "shared.h"
 
 std::vector<Boss> sortedRaidBosses {

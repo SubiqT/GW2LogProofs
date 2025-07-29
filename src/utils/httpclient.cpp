@@ -1,13 +1,11 @@
-#pragma once
-#pragma comment(lib, "urlmon.lib")
+#include "httpclient.h"
 
+#pragma comment(lib, "urlmon.lib")
 #include <urlmon.h>
-#include <string>
 #include <sstream>
-#include <format>
 
 namespace HTTPClient {
-    std::string GetRequest(std::wstring wUrl) {
+    std::string GetRequest(const std::wstring& wUrl) {
         IStream* stream;
         HRESULT result = URLOpenBlockingStream(0, wUrl.c_str(), &stream, 0, 0);
         if (result != 0) {

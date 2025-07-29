@@ -1,0 +1,45 @@
+#include "wingman_client.h"
+#include "../../utils/httpclient.h"
+#include "../../core/shared.h"
+#include "../../nlohmann/json.hpp"
+#include <format>
+
+using json = nlohmann::json;
+
+namespace Wingman {
+    void from_json(const json& j, WingmanResponse& r) {
+        try {
+            if (j.contains("account")) {
+                if (j.at("account").is_string()) {
+                    j.at("account").get_to(r.account);
+                }
+            }
+
+            if (j.contains("kp")) {
+                if (j.at("kp").is_object()) {
+                    for (const auto& item : j.at("kp").items()) {
+                        if (item.value().is_object()) {
+                            if (item.value().contains("total")) {
+                                if (item.value().at("total").is_number_integer()) {
+                                    r.kp[item.key()] = item.value().at("total");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (json::parse_error& ex) {
+            APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("failed to parse wingman response. \nexception details: {}", ex.what()).c_str());
+        }
+    }
+
+    WingmanResponse WingmanClient::GetKp(const std::string& account) {
+        std::string url = std::format("https://gw2wingman.nevermindcreations.de/api/kp?account={}", account);
+        const char* cUrl = url.c_str();
+        APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, cUrl);
+        std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
+        std::string response = HTTPClient::GetRequest(wUrl.c_str());
+        json j = json::parse(response);
+        return j.template get<WingmanResponse>();
+    }
+}

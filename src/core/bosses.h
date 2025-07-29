@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#include "nexus/Nexus.h"
+#include "../nexus/Nexus.h"
 
 enum Boss {
 	/* Raids */

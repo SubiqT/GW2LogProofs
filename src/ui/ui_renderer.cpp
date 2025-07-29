@@ -1,7 +1,7 @@
 #include "ui_renderer.h"
-#include "imgui/imgui.h"
+#include "../imgui/imgui.h"
 #include "imgui_extensions.h"
-#include "settings.h"
+#include "../core/settings.h"
 #include <Windows.h>
 
 void UIRenderer::DrawPlayerAccountName(const Player& player) {

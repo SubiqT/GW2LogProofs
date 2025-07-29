@@ -3,9 +3,9 @@
 
 #include <mutex>
 
-#include "imgui/imgui.h"
+#include "../imgui/imgui.h"
 
-#include "nlohmann/json.hpp"
+#include "../nlohmann/json.hpp"
 using json = nlohmann::json;
 
 enum DataSource {

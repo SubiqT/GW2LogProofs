@@ -2,15 +2,15 @@
 #include <format>
 #include <thread>
 
-#include "bosses.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
+#include "../core/bosses.h"
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_internal.h"
 #include "imgui_extensions.h"
-#include "log_proofs.h"
-#include "settings.h"
-#include "shared.h"
+#include "../core/log_proofs.h"
+#include "../core/settings.h"
+#include "../core/shared.h"
 #include "ui_renderer.h"
-#include "provider_registry.h"
+#include "../providers/common/provider_registry.h"
 
 static ImGuiWindowFlags windowFlags = (ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_AlwaysAutoResize);
 static ImGuiTableFlags tableFlags = (ImGuiTableFlags_Borders | ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY);
