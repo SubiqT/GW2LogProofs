@@ -18,7 +18,6 @@ AddonDefinition AddonDef = {};
 
 void AddonOptions() {
 	ImGui::Separator();
-	ImGui::Text(ADDON_NAME);
 	RenderWindowSettings();
 }
 

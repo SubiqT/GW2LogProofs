@@ -97,30 +97,88 @@ static void DrawHoverOptions() {
 void DrawProofSelector(const std::string& providerId, std::vector<ProofSelection>& selectedProofs) {
 	auto availableProofs = TabConfigManager::Instance().GetAvailableProofs(providerId);
 
-	std::unordered_map<std::string, std::vector<ProofOption>> categorized;
+	// Group proofs by default tab structure
+	std::unordered_map<std::string, std::vector<ProofOption>> tabGroups;
 	for (const auto& proof : availableProofs) {
-		categorized[proof.category].push_back(proof);
+		std::string tabName;
+		if (proof.category == "Raid") {
+			if (proof.bossType == "Normal") tabName = "Raids";
+			else if (proof.bossType == "CM")
+				tabName = "Raid CMs";
+			else if (proof.bossType == "LCM")
+				tabName = "Raid LMs";
+		} else if (proof.category == "Strike") {
+			if (proof.bossType == "Normal") tabName = "Strikes";
+			else if (proof.bossType == "CM")
+				tabName = "Strike CMs";
+			else if (proof.bossType == "LCM")
+				tabName = "Strike LMs";
+		} else if (proof.category == "Fractal") {
+			if (proof.bossType == "CM") tabName = "Fractal CMs";
+			else if (proof.bossType == "LCM")
+				tabName = "Fractal LMs";
+		} else {
+			// For other categories, use category + boss type
+			tabName = proof.category;
+			if (proof.bossType == "CM") tabName += " CM";
+			else if (proof.bossType == "LCM")
+				tabName += " LCM";
+		}
+		tabGroups[tabName].push_back(proof);
 	}
 
-	for (const auto& [category, proofs] : categorized) {
-		if (ImGui::TreeNode(category.c_str())) {
-			for (const auto& proof : proofs) {
-				bool selected = std::find_if(selectedProofs.begin(), selectedProofs.end(), [&proof](const ProofSelection& sel) {
-									return sel.proofId == proof.id && sel.bossType == proof.bossType;
-								})
-								!= selectedProofs.end();
-				if (ImGui::Checkbox(proof.displayName.c_str(), &selected)) {
-					if (selected) {
-						selectedProofs.push_back({proof.id, proof.bossType});
-					} else {
-						selectedProofs.erase(std::remove_if(selectedProofs.begin(), selectedProofs.end(), [&proof](const ProofSelection& sel) {
-												 return sel.proofId == proof.id && sel.bossType == proof.bossType;
-											 }),
-											 selectedProofs.end());
+	// Define tab order to match default tab config
+	std::vector<std::string> tabOrder = {
+			"Raids", "Raid CMs", "Raid LMs",
+			"Strikes", "Strike CMs", "Strike LMs",
+			"Fractal CMs", "Fractal LMs"
+	};
+
+	// Draw tabs in order
+	for (const auto& tabName : tabOrder) {
+		if (tabGroups.find(tabName) != tabGroups.end()) {
+			if (ImGui::CollapsingHeader(tabName.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+				for (const auto& proof : tabGroups[tabName]) {
+					bool selected = std::find_if(selectedProofs.begin(), selectedProofs.end(), [&proof](const ProofSelection& sel) {
+										return sel.proofId == proof.id && sel.bossType == proof.bossType;
+									})
+									!= selectedProofs.end();
+					if (ImGui::Checkbox(proof.displayName.c_str(), &selected)) {
+						if (selected) {
+							selectedProofs.push_back({proof.id, proof.bossType});
+						} else {
+							selectedProofs.erase(std::remove_if(selectedProofs.begin(), selectedProofs.end(), [&proof](const ProofSelection& sel) {
+													 return sel.proofId == proof.id && sel.bossType == proof.bossType;
+												 }),
+												 selectedProofs.end());
+						}
 					}
 				}
 			}
-			ImGui::TreePop();
+		}
+	}
+
+	// Handle remaining tabs not in the predefined order
+	for (const auto& [tabName, proofs] : tabGroups) {
+		if (std::find(tabOrder.begin(), tabOrder.end(), tabName) == tabOrder.end()) {
+			if (ImGui::CollapsingHeader(tabName.c_str())) {
+				for (const auto& proof : proofs) {
+					bool selected = std::find_if(selectedProofs.begin(), selectedProofs.end(), [&proof](const ProofSelection& sel) {
+										return sel.proofId == proof.id && sel.bossType == proof.bossType;
+									})
+									!= selectedProofs.end();
+					if (ImGui::Checkbox(proof.displayName.c_str(), &selected)) {
+						if (selected) {
+							selectedProofs.push_back({proof.id, proof.bossType});
+						} else {
+							selectedProofs.erase(std::remove_if(selectedProofs.begin(), selectedProofs.end(), [&proof](const ProofSelection& sel) {
+													 return sel.proofId == proof.id && sel.bossType == proof.bossType;
+												 }),
+												 selectedProofs.end());
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -128,15 +186,38 @@ void DrawProofSelector(const std::string& providerId, std::vector<ProofSelection
 void DrawTabEditor(const std::string& providerId, CustomTab& tab) {
 	ImGui::PushID(tab.id.c_str());
 
-	char nameBuffer[256];
-	strcpy_s(nameBuffer, tab.displayName.c_str());
-	if (ImGui::InputText("Name", nameBuffer, sizeof(nameBuffer))) {
-		tab.displayName = nameBuffer;
-		TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
-	}
+	if (ImGui::BeginTable(("TabEditor_" + tab.id).c_str(), 2, ImGuiTableFlags_SizingStretchProp)) {
+		ImGui::TableSetupColumn("Setting", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
-	if (ImGui::Checkbox("Visible", &tab.visible)) {
-		TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Name");
+		ImGui::TableNextColumn();
+		char nameBuffer[256];
+		strcpy_s(nameBuffer, tab.displayName.c_str());
+		if (ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer))) {
+			tab.displayName = nameBuffer;
+			TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Visible");
+		ImGui::TableNextColumn();
+		if (ImGui::Checkbox("##Visible", &tab.visible)) {
+			TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Actions");
+		ImGui::TableNextColumn();
+		if (ImGui::Button("Delete Tab")) {
+			TabConfigManager::Instance().DeleteTab(providerId, tab.id);
+		}
+
+		ImGui::EndTable();
 	}
 
 	if (ImGui::CollapsingHeader("Proof Selection")) {
@@ -147,10 +228,6 @@ void DrawTabEditor(const std::string& providerId, CustomTab& tab) {
 		}
 	}
 
-	if (ImGui::Button("Delete Tab")) {
-		TabConfigManager::Instance().DeleteTab(providerId, tab.id);
-	}
-
 	ImGui::PopID();
 	ImGui::Separator();
 }
@@ -158,8 +235,68 @@ void DrawTabEditor(const std::string& providerId, CustomTab& tab) {
 void DrawCustomTabEditor(const std::string& providerId) {
 	auto config = TabConfigManager::Instance().GetProviderConfig(providerId);
 
-	for (auto& tab : config.tabs) {
-		DrawTabEditor(providerId, tab);
+	if (ImGui::BeginTable(("CustomTabList_" + providerId).c_str(), 4, ImGuiTableFlags_Borders | ImGuiTableFlags_SizingStretchProp)) {
+		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableSetupColumn("Visible", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+		ImGui::TableSetupColumn("Proofs", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+		ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+		ImGui::TableHeadersRow();
+
+		for (auto& tab : config.tabs) {
+			ImGui::PushID(tab.id.c_str());
+			ImGui::TableNextRow();
+
+			ImGui::TableNextColumn();
+			char nameBuffer[256];
+			strcpy_s(nameBuffer, tab.displayName.c_str());
+			ImGui::SetNextItemWidth(-1);
+			if (ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer))) {
+				tab.displayName = nameBuffer;
+				TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
+			}
+
+			ImGui::TableNextColumn();
+			if (ImGui::Checkbox("##Visible", &tab.visible)) {
+				TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
+			}
+
+			ImGui::TableNextColumn();
+			ImGui::Text("%d", static_cast<int>(tab.proofs.size()));
+
+			ImGui::TableNextColumn();
+			if (ImGui::SmallButton("Edit")) {
+				ImGui::OpenPopup(("ProofSelector_" + tab.id).c_str());
+			}
+			ImGui::SameLine();
+			if (ImGui::SmallButton("Delete")) {
+				TabConfigManager::Instance().DeleteTab(providerId, tab.id);
+			}
+
+			ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
+			if (ImGui::BeginPopupModal(("ProofSelector_" + tab.id).c_str(), nullptr, 0)) {
+				ImGui::Text("Select proofs for: %s", tab.displayName.c_str());
+				ImGui::Separator();
+
+				if (ImGui::BeginChild("ProofList", ImVec2(0, -30), true)) {
+					auto oldProofs = tab.proofs;
+					DrawProofSelector(providerId, tab.proofs);
+					if (oldProofs != tab.proofs) {
+						TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
+					}
+				}
+				ImGui::EndChild();
+
+				ImGui::Separator();
+				if (ImGui::Button("Close")) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			ImGui::PopID();
+		}
+
+		ImGui::EndTable();
 	}
 
 	if (ImGui::Button("Add New Tab")) {
@@ -200,7 +337,6 @@ void DrawProviderTabConfig(const std::string& providerId) {
 }
 
 void DrawTabConfigurationPanel() {
-	ImGui::Text("Tab Configuration");
 	if (ImGui::BeginTabBar("ProviderTabConfig")) {
 		for (const auto& providerId : {"Wingman", "KPME"}) {
 			if (ImGui::BeginTabItem(providerId)) {
