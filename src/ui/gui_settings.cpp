@@ -62,12 +62,12 @@ static void DrawColumnOptions() {
 
 static void DrawHoverOptions() {
 	static bool showColourModal = false;
-	
+
 	if (ImGui::Checkbox("Hover Enabled", &Settings::hoverEnabled)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED] = Settings::hoverEnabled;
 		Settings::Save(SettingsPath);
 	}
-	
+
 	if (Settings::hoverEnabled) {
 		ImGui::SameLine();
 		ImVec4 colour = ImGui::ColorConvertU32ToFloat4(Settings::hoverColour);
@@ -75,12 +75,12 @@ static void DrawHoverOptions() {
 			showColourModal = true;
 		}
 	}
-	
+
 	if (showColourModal) {
 		ImGui::OpenPopup("Select Hover Colour");
 		showColourModal = false;
 	}
-	
+
 	if (ImGui::BeginPopupModal("Select Hover Colour", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 		if (ImGui::ColorPicker4("##HoverColourPicker", (float*) &Settings::hoverColourBuffer)) {
 			Settings::hoverColour = ImGui::ColorConvertFloat4ToU32(Settings::hoverColourBuffer);
@@ -105,18 +105,18 @@ void DrawProofSelector(const std::string& providerId, std::vector<ProofSelection
 	for (const auto& [category, proofs] : categorized) {
 		if (ImGui::TreeNode(category.c_str())) {
 			for (const auto& proof : proofs) {
-				bool selected = std::find_if(selectedProofs.begin(), selectedProofs.end(), 
-					[&proof](const ProofSelection& sel) { 
-						return sel.proofId == proof.id && sel.bossType == proof.bossType; 
-					}) != selectedProofs.end();
+				bool selected = std::find_if(selectedProofs.begin(), selectedProofs.end(), [&proof](const ProofSelection& sel) {
+									return sel.proofId == proof.id && sel.bossType == proof.bossType;
+								})
+								!= selectedProofs.end();
 				if (ImGui::Checkbox(proof.displayName.c_str(), &selected)) {
 					if (selected) {
 						selectedProofs.push_back({proof.id, proof.bossType});
 					} else {
-						selectedProofs.erase(std::remove_if(selectedProofs.begin(), selectedProofs.end(),
-							[&proof](const ProofSelection& sel) { 
-								return sel.proofId == proof.id && sel.bossType == proof.bossType; 
-							}), selectedProofs.end());
+						selectedProofs.erase(std::remove_if(selectedProofs.begin(), selectedProofs.end(), [&proof](const ProofSelection& sel) {
+												 return sel.proofId == proof.id && sel.bossType == proof.bossType;
+											 }),
+											 selectedProofs.end());
 					}
 				}
 			}
@@ -264,6 +264,12 @@ void RenderWindowSettings() {
 			if (ImGui::BeginPopupModal("Select Hover Colour", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 				if (ImGui::ColorPicker4("##HoverColourPicker", (float*) &Settings::hoverColourBuffer)) {
 					Settings::hoverColour = ImGui::ColorConvertFloat4ToU32(Settings::hoverColourBuffer);
+					Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR] = Settings::hoverColour;
+					Settings::Save(SettingsPath);
+				}
+				if (ImGui::Button("Use Header Colour")) {
+					Settings::hoverColour = ImGui::GetColorU32(ImGuiCol_TableHeaderBg);
+					Settings::hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(Settings::hoverColour);
 					Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR] = Settings::hoverColour;
 					Settings::Save(SettingsPath);
 				}

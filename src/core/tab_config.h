@@ -9,11 +9,11 @@
 struct ProofSelection {
 	std::string proofId;
 	std::string bossType;
-	
+
 	bool operator==(const ProofSelection& other) const {
 		return proofId == other.proofId && bossType == other.bossType;
 	}
-	
+
 	bool operator!=(const ProofSelection& other) const {
 		return !(*this == other);
 	}

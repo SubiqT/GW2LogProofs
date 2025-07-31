@@ -72,7 +72,7 @@ void AddonUnload() {
 	APIDefs->Renderer.Deregister(AddonOptions);
 	APIDefs->Renderer.Deregister(AddonRender);
 
-	if (&Settings::ShowQuickAccessShortcut)
+	if (Settings::ShowQuickAccessShortcut)
 		DeregisterQuickAccessShortcut();
 	APIDefs->InputBinds.Deregister(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
 	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
