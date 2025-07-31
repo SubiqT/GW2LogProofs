@@ -213,21 +213,142 @@ void DrawTabConfigurationPanel() {
 }
 
 void RenderWindowSettings() {
-	if (ImGui::Checkbox("Show Quick Access Shortcut", &Settings::ShowQuickAccessShortcut)) {
-		Settings::Settings[SHOW_QUICK_ACCESS_SHORTCUT] = Settings::ShowQuickAccessShortcut;
-		Settings::Save(SettingsPath);
-		if (Settings::ShowQuickAccessShortcut)
-			RegisterQuickAccessShortcut();
-		else
-			DeregisterQuickAccessShortcut();
-	}
-	if (ImGui::Checkbox("Show Window", &Settings::ShowWindowLogProofs)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
-		Settings::Save(SettingsPath);
+	if (ImGui::BeginTable("SettingsTable", 2, ImGuiTableFlags_SizingStretchProp)) {
+		ImGui::TableSetupColumn("Setting", ImGuiTableColumnFlags_WidthFixed, 200.0f);
+		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Show Quick Access Shortcut");
+		ImGui::TableNextColumn();
+		if (ImGui::Checkbox("##ShowQuickAccess", &Settings::ShowQuickAccessShortcut)) {
+			Settings::Settings[SHOW_QUICK_ACCESS_SHORTCUT] = Settings::ShowQuickAccessShortcut;
+			Settings::Save(SettingsPath);
+			if (Settings::ShowQuickAccessShortcut)
+				RegisterQuickAccessShortcut();
+			else
+				DeregisterQuickAccessShortcut();
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Show Window");
+		ImGui::TableNextColumn();
+		if (ImGui::Checkbox("##ShowWindow", &Settings::ShowWindowLogProofs)) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Hover Enabled");
+		ImGui::TableNextColumn();
+		if (ImGui::Checkbox("##HoverEnabled", &Settings::hoverEnabled)) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED] = Settings::hoverEnabled;
+			Settings::Save(SettingsPath);
+		}
+		if (Settings::hoverEnabled) {
+			ImGui::SameLine();
+			static bool showColourModal = false;
+			ImVec4 colour = ImGui::ColorConvertU32ToFloat4(Settings::hoverColour);
+			if (ImGui::ColorButton("Hover Colour", colour)) {
+				showColourModal = true;
+			}
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("Click to change hover highlight colour");
+			}
+			if (showColourModal) {
+				ImGui::OpenPopup("Select Hover Colour");
+				showColourModal = false;
+			}
+			if (ImGui::BeginPopupModal("Select Hover Colour", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+				if (ImGui::ColorPicker4("##HoverColourPicker", (float*) &Settings::hoverColourBuffer)) {
+					Settings::hoverColour = ImGui::ColorConvertFloat4ToU32(Settings::hoverColourBuffer);
+					Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR] = Settings::hoverColour;
+					Settings::Save(SettingsPath);
+				}
+				ImGui::Text("Preview:");
+				if (ImGui::BeginTable("HoverPreview", 2, ImGuiTableFlags_Borders)) {
+					ImGui::TableNextRow();
+					ImGui::TableNextColumn();
+					ImGui::Text("Normal");
+					ImGui::TableNextColumn();
+					ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, Settings::hoverColour);
+					ImGui::Text("Hovered");
+					ImGui::EndTable();
+				}
+				if (ImGui::Button("Close")) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Min Width");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##MinWidth", &Settings::MinWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Max Width");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##MaxWidth", &Settings::MaxWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH] = Settings::MaxWindowWidth;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Min Height");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##MinHeight", &Settings::MinWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT] = Settings::MinWindowHeight;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Max Height");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##MaxHeight", &Settings::MaxWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT] = Settings::MaxWindowHeight;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Account Column Size");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##AccountSize", &Settings::ColumnSizeAccount, 40.0f, 400.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE] = Settings::ColumnSizeAccount;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Boss Column Size");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##BossSize", &Settings::ColumnSizeBosses, 8.0f, 128.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE] = Settings::ColumnSizeBosses;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("KPME ID Column Size");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##KpmeIdSize", &Settings::ColumnSizeKpmeId, 8.0f, 128.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE] = Settings::ColumnSizeKpmeId;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::EndTable();
 	}
 
-	DrawHoverOptions();
-	DrawWindowSizingOptions();
-	DrawColumnOptions();
 	DrawTabConfigurationPanel();
 }
