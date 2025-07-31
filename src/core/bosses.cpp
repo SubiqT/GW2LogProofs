@@ -81,7 +81,7 @@ std::vector<Boss> sortedKpmeStrikeCMBosses {
 		DagdaCM, CerusCM
 };
 
-const char* GetBossName(Boss boss) {
+std::string GetBossName(Boss boss) {
 	boss = Boss(abs(boss));
 	switch (boss) {
 		/* Raids */
@@ -197,6 +197,30 @@ const char* GetBossName(Boss boss) {
 			return "Cerus";
 		default:
 			return "Unknown";
+	}
+}
+
+std::string GetBossName(Boss boss, BossType type) {
+	std::string baseName = GetBossName(boss);
+	switch (type) {
+		case BossType::CM:
+			return baseName + " CM";
+		case BossType::LCM:
+			return baseName + " LCM";
+		default:
+			return baseName;
+	}
+}
+
+std::string GetBossName(Boss boss, BossType type, BossProofType proofType) {
+	std::string name = GetBossName(boss, type);
+	switch (proofType) {
+		case BossProofType::TOKEN:
+			return name + " Token";
+		case BossProofType::COFFER:
+			return name + " Coffer";
+		default:
+			return name;
 	}
 }
 

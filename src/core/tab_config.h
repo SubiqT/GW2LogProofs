@@ -6,10 +6,23 @@
 #include <unordered_map>
 #include <vector>
 
+struct ProofSelection {
+	std::string proofId;
+	std::string bossType;
+	
+	bool operator==(const ProofSelection& other) const {
+		return proofId == other.proofId && bossType == other.bossType;
+	}
+	
+	bool operator!=(const ProofSelection& other) const {
+		return !(*this == other);
+	}
+};
+
 struct CustomTab {
 	std::string id;
 	std::string displayName;
-	std::vector<std::string> proofIds;
+	std::vector<ProofSelection> proofs;
 	bool visible = true;
 	int order = 0;
 };
@@ -25,6 +38,7 @@ struct ProofOption {
 	std::string displayName;
 	std::string category;
 	std::string subcategory;
+	std::string bossType; // "Normal", "CM", "LCM"
 };
 
 class TabConfigManager {
@@ -53,6 +67,8 @@ private:
 };
 
 // JSON serialization
+void to_json(nlohmann::json& j, const ProofSelection& proof);
+void from_json(const nlohmann::json& j, ProofSelection& proof);
 void to_json(nlohmann::json& j, const CustomTab& tab);
 void from_json(const nlohmann::json& j, CustomTab& tab);
 void to_json(nlohmann::json& j, const ProviderTabConfig& config);

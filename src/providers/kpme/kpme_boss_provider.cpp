@@ -4,10 +4,10 @@
 std::vector<BossGroup> KpmeBossProvider::GetBossGroups() const {
 	return {
 			{"Summary", "kpmeSummaryTable", BossCategory::SUMMARY, {}, {"Legendary Insight", "Unstable Fractal Essence", "Boneskinner Ritual Vial"}},
-			{"Raid Tokens", "kpmeRaidsTable", BossCategory::RAID_NORMAL, {ValeGuardian, Gorseval, Sabetha, Slothasor, Matthias, Escort, KeepConstruct, Xera, Cairn, MursaatOverseer, Samarog, Deimos, SoullessHorror, RiverOfSouls, BrokenKing, Dhuum, ConjuredAmalgamate, TwinLargos, Qadim, Adina, Sabir, QadimThePeerless, Greer, Decima, Ura}},
-			{"Raid CM Coffers", "kpmeRaidCMsTable", BossCategory::RAID_CM, {GreerCM, DecimaCM, UraCM}},
-			{"Strike Coffers", "kpmeStrikesTable", BossCategory::STRIKE_NORMAL, {CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate, OldLionsCourt, Dagda, Cerus}},
-			{"Strike CM Coffers", "kpmeStrikeCMsTable", BossCategory::STRIKE_CM, {CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM, OldLionsCourtCM, DagdaCM, CerusCM}}
+			{"Raid Tokens", "kpmeRaidsTable", BossCategory::RAID_NORMAL, {{ValeGuardian, BossType::NORMAL}, {Gorseval, BossType::NORMAL}, {Sabetha, BossType::NORMAL}, {Slothasor, BossType::NORMAL}, {Matthias, BossType::NORMAL}, {Escort, BossType::NORMAL}, {KeepConstruct, BossType::NORMAL}, {Xera, BossType::NORMAL}, {Cairn, BossType::NORMAL}, {MursaatOverseer, BossType::NORMAL}, {Samarog, BossType::NORMAL}, {Deimos, BossType::NORMAL}, {SoullessHorror, BossType::NORMAL}, {RiverOfSouls, BossType::NORMAL}, {BrokenKing, BossType::NORMAL}, {Dhuum, BossType::NORMAL}, {ConjuredAmalgamate, BossType::NORMAL}, {TwinLargos, BossType::NORMAL}, {Qadim, BossType::NORMAL}, {Adina, BossType::NORMAL}, {Sabir, BossType::NORMAL}, {QadimThePeerless, BossType::NORMAL}, {Greer, BossType::NORMAL}, {Decima, BossType::NORMAL}, {Ura, BossType::NORMAL}}},
+			{"Raid CM Coffers", "kpmeRaidCMsTable", BossCategory::RAID_CM, {{GreerCM, BossType::CM}, {DecimaCM, BossType::CM}, {UraCM, BossType::CM}}},
+			{"Strike Coffers", "kpmeStrikesTable", BossCategory::STRIKE_NORMAL, {{CaptainMaiTrin, BossType::NORMAL}, {Ankka, BossType::NORMAL}, {MinisterLi, BossType::NORMAL}, {VoidAmalgamate, BossType::NORMAL}, {OldLionsCourt, BossType::NORMAL}, {Dagda, BossType::NORMAL}, {Cerus, BossType::NORMAL}}},
+			{"Strike CM Coffers", "kpmeStrikeCMsTable", BossCategory::STRIKE_CM, {{CaptainMaiTrinCM, BossType::CM}, {AnkkaCM, BossType::CM}, {MinisterLiCM, BossType::CM}, {VoidAmalgamateCM, BossType::CM}, {OldLionsCourtCM, BossType::CM}, {DagdaCM, BossType::CM}, {CerusCM, BossType::CM}}}
 	};
 }
 
@@ -86,28 +86,28 @@ std::vector<ProofOption> KpmeBossProvider::GetAvailableProofs() const {
 	std::vector<ProofOption> proofs;
 	
 	// Summary currencies
-	proofs.push_back({"Legendary Insight", "Legendary Insight", "Summary", "Currency"});
-	proofs.push_back({"Unstable Fractal Essence", "Unstable Fractal Essence", "Summary", "Currency"});
-	proofs.push_back({"Boneskinner Ritual Vial", "Boneskinner Ritual Vial", "Summary", "Currency"});
+	proofs.push_back({"Legendary Insight", "Legendary Insight", "Summary", "Currency", "Normal"});
+	proofs.push_back({"Unstable Fractal Essence", "Unstable Fractal Essence", "Summary", "Currency", "Normal"});
+	proofs.push_back({"Boneskinner Ritual Vial", "Boneskinner Ritual Vial", "Summary", "Currency", "Normal"});
 	
 	// Raid tokens
 	for (const auto& boss : {ValeGuardian, Gorseval, Sabetha, Slothasor, Matthias, Escort, KeepConstruct, Xera, Cairn, MursaatOverseer, Samarog, Deimos, SoullessHorror, RiverOfSouls, BrokenKing, Dhuum, ConjuredAmalgamate, TwinLargos, Qadim, Adina, Sabir, QadimThePeerless, Greer, Decima, Ura}) {
-		proofs.push_back({GetKpMeBossToken(boss), GetBossName(boss), "Raid", "Token"});
+		proofs.push_back({GetKpMeBossToken(boss), GetBossName(boss, BossType::NORMAL, BossProofType::TOKEN), "Raid", "Token", "Normal"});
 	}
 	
 	// Raid CM coffers
 	for (const auto& boss : {GreerCM, DecimaCM, UraCM}) {
-		proofs.push_back({GetKpMeBossCoffer(boss), GetBossName(boss), "Raid", "CM Coffer"});
+		proofs.push_back({GetKpMeBossCoffer(boss), GetBossName(boss, BossType::CM, BossProofType::COFFER), "Raid", "CM Coffer", "CM"});
 	}
 	
 	// Strike coffers
 	for (const auto& boss : {CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate, OldLionsCourt, Dagda, Cerus}) {
-		proofs.push_back({GetKpMeBossCoffer(boss), GetBossName(boss), "Strike", "Coffer"});
+		proofs.push_back({GetKpMeBossCoffer(boss), GetBossName(boss, BossType::NORMAL, BossProofType::COFFER), "Strike", "Coffer", "Normal"});
 	}
 	
 	// Strike CM coffers
 	for (const auto& boss : {CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM, OldLionsCourtCM, DagdaCM, CerusCM}) {
-		proofs.push_back({GetKpMeBossCoffer(boss), GetBossName(boss), "Strike", "CM Coffer"});
+		proofs.push_back({GetKpMeBossCoffer(boss), GetBossName(boss, BossType::CM, BossProofType::COFFER), "Strike", "CM Coffer", "CM"});
 	}
 	
 	return proofs;
@@ -119,31 +119,35 @@ BossGroup KpmeBossProvider::CreateCustomBossGroup(const CustomTab& tab) const {
 		return BossGroup{"", "", BossCategory::SUMMARY, {}, {}};
 	}
 	
-	std::vector<Boss> bosses;
+	std::vector<BossEntry> bosses;
 	std::vector<std::string> currencies;
 	BossCategory category = BossCategory::SUMMARY; // Default to summary for mixed content
 	
 	// Separate currencies and bosses
-	for (const auto& proofId : tab.proofIds) {
-		if (proofId.empty()) continue; // Skip empty proof IDs
+	for (const auto& proof : tab.proofs) {
+		if (proof.proofId.empty()) continue; // Skip empty proof IDs
 		
 		// Check if it's a currency
-		if (proofId == "Legendary Insight" || proofId == "Unstable Fractal Essence" || proofId == "Boneskinner Ritual Vial") {
-			currencies.push_back(proofId);
+		if (proof.proofId == "Legendary Insight" || proof.proofId == "Unstable Fractal Essence" || proof.proofId == "Boneskinner Ritual Vial") {
+			currencies.push_back(proof.proofId);
 		} else {
 			// Find boss by proof identifier
 			bool found = false;
+			BossType type = BossType::NORMAL;
+			if (proof.bossType == "CM") type = BossType::CM;
+			else if (proof.bossType == "LCM") type = BossType::LCM;
+			
 			for (const auto& boss : {ValeGuardian, Gorseval, Sabetha, Slothasor, Matthias, Escort, KeepConstruct, Xera, Cairn, MursaatOverseer, Samarog, Deimos, SoullessHorror, RiverOfSouls, BrokenKing, Dhuum, ConjuredAmalgamate, TwinLargos, Qadim, Adina, Sabir, QadimThePeerless, Greer, Decima, Ura}) {
-				if (GetKpMeBossToken(boss) == proofId) {
-					bosses.push_back(boss);
+				if (GetKpMeBossToken(boss) == proof.proofId) {
+					bosses.push_back({boss, type});
 					found = true;
 					break;
 				}
 			}
 			if (!found) {
 				for (const auto& boss : {GreerCM, DecimaCM, UraCM, CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate, OldLionsCourt, Dagda, Cerus, CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM, OldLionsCourtCM, DagdaCM, CerusCM}) {
-					if (GetKpMeBossCoffer(boss) == proofId) {
-						bosses.push_back(boss);
+					if (GetKpMeBossCoffer(boss) == proof.proofId) {
+						bosses.push_back({boss, type});
 						break;
 					}
 				}
@@ -155,9 +159,6 @@ BossGroup KpmeBossProvider::CreateCustomBossGroup(const CustomTab& tab) const {
 	if (bosses.empty() && currencies.empty()) {
 		return BossGroup{"", "", BossCategory::SUMMARY, {}, {}};
 	}
-	
-	// Always use SUMMARY category for custom tabs to handle mixed content
-	category = BossCategory::SUMMARY;
 	
 	return BossGroup{tab.displayName, tab.id + "Table", category, bosses, currencies};
 }

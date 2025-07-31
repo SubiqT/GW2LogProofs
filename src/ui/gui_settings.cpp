@@ -73,7 +73,7 @@ static void DrawHoverOptions() {
 	}
 }
 
-void DrawProofSelector(const std::string& providerId, std::vector<std::string>& selectedProofs) {
+void DrawProofSelector(const std::string& providerId, std::vector<ProofSelection>& selectedProofs) {
 	auto availableProofs = TabConfigManager::Instance().GetAvailableProofs(providerId);
 
 	std::unordered_map<std::string, std::vector<ProofOption>> categorized;
@@ -84,12 +84,18 @@ void DrawProofSelector(const std::string& providerId, std::vector<std::string>& 
 	for (const auto& [category, proofs] : categorized) {
 		if (ImGui::TreeNode(category.c_str())) {
 			for (const auto& proof : proofs) {
-				bool selected = std::find(selectedProofs.begin(), selectedProofs.end(), proof.id) != selectedProofs.end();
+				bool selected = std::find_if(selectedProofs.begin(), selectedProofs.end(), 
+					[&proof](const ProofSelection& sel) { 
+						return sel.proofId == proof.id && sel.bossType == proof.bossType; 
+					}) != selectedProofs.end();
 				if (ImGui::Checkbox(proof.displayName.c_str(), &selected)) {
 					if (selected) {
-						selectedProofs.push_back(proof.id);
+						selectedProofs.push_back({proof.id, proof.bossType});
 					} else {
-						selectedProofs.erase(std::remove(selectedProofs.begin(), selectedProofs.end(), proof.id), selectedProofs.end());
+						selectedProofs.erase(std::remove_if(selectedProofs.begin(), selectedProofs.end(),
+							[&proof](const ProofSelection& sel) { 
+								return sel.proofId == proof.id && sel.bossType == proof.bossType; 
+							}), selectedProofs.end());
 					}
 				}
 			}
@@ -113,9 +119,9 @@ void DrawTabEditor(const std::string& providerId, CustomTab& tab) {
 	}
 
 	if (ImGui::CollapsingHeader("Proof Selection")) {
-		auto oldProofIds = tab.proofIds;
-		DrawProofSelector(providerId, tab.proofIds);
-		if (oldProofIds != tab.proofIds) {
+		auto oldProofs = tab.proofs;
+		DrawProofSelector(providerId, tab.proofs);
+		if (oldProofs != tab.proofs) {
 			TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
 		}
 	}

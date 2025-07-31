@@ -19,11 +19,16 @@ enum class BossCategory {
 	SUMMARY
 };
 
+struct BossEntry {
+	Boss boss;
+	BossType type;
+};
+
 struct BossGroup {
 	std::string name;
 	std::string tableName;
 	BossCategory category;
-	std::vector<Boss> bosses;
+	std::vector<BossEntry> bosses;
 	std::vector<std::string> currencies; // For summary/currency groups
 };
 

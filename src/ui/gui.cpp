@@ -91,8 +91,8 @@ static void SetupTableColumns(const BossGroup& group, bool showKpmeId) {
 	for (const auto& currency : group.currencies) {
 		ImGui::TableSetupColumn(currency.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
 	}
-	for (const auto& boss : group.bosses) {
-		ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
+	for (const auto& bossEntry : group.bosses) {
+		ImGui::TableSetupColumn(GetBossName(bossEntry.boss, bossEntry.type).c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
 	}
 }
 
@@ -120,18 +120,18 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 			ImGui::EndTooltip();
 		}
 	}
-	for (const auto& boss : group.bosses) {
+	for (const auto& bossEntry : group.bosses) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
-		Texture* texture = GetBossTexture(boss);
+		Texture* texture = GetBossTexture(bossEntry.boss);
 		if (texture) {
 			ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
 		} else {
-			ImGui::Text(GetBossName(boss));
+			ImGui::Text(GetBossName(bossEntry.boss, bossEntry.type).c_str());
 		}
 		if (ImGui::IsItemHovered()) {
 			ImGui::BeginTooltip();
-			ImGui::Text(GetBossName(boss));
+			ImGui::Text(GetBossName(bossEntry.boss, bossEntry.type).c_str());
 			ImGui::EndTooltip();
 		}
 	}
@@ -150,10 +150,10 @@ static void DrawPlayerRow(const LogProofs::Player& p, const BossGroup& group, IB
 		HighlightColumnOnHover();
 		DrawPlayerProofValue(p, provider->GetProofIdentifier(currency));
 	}
-	for (const auto& boss : group.bosses) {
+	for (const auto& bossEntry : group.bosses) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
-		DrawPlayerProofValue(p, provider->GetProofIdentifier(boss, group.category));
+		DrawPlayerProofValue(p, provider->GetProofIdentifier(bossEntry.boss, group.category));
 	}
 	HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 }

@@ -6,6 +6,18 @@
 
 #include "../nexus/Nexus.h"
 
+enum class BossType {
+	NORMAL,
+	CM,
+	LCM
+};
+
+enum class BossProofType {
+	KILL_PROOF,
+	TOKEN,
+	COFFER
+};
+
 enum Boss {
 	/* Raids */
 	ValeGuardian = 15438,
@@ -115,7 +127,9 @@ extern std::vector<Boss> sortedKpmeRaidCMBosses;
 extern std::vector<Boss> sortedKpmeStrikeBosses;
 extern std::vector<Boss> sortedKpmeStrikeCMBosses;
 
-const char* GetBossName(Boss boss);
+std::string GetBossName(Boss boss);
+std::string GetBossName(Boss boss, BossType type);
+std::string GetBossName(Boss boss, BossType type, BossProofType proofType);
 Texture* GetBossTexture(Boss boss);
 Texture* GetCurrencyTexture(std::string name);
 

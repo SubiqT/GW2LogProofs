@@ -8,11 +8,23 @@
 using json = nlohmann::json;
 
 // JSON serialization implementations
+void to_json(json& j, const ProofSelection& proof) {
+	j = json {
+			{"ProofId",  proof.proofId },
+			{"BossType", proof.bossType}
+	};
+}
+
+void from_json(const json& j, ProofSelection& proof) {
+	j.at("ProofId").get_to(proof.proofId);
+	j.at("BossType").get_to(proof.bossType);
+}
+
 void to_json(json& j, const CustomTab& tab) {
 	j = json {
 			{"Id",          tab.id         },
 			{"DisplayName", tab.displayName},
-			{"ProofIds",    tab.proofIds   },
+			{"Proofs",      tab.proofs     },
 			{"Visible",     tab.visible    },
 			{"Order",       tab.order      }
 	};
@@ -21,7 +33,7 @@ void to_json(json& j, const CustomTab& tab) {
 void from_json(const json& j, CustomTab& tab) {
 	j.at("Id").get_to(tab.id);
 	j.at("DisplayName").get_to(tab.displayName);
-	j.at("ProofIds").get_to(tab.proofIds);
+	j.at("Proofs").get_to(tab.proofs);
 	j.at("Visible").get_to(tab.visible);
 	j.at("Order").get_to(tab.order);
 }
