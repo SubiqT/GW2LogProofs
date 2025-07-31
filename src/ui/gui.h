@@ -9,4 +9,7 @@ void ToggleShowWindowLogProofs(const char* keybindIdentifier, bool isRelease);
 void RegisterQuickAccessShortcut(void);
 void DeregisterQuickAccessShortcut(void);
 
+// Tab configuration functions
+void DrawTabConfigurationPanel(void);
+
 #endif

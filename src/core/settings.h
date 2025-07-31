@@ -4,6 +4,7 @@
 #include <mutex>
 
 #include "../imgui/imgui.h"
+#include "tab_config.h"
 
 #include "../nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -47,12 +48,17 @@ extern const char* INCLUDE_MISSING_ACCOUNTS;
 extern const char* HOVER_ENABLED;
 extern const char* HOVER_COLOUR;
 
+extern const char* CUSTOM_TABS_ENABLED;
+extern const char* PROVIDER_CONFIGS;
+extern const char* MIGRATION_COMPLETED;
+
 namespace Settings {
 	extern std::mutex Mutex;
 	extern json Settings;
 
 	void Load(std::filesystem::path filePath);
 	void Save(std::filesystem::path filePath);
+	void SaveInternal(std::filesystem::path filePath);
 
 	extern bool ShowQuickAccessShortcut;
 	extern bool ShowWindowLogProofs;
@@ -87,6 +93,14 @@ namespace Settings {
 	extern bool hoverEnabled;
 	extern ImU32 hoverColour;
 	extern ImVec4 hoverColourBuffer;
+
+	// Custom tab settings
+	extern bool CustomTabsEnabled;
+
+	// Migration functions
+	void MigrateLegacyTabSettings();
+	void ResetToDefaultTabs(const std::string& providerId);
+	void EnsureProviderConfigExists(const std::string& providerId);
 } // namespace Settings
 
 #endif

@@ -7,6 +7,7 @@
 #include "../core/log_proofs.h"
 #include "../core/settings.h"
 #include "../core/shared.h"
+#include "../core/tab_config.h"
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_internal.h"
 #include "../providers/common/provider_registry.h"
@@ -87,15 +88,11 @@ static void SetupTableColumns(const BossGroup& group, bool showKpmeId) {
 	if (showKpmeId) {
 		ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed, Settings::ColumnSizeKpmeId);
 	}
-	const auto& items = (group.category == BossCategory::SUMMARY) ? group.currencies : std::vector<std::string>();
-	if (group.category == BossCategory::SUMMARY) {
-		for (const auto& currency : group.currencies) {
-			ImGui::TableSetupColumn(currency.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
-		}
-	} else {
-		for (const auto& boss : group.bosses) {
-			ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
-		}
+	for (const auto& currency : group.currencies) {
+		ImGui::TableSetupColumn(currency.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
+	}
+	for (const auto& boss : group.bosses) {
+		ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
 	}
 }
 
@@ -108,37 +105,34 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 		ImGui::TableNextColumn();
 		ImGui::Text("Id");
 	}
-	if (group.category == BossCategory::SUMMARY) {
-		for (const auto& currency : group.currencies) {
-			ImGui::TableNextColumn();
-			HighlightColumnOnHover();
-			Texture* texture = GetCurrencyTexture(currency);
-			if (texture) {
-				ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
-			} else {
-				ImGui::Text(currency.c_str());
-			}
-			if (ImGui::IsItemHovered()) {
-				ImGui::BeginTooltip();
-				ImGui::Text(currency.c_str());
-				ImGui::EndTooltip();
-			}
+	for (const auto& currency : group.currencies) {
+		ImGui::TableNextColumn();
+		HighlightColumnOnHover();
+		Texture* texture = GetCurrencyTexture(currency);
+		if (texture) {
+			ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+		} else {
+			ImGui::Text(currency.c_str());
 		}
-	} else {
-		for (const auto& boss : group.bosses) {
-			ImGui::TableNextColumn();
-			HighlightColumnOnHover();
-			Texture* texture = GetBossTexture(boss);
-			if (texture) {
-				ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
-			} else {
-				ImGui::Text(GetBossName(boss));
-			}
-			if (ImGui::IsItemHovered()) {
-				ImGui::BeginTooltip();
-				ImGui::Text(GetBossName(boss));
-				ImGui::EndTooltip();
-			}
+		if (ImGui::IsItemHovered()) {
+			ImGui::BeginTooltip();
+			ImGui::Text(currency.c_str());
+			ImGui::EndTooltip();
+		}
+	}
+	for (const auto& boss : group.bosses) {
+		ImGui::TableNextColumn();
+		HighlightColumnOnHover();
+		Texture* texture = GetBossTexture(boss);
+		if (texture) {
+			ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+		} else {
+			ImGui::Text(GetBossName(boss));
+		}
+		if (ImGui::IsItemHovered()) {
+			ImGui::BeginTooltip();
+			ImGui::Text(GetBossName(boss));
+			ImGui::EndTooltip();
 		}
 	}
 }
@@ -151,25 +145,22 @@ static void DrawPlayerRow(const LogProofs::Player& p, const BossGroup& group, IB
 		HighlightColumnOnHover();
 		DrawKpmeId(p);
 	}
-	if (group.category == BossCategory::SUMMARY) {
-		for (const auto& currency : group.currencies) {
-			ImGui::TableNextColumn();
-			HighlightColumnOnHover();
-			DrawPlayerProofValue(p, provider->GetProofIdentifier(currency));
-		}
-	} else {
-		for (const auto& boss : group.bosses) {
-			ImGui::TableNextColumn();
-			HighlightColumnOnHover();
-			DrawPlayerProofValue(p, provider->GetProofIdentifier(boss, group.category));
-		}
+	for (const auto& currency : group.currencies) {
+		ImGui::TableNextColumn();
+		HighlightColumnOnHover();
+		DrawPlayerProofValue(p, provider->GetProofIdentifier(currency));
+	}
+	for (const auto& boss : group.bosses) {
+		ImGui::TableNextColumn();
+		HighlightColumnOnHover();
+		DrawPlayerProofValue(p, provider->GetProofIdentifier(boss, group.category));
 	}
 	HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 }
 
 static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKpmeId = false) {
 	if (!ImGui::BeginTabItem(group.name.c_str())) return;
-	int columnCount = static_cast<int>(group.category == BossCategory::SUMMARY ? group.currencies.size() : group.bosses.size()) + (showKpmeId ? 2 : 1);
+	int columnCount = static_cast<int>(group.currencies.size() + group.bosses.size()) + (showKpmeId ? 2 : 1);
 	if (ImGui::BeginTable(group.tableName.c_str(), columnCount, tableFlags)) {
 		SetupTableColumns(group, showKpmeId);
 		DrawTableHeaders(group, showKpmeId);
@@ -244,9 +235,34 @@ void RenderWindowLogProofs() {
 	IBossProvider* bossProvider = BossRegistry::Instance().GetProvider(currentProvider);
 	if (bossProvider && ImGui::BeginTabBar(("##" + currentProvider).c_str(), ImGuiTabBarFlags_None)) {
 		bool isKpme = (currentProvider == "KPME");
-		for (const auto& group : bossProvider->GetBossGroups()) {
-			DrawGenericTab(group, bossProvider, isKpme);
+
+		// Ensure provider configuration exists
+		Settings::EnsureProviderConfigExists(currentProvider);
+		auto config = TabConfigManager::Instance().GetProviderConfig(currentProvider);
+
+		if (config.useCustomTabs && !config.tabs.empty()) {
+			// Render custom tabs
+			for (const auto& customTab : config.tabs) {
+				if (customTab.visible && !customTab.displayName.empty()) {
+					try {
+						auto bossGroup = bossProvider->CreateCustomBossGroup(customTab);
+						// Only render if the boss group has valid content
+						if (!bossGroup.bosses.empty() || !bossGroup.currencies.empty()) {
+							DrawGenericTab(bossGroup, bossProvider, isKpme);
+						}
+					} catch (...) {
+						// Skip invalid tabs silently
+						continue;
+					}
+				}
+			}
+		} else {
+			// Render default tabs
+			for (const auto& group : bossProvider->GetBossGroups()) {
+				DrawGenericTab(group, bossProvider, isKpme);
+			}
 		}
+
 		ImGui::EndTabBar();
 	}
 	ImGui::End();

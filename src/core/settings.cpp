@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "shared.h"
+#include "tab_config.h"
 
 #include <filesystem>
 #include <format>
@@ -40,6 +41,10 @@ const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
 
 const char* HOVER_ENABLED = "HoverEnabled";
 const char* HOVER_COLOUR = "HoverColour";
+
+const char* CUSTOM_TABS_ENABLED = "CustomTabsEnabled";
+const char* PROVIDER_CONFIGS = "ProviderConfigs";
+const char* MIGRATION_COMPLETED = "MigrationCompleted";
 
 namespace Settings {
 	std::mutex Mutex;
@@ -152,9 +157,28 @@ namespace Settings {
 			Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR].get_to<ImU32>(hoverColour);
 			hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
 		}
+
+		/* Custom tabs settings */
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][CUSTOM_TABS_ENABLED].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][CUSTOM_TABS_ENABLED].get_to<bool>(CustomTabsEnabled);
+		}
+
+		// Load custom tab configurations
+		TabConfigManager::Instance().LoadFromSettings();
+
+		// Perform migration if needed
+		MigrateLegacyTabSettings();
+
+		// Skip validation during load - will validate when needed
 	}
+
 	void Save(std::filesystem::path filePath) {
 		std::scoped_lock lck(Mutex);
+		SaveInternal(filePath);
+	}
+
+	void SaveInternal(std::filesystem::path filePath) {
+		// Note: Caller must hold Mutex
 		std::ofstream file(filePath);
 		file << Settings.dump(4, ' ') << std::endl;
 		file.close();
@@ -193,4 +217,51 @@ namespace Settings {
 	bool hoverEnabled = true;
 	ImU32 hoverColour = 4285558896;
 	ImVec4 hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
+
+	bool CustomTabsEnabled = false;
+
+	void MigrateLegacyTabSettings() {
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][MIGRATION_COMPLETED].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][MIGRATION_COMPLETED].get<bool>()) {
+			return; // Already migrated
+		}
+
+		// Create default Wingman configuration
+		ProviderTabConfig wingmanConfig;
+		wingmanConfig.providerId = "Wingman";
+		wingmanConfig.useCustomTabs = false;
+		wingmanConfig.tabs.clear(); // Ensure empty for default mode
+
+		// Create default KPME configuration
+		ProviderTabConfig kpmeConfig;
+		kpmeConfig.providerId = "KPME";
+		kpmeConfig.useCustomTabs = false;
+		kpmeConfig.tabs.clear(); // Ensure empty for default mode
+
+		// Initialize TabConfigManager with default configs
+		auto& tabManager = TabConfigManager::Instance();
+		tabManager.SetProviderConfig("Wingman", wingmanConfig);
+		tabManager.SetProviderConfig("KPME", kpmeConfig);
+		tabManager.SaveToSettings();
+
+		Settings[WINDOW_LOG_PROOFS_KEY][MIGRATION_COMPLETED] = true;
+		SaveInternal(SettingsPath);
+	}
+
+	void ResetToDefaultTabs(const std::string& providerId) {
+		ProviderTabConfig config;
+		config.providerId = providerId;
+		config.useCustomTabs = false;
+		config.tabs.clear();
+		TabConfigManager::Instance().SetProviderConfig(providerId, config);
+		TabConfigManager::Instance().SaveAndPersist();
+	}
+
+	void EnsureProviderConfigExists(const std::string& providerId) {
+		auto& tabManager = TabConfigManager::Instance();
+		auto config = tabManager.GetProviderConfig(providerId);
+		if (config.providerId.empty()) {
+			// Provider config doesn't exist, create default
+			ResetToDefaultTabs(providerId);
+		}
+	}
 } // namespace Settings

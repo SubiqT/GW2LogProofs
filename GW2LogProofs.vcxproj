@@ -26,6 +26,7 @@
     <ClCompile Include="src\core\log_proofs.cpp" />
     <ClCompile Include="src\core\settings.cpp" />
     <ClCompile Include="src\core\shared.cpp" />
+    <ClCompile Include="src\core\tab_config.cpp" />
     <ClCompile Include="src\unofficial_extras\KeyBindHelper.cpp" />
     <ClCompile Include="src\unofficial_extras\KeyBindsTranslation.cpp" />
     <ClCompile Include="src\providers\common\provider_registry.cpp" />
@@ -58,6 +59,7 @@
     <ClInclude Include="src\resource.h" />
     <ClInclude Include="src\core\settings.h" />
     <ClInclude Include="src\core\shared.h" />
+    <ClInclude Include="src\core\tab_config.h" />
     <ClInclude Include="src\utils\threadpool.hpp" />
     <ClInclude Include="src\unofficial_extras\Definitions.h" />
     <ClInclude Include="src\unofficial_extras\KeyBindHelper.h" />

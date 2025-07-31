@@ -1,6 +1,9 @@
 #include "../core/settings.h"
 #include "../core/shared.h"
+#include "../core/tab_config.h"
 #include "../imgui/imgui.h"
+#include <algorithm>
+#include <unordered_map>
 
 void ToggleShowWindowLogProofs(const char* keybindIdentifier, bool isRelease) {
 	if (isRelease)
@@ -41,59 +44,6 @@ static void DrawWindowSizingOptions() {
 	}
 }
 
-static void DrawTabsOptions() {
-	ImGui::Text("Wingman Tabs");
-	if (ImGui::Checkbox("Raids", &Settings::ShowTabRaidsNormal)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_NORMAL] = Settings::ShowTabRaidsNormal;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::Checkbox("Raid CMs", &Settings::ShowTabRaidsCM)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_CM] = Settings::ShowTabRaidsCM;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::Checkbox("Raid LMs", &Settings::ShowTabRaidsLM)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_LM] = Settings::ShowTabRaidsLM;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::Checkbox("Fractal CMs", &Settings::ShowTabFractalsCM)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_CM] = Settings::ShowTabFractalsCM;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::Checkbox("Strikes", &Settings::ShowTabStrikesNormal)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_NORMAL] = Settings::ShowTabStrikesNormal;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::Checkbox("Strike CMs", &Settings::ShowTabStrikesCM)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_CM] = Settings::ShowTabStrikesCM;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::Checkbox("Strike LMs", &Settings::ShowTabStrikesLM)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_LM] = Settings::ShowTabStrikesLM;
-		Settings::Save(SettingsPath);
-	}
-	ImGui::Text("KPME Tabs");
-	if (ImGui::Checkbox("Summary", &Settings::ShowTabKpmeSummary)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_SUMMARY] = Settings::ShowTabKpmeSummary;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::Checkbox("Raid Tokens", &Settings::ShowTabKpmeRaidTokens)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_TOKENS] = Settings::ShowTabKpmeRaidTokens;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::Checkbox("Raid CM Coffers", &Settings::ShowTabKpmeRaidCMCoffers)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_CM_COFFERS] = Settings::ShowTabKpmeRaidCMCoffers;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::Checkbox("Strike Coffers", &Settings::ShowTabKpmeStrikeCoffers)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_COFFERS] = Settings::ShowTabKpmeStrikeCoffers;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::Checkbox("Strike CM Coffers", &Settings::ShowTabKpmeStrikeCMCoffers)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_CM_COFFERS] = Settings::ShowTabKpmeStrikeCMCoffers;
-		Settings::Save(SettingsPath);
-	}
-}
-
 static void DrawColumnOptions() {
 	ImGui::Text("Columns");
 	if (ImGui::SliderFloat("Account Size", &Settings::ColumnSizeAccount, 40.0f, 400.0f, "%.3f px")) {
@@ -123,6 +73,109 @@ static void DrawHoverOptions() {
 	}
 }
 
+void DrawProofSelector(const std::string& providerId, std::vector<std::string>& selectedProofs) {
+	auto availableProofs = TabConfigManager::Instance().GetAvailableProofs(providerId);
+
+	std::unordered_map<std::string, std::vector<ProofOption>> categorized;
+	for (const auto& proof : availableProofs) {
+		categorized[proof.category].push_back(proof);
+	}
+
+	for (const auto& [category, proofs] : categorized) {
+		if (ImGui::TreeNode(category.c_str())) {
+			for (const auto& proof : proofs) {
+				bool selected = std::find(selectedProofs.begin(), selectedProofs.end(), proof.id) != selectedProofs.end();
+				if (ImGui::Checkbox(proof.displayName.c_str(), &selected)) {
+					if (selected) {
+						selectedProofs.push_back(proof.id);
+					} else {
+						selectedProofs.erase(std::remove(selectedProofs.begin(), selectedProofs.end(), proof.id), selectedProofs.end());
+					}
+				}
+			}
+			ImGui::TreePop();
+		}
+	}
+}
+
+void DrawTabEditor(const std::string& providerId, CustomTab& tab) {
+	ImGui::PushID(tab.id.c_str());
+
+	char nameBuffer[256];
+	strcpy_s(nameBuffer, tab.displayName.c_str());
+	if (ImGui::InputText("Name", nameBuffer, sizeof(nameBuffer))) {
+		tab.displayName = nameBuffer;
+		TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
+	}
+
+	if (ImGui::Checkbox("Visible", &tab.visible)) {
+		TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
+	}
+
+	if (ImGui::CollapsingHeader("Proof Selection")) {
+		auto oldProofIds = tab.proofIds;
+		DrawProofSelector(providerId, tab.proofIds);
+		if (oldProofIds != tab.proofIds) {
+			TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
+		}
+	}
+
+	if (ImGui::Button("Delete Tab")) {
+		TabConfigManager::Instance().DeleteTab(providerId, tab.id);
+	}
+
+	ImGui::PopID();
+	ImGui::Separator();
+}
+
+void DrawCustomTabEditor(const std::string& providerId) {
+	auto config = TabConfigManager::Instance().GetProviderConfig(providerId);
+
+	for (auto& tab : config.tabs) {
+		DrawTabEditor(providerId, tab);
+	}
+
+	if (ImGui::Button("Add New Tab")) {
+		static int tabCounter = 0;
+		CustomTab newTab;
+		newTab.id = "custom_tab_" + std::to_string(++tabCounter);
+		newTab.displayName = "New Tab";
+		newTab.visible = true;
+		newTab.order = static_cast<int>(config.tabs.size());
+		TabConfigManager::Instance().CreateTab(providerId, newTab);
+	}
+}
+
+void DrawProviderTabConfig(const std::string& providerId) {
+	auto config = TabConfigManager::Instance().GetProviderConfig(providerId);
+
+	bool useCustomTabs = config.useCustomTabs;
+	if (ImGui::Checkbox("Use Custom Tabs", &useCustomTabs)) {
+		config.useCustomTabs = useCustomTabs;
+		TabConfigManager::Instance().SetProviderConfig(providerId, config);
+		TabConfigManager::Instance().SaveAndPersist();
+	}
+
+	if (config.useCustomTabs) {
+		DrawCustomTabEditor(providerId);
+	} else {
+		ImGui::Text("Using default tabs. Enable custom tabs to configure.");
+	}
+}
+
+void DrawTabConfigurationPanel() {
+	ImGui::Text("Tab Configuration");
+	if (ImGui::BeginTabBar("ProviderTabConfig")) {
+		for (const auto& providerId : {"Wingman", "KPME"}) {
+			if (ImGui::BeginTabItem(providerId)) {
+				DrawProviderTabConfig(providerId);
+				ImGui::EndTabItem();
+			}
+		}
+		ImGui::EndTabBar();
+	}
+}
+
 void RenderWindowSettings() {
 	if (ImGui::Checkbox("Show Quick Access Shortcut", &Settings::ShowQuickAccessShortcut)) {
 		Settings::Settings[SHOW_QUICK_ACCESS_SHORTCUT] = Settings::ShowQuickAccessShortcut;
@@ -136,8 +189,12 @@ void RenderWindowSettings() {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
 		Settings::Save(SettingsPath);
 	}
+	if (ImGui::Checkbox("Enable Custom Tabs", &Settings::CustomTabsEnabled)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][CUSTOM_TABS_ENABLED] = Settings::CustomTabsEnabled;
+		Settings::Save(SettingsPath);
+	}
 	DrawWindowSizingOptions();
 	DrawColumnOptions();
-	DrawTabsOptions();
+	DrawTabConfigurationPanel();
 	DrawHoverOptions();
 }

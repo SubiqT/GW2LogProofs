@@ -2,6 +2,7 @@
 #define BOSS_REGISTRY_H
 
 #include "bosses.h"
+#include "tab_config.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -32,6 +33,11 @@ public:
 	virtual std::vector<BossGroup> GetBossGroups() const = 0;
 	virtual std::string GetProofIdentifier(Boss boss, BossCategory category) const = 0;
 	virtual std::string GetProofIdentifier(const std::string& currency) const = 0;
+
+	// Custom tab support
+	virtual std::vector<ProofOption> GetAvailableProofs() const = 0;
+	virtual BossGroup CreateCustomBossGroup(const CustomTab& tab) const = 0;
+	virtual bool SupportsCustomTabs() const { return true; }
 };
 
 class BossRegistry {
