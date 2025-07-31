@@ -21,7 +21,7 @@ void DeregisterQuickAccessShortcut() {
 	APIDefs->QuickAccess.Remove("SHORTCUT_LOG_PROOFS");
 }
 
-void DrawWindowSizingOptions() {
+static void DrawWindowSizingOptions() {
 	ImGui::Text("Window Sizing");
 	if (ImGui::SliderFloat("Min Width", &Settings::MinWindowWidth, 100.0f, 1500.0f, "%.3f px")) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
@@ -41,7 +41,7 @@ void DrawWindowSizingOptions() {
 	}
 }
 
-void DrawTabsOptions() {
+static void DrawTabsOptions() {
 	ImGui::Text("Wingman Tabs");
 	if (ImGui::Checkbox("Raids", &Settings::ShowTabRaidsNormal)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_NORMAL] = Settings::ShowTabRaidsNormal;
@@ -94,7 +94,7 @@ void DrawTabsOptions() {
 	}
 }
 
-void DrawColumnOptions() {
+static void DrawColumnOptions() {
 	ImGui::Text("Columns");
 	if (ImGui::SliderFloat("Account Size", &Settings::ColumnSizeAccount, 40.0f, 400.0f, "%.3f px")) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE] = Settings::ColumnSizeAccount;
@@ -110,7 +110,7 @@ void DrawColumnOptions() {
 	}
 }
 
-void DrawHoverOptions() {
+static void DrawHoverOptions() {
 	ImGui::Text("Hover");
 	if (ImGui::Checkbox("Enabled##HoverEnabled", &Settings::hoverEnabled)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED] = Settings::hoverEnabled;

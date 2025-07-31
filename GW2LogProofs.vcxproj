@@ -30,7 +30,7 @@
     <ClCompile Include="src\unofficial_extras\KeyBindsTranslation.cpp" />
     <ClCompile Include="src\providers\common\provider_registry.cpp" />
     <ClCompile Include="src\utils\httpclient.cpp" />
-    <ClCompile Include="src\ui\ui_renderer.cpp" />
+
     <ClCompile Include="src\ui\gui_settings.cpp" />
     <ClCompile Include="src\providers\wingman\wingman_provider.cpp" />
     <ClCompile Include="src\providers\wingman\wingman_client.cpp" />
@@ -67,7 +67,7 @@
     <ClInclude Include="src\providers\common\data_provider.h" />
     <ClInclude Include="src\providers\common\provider_registry.h" />
     <ClInclude Include="src\core\player_data.h" />
-    <ClInclude Include="src\ui\ui_renderer.h" />
+
     <ClInclude Include="src\providers\wingman\wingman_provider.h" />
     <ClInclude Include="src\providers\wingman\wingman_client.h" />
     <ClInclude Include="src\providers\wingman\wingman_types.h" />

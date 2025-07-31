@@ -11,16 +11,42 @@
 #include "../imgui/imgui_internal.h"
 #include "../providers/common/provider_registry.h"
 #include "imgui_extensions.h"
-#include "ui_renderer.h"
+#include <Windows.h>
+
 
 static ImGuiWindowFlags windowFlags = (ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_AlwaysAutoResize);
 static ImGuiTableFlags tableFlags = (ImGuiTableFlags_Borders | ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY);
 
-std::vector<std::string> GetDataSources() {
+static std::vector<std::string> GetDataSources() {
 	return BossRegistry::Instance().GetAvailableProviders();
 }
 
-void DrawKpmeId(const LogProofs::Player& aPlayer) {
+static void DrawPlayerAccountName(const LogProofs::Player& player) {
+	if (player.proofData && !player.proofData->profileUrl.empty()) {
+		if (ImGui::TextURL(player.account.c_str())) {
+			ShellExecuteA(0, 0, player.proofData->profileUrl.c_str(), 0, 0, SW_SHOW);
+		}
+	} else {
+		ImGui::Text(player.account.c_str());
+	}
+}
+
+static void DrawPlayerProofValue(const LogProofs::Player& player, const std::string& proofId) {
+	if (player.state == LoadState::READY && player.proofData) {
+		auto it = player.proofData->proofs.find(proofId);
+		if (it != player.proofData->proofs.end()) {
+			ImGui::Text("%i", it->second.amount);
+		} else {
+			ImGui::Text("-");
+		}
+	} else if (player.state == LoadState::LOADING) {
+		ImGui::Text("...");
+	} else {
+		ImGui::Text("-");
+	}
+}
+
+static void DrawKpmeId(const LogProofs::Player& aPlayer) {
 	if (aPlayer.proofData && !aPlayer.proofData->profileId.empty()) {
 		if (ImGui::TextURL(aPlayer.proofData->profileId.c_str())) {
 			ImGui::SetClipboardText(aPlayer.proofData->profileId.c_str());
@@ -30,7 +56,7 @@ void DrawKpmeId(const LogProofs::Player& aPlayer) {
 	}
 }
 
-void HighlightColumnOnHover() {
+static void HighlightColumnOnHover() {
 	if (!Settings::hoverEnabled)
 		return;
 	if (ImGui::TableGetColumnFlags(ImGui::TableGetColumnIndex()) & ImGuiTableColumnFlags_IsHovered) {
@@ -38,7 +64,7 @@ void HighlightColumnOnHover() {
 	}
 }
 
-void HighlightRowOnHover(ImGuiTable* table) {
+static void HighlightRowOnHover(ImGuiTable* table) {
 	if (!Settings::hoverEnabled)
 		return;
 	ImRect rowRect(
@@ -56,7 +82,7 @@ void HighlightRowOnHover(ImGuiTable* table) {
 	}
 }
 
-void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKpmeId = false) {
+static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKpmeId = false) {
 	if (ImGui::BeginTabItem(group.name.c_str())) {
 		int columnCount = static_cast<int>((group.category == BossCategory::SUMMARY ? group.currencies.size() : group.bosses.size())) + (showKpmeId ? 2 : 1);
 		if (ImGui::BeginTable(group.tableName.c_str(), columnCount, tableFlags)) {
@@ -126,7 +152,7 @@ void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKp
 							continue;
 						}
 						ImGui::TableNextColumn();
-						UIRenderer::DrawPlayerAccountName(p);
+						DrawPlayerAccountName(p);
 						if (showKpmeId) {
 							ImGui::TableNextColumn();
 							HighlightColumnOnHover();
@@ -138,14 +164,14 @@ void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKp
 								ImGui::TableNextColumn();
 								HighlightColumnOnHover();
 								std::string proofId = provider->GetProofIdentifier(currency);
-								UIRenderer::DrawPlayerProofValue(p, proofId);
+								DrawPlayerProofValue(p, proofId);
 							}
 						} else {
 							for (const Boss& boss : group.bosses) {
 								ImGui::TableNextColumn();
 								HighlightColumnOnHover();
 								std::string proofId = provider->GetProofIdentifier(boss, group.category);
-								UIRenderer::DrawPlayerProofValue(p, proofId);
+								DrawPlayerProofValue(p, proofId);
 							}
 						}
 						HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
