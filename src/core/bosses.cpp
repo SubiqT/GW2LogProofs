@@ -320,7 +320,6 @@ Texture* GetBossTexture(Boss boss) {
 }
 
 
-
 Texture* GetCurrencyTexture(std::string name) {
 	if (name == "Legendary Insight")
 		return APIDefs->Textures.GetOrCreateFromResource("TEX_LEGENDARY_INSIGHT", IDB_LEGENDARY_INSIGHT, hSelf);

@@ -2,8 +2,8 @@
 #include <format>
 #include <thread>
 
-#include "../core/bosses.h"
 #include "../core/boss_registry.h"
+#include "../core/bosses.h"
 #include "../core/log_proofs.h"
 #include "../core/settings.h"
 #include "../core/shared.h"
@@ -64,7 +64,7 @@ void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKp
 			if (showKpmeId) {
 				ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed, Settings::ColumnSizeKpmeId);
 			}
-			
+
 			if (group.category == BossCategory::SUMMARY) {
 				for (const std::string& currency : group.currencies) {
 					ImGui::TableSetupColumn(currency.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
@@ -74,7 +74,7 @@ void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKp
 					ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
 				}
 			}
-			
+
 			ImGui::TableSetupScrollFreeze(1, 1);
 			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
 			ImGui::TableNextColumn();
@@ -83,7 +83,7 @@ void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKp
 				ImGui::TableNextColumn();
 				ImGui::Text("Id");
 			}
-			
+
 			if (group.category == BossCategory::SUMMARY) {
 				for (const std::string& currency : group.currencies) {
 					ImGui::TableNextColumn();
@@ -117,7 +117,7 @@ void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKp
 					}
 				}
 			}
-			
+
 			{
 				std::scoped_lock lck(LogProofs::Mutex);
 				if (LogProofs::players.size() > 0) {
@@ -132,7 +132,7 @@ void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKp
 							HighlightColumnOnHover();
 							DrawKpmeId(p);
 						}
-						
+
 						if (group.category == BossCategory::SUMMARY) {
 							for (const std::string& currency : group.currencies) {
 								ImGui::TableNextColumn();
@@ -161,11 +161,6 @@ void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKp
 		ImGui::EndTabItem();
 	}
 }
-
-
-
-
-
 
 
 void RenderWindowLogProofs() {
@@ -207,7 +202,7 @@ void RenderWindowLogProofs() {
 		if (bossProvider) {
 			auto bossGroups = bossProvider->GetBossGroups();
 			bool isKpme = (currentProvider == "KPME");
-			
+
 			if (isKpme) {
 				ImGui::SameLine();
 				if (ImGui::Checkbox("Linked Accounts", &Settings::IncludeLinkedAccounts)) {
@@ -216,7 +211,7 @@ void RenderWindowLogProofs() {
 					LogProofs::ReloadKpmePlayersForLinkedAccounts();
 				}
 			}
-			
+
 			if (ImGui::BeginTabBar(("##" + currentProvider).c_str(), ImGuiTabBarFlags_None)) {
 				for (const auto& group : bossGroups) {
 					DrawGenericTab(group, bossProvider, isKpme);
