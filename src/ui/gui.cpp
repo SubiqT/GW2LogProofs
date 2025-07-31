@@ -82,174 +82,173 @@ static void HighlightRowOnHover(ImGuiTable* table) {
 	}
 }
 
-static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKpmeId = false) {
-	if (ImGui::BeginTabItem(group.name.c_str())) {
-		int columnCount = static_cast<int>((group.category == BossCategory::SUMMARY ? group.currencies.size() : group.bosses.size())) + (showKpmeId ? 2 : 1);
-		if (ImGui::BeginTable(group.tableName.c_str(), columnCount, tableFlags)) {
-			ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
-			if (showKpmeId) {
-				ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed, Settings::ColumnSizeKpmeId);
-			}
-
-			if (group.category == BossCategory::SUMMARY) {
-				for (const std::string& currency : group.currencies) {
-					ImGui::TableSetupColumn(currency.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
-				}
-			} else {
-				for (const Boss& boss : group.bosses) {
-					ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
-				}
-			}
-
-			ImGui::TableSetupScrollFreeze(1, 1);
-			ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
-			ImGui::TableNextColumn();
-			ImGui::Text("Account");
-			if (showKpmeId) {
-				ImGui::TableNextColumn();
-				ImGui::Text("Id");
-			}
-
-			if (group.category == BossCategory::SUMMARY) {
-				for (const std::string& currency : group.currencies) {
-					ImGui::TableNextColumn();
-					HighlightColumnOnHover();
-					Texture* texture = GetCurrencyTexture(currency);
-					if (texture != nullptr) {
-						ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
-					} else {
-						ImGui::Text(currency.c_str());
-					}
-					if (ImGui::IsItemHovered()) {
-						ImGui::BeginTooltip();
-						ImGui::Text(currency.c_str());
-						ImGui::EndTooltip();
-					}
-				}
-			} else {
-				for (const Boss& boss : group.bosses) {
-					ImGui::TableNextColumn();
-					HighlightColumnOnHover();
-					Texture* texture = GetBossTexture(boss);
-					if (texture != nullptr) {
-						ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
-					} else {
-						ImGui::Text(GetBossName(boss));
-					}
-					if (ImGui::IsItemHovered()) {
-						ImGui::BeginTooltip();
-						ImGui::Text(GetBossName(boss));
-						ImGui::EndTooltip();
-					}
-				}
-			}
-
-			{
-				std::scoped_lock lck(LogProofs::Mutex);
-				if (LogProofs::players.size() > 0) {
-					for (const LogProofs::Player& p : LogProofs::players) {
-						if (!Settings::IncludeMissingAccounts && p.state == ::LoadState::READY && (!p.proofData || (showKpmeId ? p.proofData->profileId.empty() : p.proofData->accountName.empty()))) {
-							continue;
-						}
-						ImGui::TableNextColumn();
-						DrawPlayerAccountName(p);
-						if (showKpmeId) {
-							ImGui::TableNextColumn();
-							HighlightColumnOnHover();
-							DrawKpmeId(p);
-						}
-
-						if (group.category == BossCategory::SUMMARY) {
-							for (const std::string& currency : group.currencies) {
-								ImGui::TableNextColumn();
-								HighlightColumnOnHover();
-								std::string proofId = provider->GetProofIdentifier(currency);
-								DrawPlayerProofValue(p, proofId);
-							}
-						} else {
-							for (const Boss& boss : group.bosses) {
-								ImGui::TableNextColumn();
-								HighlightColumnOnHover();
-								std::string proofId = provider->GetProofIdentifier(boss, group.category);
-								DrawPlayerProofValue(p, proofId);
-							}
-						}
-						HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
-					}
-				}
-			}
-			if (LogProofs::players.size() == 0) {
-				ImGui::TableNextColumn();
-				ImGui::Text("No players found... ");
-			}
-			ImGui::EndTable();
+static void SetupTableColumns(const BossGroup& group, bool showKpmeId) {
+	ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
+	if (showKpmeId) {
+		ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed, Settings::ColumnSizeKpmeId);
+	}
+	const auto& items = (group.category == BossCategory::SUMMARY) ? group.currencies : std::vector<std::string>();
+	if (group.category == BossCategory::SUMMARY) {
+		for (const auto& currency : group.currencies) {
+			ImGui::TableSetupColumn(currency.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
 		}
-		ImGui::EndTabItem();
+	} else {
+		for (const auto& boss : group.bosses) {
+			ImGui::TableSetupColumn(GetBossName(boss), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
+		}
 	}
 }
 
+static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
+	ImGui::TableSetupScrollFreeze(1, 1);
+	ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+	ImGui::TableNextColumn();
+	ImGui::Text("Account");
+	if (showKpmeId) {
+		ImGui::TableNextColumn();
+		ImGui::Text("Id");
+	}
+	if (group.category == BossCategory::SUMMARY) {
+		for (const auto& currency : group.currencies) {
+			ImGui::TableNextColumn();
+			HighlightColumnOnHover();
+			Texture* texture = GetCurrencyTexture(currency);
+			if (texture) {
+				ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+			} else {
+				ImGui::Text(currency.c_str());
+			}
+			if (ImGui::IsItemHovered()) {
+				ImGui::BeginTooltip();
+				ImGui::Text(currency.c_str());
+				ImGui::EndTooltip();
+			}
+		}
+	} else {
+		for (const auto& boss : group.bosses) {
+			ImGui::TableNextColumn();
+			HighlightColumnOnHover();
+			Texture* texture = GetBossTexture(boss);
+			if (texture) {
+				ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+			} else {
+				ImGui::Text(GetBossName(boss));
+			}
+			if (ImGui::IsItemHovered()) {
+				ImGui::BeginTooltip();
+				ImGui::Text(GetBossName(boss));
+				ImGui::EndTooltip();
+			}
+		}
+	}
+}
+
+static void DrawPlayerRow(const LogProofs::Player& p, const BossGroup& group, IBossProvider* provider, bool showKpmeId) {
+	ImGui::TableNextColumn();
+	DrawPlayerAccountName(p);
+	if (showKpmeId) {
+		ImGui::TableNextColumn();
+		HighlightColumnOnHover();
+		DrawKpmeId(p);
+	}
+	if (group.category == BossCategory::SUMMARY) {
+		for (const auto& currency : group.currencies) {
+			ImGui::TableNextColumn();
+			HighlightColumnOnHover();
+			DrawPlayerProofValue(p, provider->GetProofIdentifier(currency));
+		}
+	} else {
+		for (const auto& boss : group.bosses) {
+			ImGui::TableNextColumn();
+			HighlightColumnOnHover();
+			DrawPlayerProofValue(p, provider->GetProofIdentifier(boss, group.category));
+		}
+	}
+	HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
+}
+
+static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKpmeId = false) {
+	if (!ImGui::BeginTabItem(group.name.c_str())) return;
+	int columnCount = static_cast<int>(group.category == BossCategory::SUMMARY ? group.currencies.size() : group.bosses.size()) + (showKpmeId ? 2 : 1);
+	if (ImGui::BeginTable(group.tableName.c_str(), columnCount, tableFlags)) {
+		SetupTableColumns(group, showKpmeId);
+		DrawTableHeaders(group, showKpmeId);
+		std::scoped_lock lck(LogProofs::Mutex);
+		if (LogProofs::players.empty()) {
+			ImGui::TableNextColumn();
+			ImGui::Text("No players found... ");
+		} else {
+			for (const auto& p : LogProofs::players) {
+				if (!Settings::IncludeMissingAccounts && p.state == LoadState::READY && (!p.proofData || (showKpmeId ? p.proofData->profileId.empty() : p.proofData->accountName.empty()))) {
+					continue;
+				}
+				DrawPlayerRow(p, group, provider, showKpmeId);
+			}
+		}
+		ImGui::EndTable();
+	}
+	ImGui::EndTabItem();
+}
+
+
+static void SaveWindowState() {
+	Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
+	Settings::Save(SettingsPath);
+}
+
+static void DrawProviderCombo(const std::string& currentProvider) {
+	if (ImGui::BeginCombo("Source##DataSource", currentProvider.c_str())) {
+		for (const auto& provider : GetDataSources()) {
+			bool is_selected = (provider == currentProvider);
+			if (ImGui::Selectable(provider.c_str(), is_selected)) {
+				Settings::SelectedDataSource = (provider == "Wingman") ? WINGMAN : KPME;
+				Settings::Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE] = Settings::SelectedDataSource;
+				Settings::Save(SettingsPath);
+				LogProofs::ReloadAllPlayersWithProvider(provider);
+			}
+			if (is_selected) ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+}
+
+static void DrawControls(const std::string& currentProvider) {
+	DrawProviderCombo(currentProvider);
+	ImGui::SameLine();
+	if (ImGui::Checkbox("Missing Accounts", &Settings::IncludeMissingAccounts)) {
+		Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS] = Settings::IncludeMissingAccounts;
+		Settings::Save(SettingsPath);
+	}
+	if (currentProvider == "KPME") {
+		ImGui::SameLine();
+		if (ImGui::Checkbox("Linked Accounts", &Settings::IncludeLinkedAccounts)) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS] = Settings::IncludeLinkedAccounts;
+			Settings::Save(SettingsPath);
+			LogProofs::ReloadKpmePlayersForLinkedAccounts();
+		}
+	}
+}
 
 void RenderWindowLogProofs() {
 	if (!Settings::ShowWindowLogProofs) {
-		if (Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] != Settings::ShowWindowLogProofs) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
-			Settings::Save(SettingsPath);
-		}
+		SaveWindowState();
 		return;
 	}
 	ImGui::SetNextWindowSizeConstraints(ImVec2(Settings::MinWindowWidth, Settings::MinWindowHeight), ImVec2(Settings::MaxWindowWidth, Settings::MaxWindowHeight));
-	if (ImGui::Begin("Log Proofs", &Settings::ShowWindowLogProofs, windowFlags)) {
-
-		auto dataSources = GetDataSources();
-		std::string currentProvider = (Settings::SelectedDataSource == WINGMAN) ? "Wingman" : "KPME";
-		if (ImGui::BeginCombo("Source##DataSource", currentProvider.c_str())) {
-			for (const auto& provider : dataSources) {
-				const bool is_selected = (provider == currentProvider);
-				if (ImGui::Selectable(provider.c_str(), is_selected)) {
-					Settings::SelectedDataSource = (provider == "Wingman") ? WINGMAN : KPME;
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE] = Settings::SelectedDataSource;
-					Settings::Save(SettingsPath);
-					// Reload all players with new provider
-					LogProofs::ReloadAllPlayersWithProvider(provider);
-				}
-				if (is_selected)
-					ImGui::SetItemDefaultFocus();
-			}
-			ImGui::EndCombo();
+	if (!ImGui::Begin("Log Proofs", &Settings::ShowWindowLogProofs, windowFlags)) {
+		ImGui::End();
+		return;
+	}
+	std::string currentProvider = (Settings::SelectedDataSource == WINGMAN) ? "Wingman" : "KPME";
+	DrawControls(currentProvider);
+	IBossProvider* bossProvider = BossRegistry::Instance().GetProvider(currentProvider);
+	if (bossProvider && ImGui::BeginTabBar(("##" + currentProvider).c_str(), ImGuiTabBarFlags_None)) {
+		bool isKpme = (currentProvider == "KPME");
+		for (const auto& group : bossProvider->GetBossGroups()) {
+			DrawGenericTab(group, bossProvider, isKpme);
 		}
-
-		ImGui::SameLine();
-		if (ImGui::Checkbox("Missing Accounts", &Settings::IncludeMissingAccounts)) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS] = Settings::IncludeMissingAccounts;
-			Settings::Save(SettingsPath);
-		}
-
-		IBossProvider* bossProvider = BossRegistry::Instance().GetProvider(currentProvider);
-		if (bossProvider) {
-			auto bossGroups = bossProvider->GetBossGroups();
-			bool isKpme = (currentProvider == "KPME");
-
-			if (isKpme) {
-				ImGui::SameLine();
-				if (ImGui::Checkbox("Linked Accounts", &Settings::IncludeLinkedAccounts)) {
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS] = Settings::IncludeLinkedAccounts;
-					Settings::Save(SettingsPath);
-					LogProofs::ReloadKpmePlayersForLinkedAccounts();
-				}
-			}
-
-			if (ImGui::BeginTabBar(("##" + currentProvider).c_str(), ImGuiTabBarFlags_None)) {
-				for (const auto& group : bossGroups) {
-					DrawGenericTab(group, bossProvider, isKpme);
-				}
-				ImGui::EndTabBar();
-			}
-		}
+		ImGui::EndTabBar();
 	}
 	ImGui::End();
-
-	if (!Settings::ShowWindowLogProofs) { // X button on top right was clicked
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
-		Settings::Save(SettingsPath);
-	}
+	if (!Settings::ShowWindowLogProofs) SaveWindowState();
 }
