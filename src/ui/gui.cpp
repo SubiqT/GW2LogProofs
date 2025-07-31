@@ -240,8 +240,8 @@ void RenderWindowLogProofs() {
 		Settings::EnsureProviderConfigExists(currentProvider);
 		auto config = TabConfigManager::Instance().GetProviderConfig(currentProvider);
 
-		if (config.useCustomTabs && !config.tabs.empty()) {
-			// Render custom tabs
+		if (config.useCustomTabs) {
+			// Render custom tabs only
 			for (const auto& customTab : config.tabs) {
 				if (customTab.visible && !customTab.displayName.empty()) {
 					try {

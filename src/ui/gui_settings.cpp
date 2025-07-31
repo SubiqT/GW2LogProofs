@@ -204,10 +204,7 @@ void RenderWindowSettings() {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
 		Settings::Save(SettingsPath);
 	}
-	if (ImGui::Checkbox("Enable Custom Tabs", &Settings::CustomTabsEnabled)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][CUSTOM_TABS_ENABLED] = Settings::CustomTabsEnabled;
-		Settings::Save(SettingsPath);
-	}
+
 	DrawWindowSizingOptions();
 	DrawColumnOptions();
 	DrawTabConfigurationPanel();
