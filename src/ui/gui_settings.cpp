@@ -142,7 +142,16 @@ void DrawCustomTabEditor(const std::string& providerId) {
 	}
 
 	if (ImGui::Button("Add New Tab")) {
-		static int tabCounter = 0;
+		static int tabCounter = -1;
+		if (tabCounter == -1) {
+			tabCounter = 0;
+			for (const auto& tab : config.tabs) {
+				if (tab.id.substr(0, 11) == "custom_tab_") {
+					int num = std::stoi(tab.id.substr(11));
+					tabCounter = (tabCounter > num) ? tabCounter : num;
+				}
+			}
+		}
 		CustomTab newTab;
 		newTab.id = "custom_tab_" + std::to_string(++tabCounter);
 		newTab.displayName = "New Tab";
