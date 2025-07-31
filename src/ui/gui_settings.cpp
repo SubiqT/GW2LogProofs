@@ -61,15 +61,36 @@ static void DrawColumnOptions() {
 }
 
 static void DrawHoverOptions() {
-	ImGui::Text("Hover");
-	if (ImGui::Checkbox("Enabled##HoverEnabled", &Settings::hoverEnabled)) {
+	static bool showColourModal = false;
+	
+	if (ImGui::Checkbox("Hover Enabled", &Settings::hoverEnabled)) {
 		Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED] = Settings::hoverEnabled;
 		Settings::Save(SettingsPath);
 	}
-	if (ImGui::ColorPicker4("HoverColour##HoverColourPicker", (float*) &Settings::hoverColourBuffer)) {
-		Settings::hoverColour = ImGui::ColorConvertFloat4ToU32(Settings::hoverColourBuffer);
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR] = Settings::hoverColour;
-		Settings::Save(SettingsPath);
+	
+	if (Settings::hoverEnabled) {
+		ImGui::SameLine();
+		ImVec4 colour = ImGui::ColorConvertU32ToFloat4(Settings::hoverColour);
+		if (ImGui::ColorButton("Hover Colour", colour)) {
+			showColourModal = true;
+		}
+	}
+	
+	if (showColourModal) {
+		ImGui::OpenPopup("Select Hover Colour");
+		showColourModal = false;
+	}
+	
+	if (ImGui::BeginPopupModal("Select Hover Colour", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::ColorPicker4("##HoverColourPicker", (float*) &Settings::hoverColourBuffer)) {
+			Settings::hoverColour = ImGui::ColorConvertFloat4ToU32(Settings::hoverColourBuffer);
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR] = Settings::hoverColour;
+			Settings::Save(SettingsPath);
+		}
+		if (ImGui::Button("Close")) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
 	}
 }
 
@@ -205,8 +226,8 @@ void RenderWindowSettings() {
 		Settings::Save(SettingsPath);
 	}
 
+	DrawHoverOptions();
 	DrawWindowSizingOptions();
 	DrawColumnOptions();
 	DrawTabConfigurationPanel();
-	DrawHoverOptions();
 }
