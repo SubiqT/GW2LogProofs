@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "../providers/common/data_provider.h"
 #include "player_data.h"
@@ -37,7 +38,7 @@ public:
 	void SetEntry(const std::string& key, std::unique_ptr<PlayerProofData> data);
 	void MarkFailure(const std::string& key);
 	bool ShouldRetry(const std::string& key);
-	void CleanExpiredEntries();
+	std::vector<std::string> CleanExpiredEntries();
 	void OnWindowOpened();
 	void OnWindowClosed();
 

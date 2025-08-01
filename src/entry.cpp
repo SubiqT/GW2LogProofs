@@ -31,7 +31,7 @@ void AddonRender() {
 	// Periodic cleanup of expired cache entries
 	static auto lastCleanup = std::chrono::steady_clock::now();
 	auto now = std::chrono::steady_clock::now();
-	if (now - lastCleanup > std::chrono::seconds(30)) {
+	if (now - lastCleanup > std::chrono::seconds(1)) {
 		LogProofs::lazyLoadManager.CleanupExpiredEntries();
 		lastCleanup = now;
 	}

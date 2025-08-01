@@ -171,11 +171,17 @@ namespace Settings {
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][LAZY_LOADING_ENABLED].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][LAZY_LOADING_ENABLED].get_to<bool>(LazyLoadingEnabled);
 		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].get_to<int>(CacheTimeoutMinutes);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].is_number_integer()) {
+			int value = Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].get<int>();
+			if (value >= 1 && value <= 30) {
+				CacheTimeoutMinutes = value;
+			}
 		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].get_to<int>(MaxRetryAttempts);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].is_number_integer()) {
+			int value = Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].get<int>();
+			if (value >= 1 && value <= 10) {
+				MaxRetryAttempts = value;
+			}
 		}
 
 		// Load custom tab configurations

@@ -56,16 +56,21 @@ bool ProofCache::ShouldRetry(const std::string& key) {
 	return std::chrono::steady_clock::now() >= entry.nextRetryTime;
 }
 
-void ProofCache::CleanExpiredEntries() {
+std::vector<std::string> ProofCache::CleanExpiredEntries() {
+	std::vector<std::string> expiredKeys;
 	std::scoped_lock lock(cacheMutex);
 	auto it = cache.begin();
 	while (it != cache.end()) {
 		if (IsExpired(it->second)) {
+			if (windowCurrentlyOpen) {
+				expiredKeys.push_back(it->first);
+			}
 			it = cache.erase(it);
 		} else {
 			++it;
 		}
 	}
+	return expiredKeys;
 }
 
 void ProofCache::OnWindowOpened() {
@@ -161,7 +166,17 @@ std::unique_ptr<PlayerProofData> LazyLoadManager::GetPlayerData(const std::strin
 }
 
 void LazyLoadManager::CleanupExpiredEntries() {
-	cache.CleanExpiredEntries();
+	auto expiredKeys = cache.CleanExpiredEntries();
+
+	// Trigger refresh for expired entries if window is open
+	for (const auto& key : expiredKeys) {
+		size_t pos = key.find('|');
+		if (pos != std::string::npos) {
+			std::string account = key.substr(0, pos);
+			std::string provider = key.substr(pos + 1);
+			RequestPlayerData(account, provider);
+		}
+	}
 
 	std::scoped_lock lock(pendingMutex);
 	// Clear pending loads for expired entries
