@@ -41,6 +41,7 @@
     <ClCompile Include="src\core\player_tracker_manager.cpp" />
     <ClCompile Include="src\trackers\arcdps_tracker.cpp" />
     <ClCompile Include="src\trackers\unofficial_extras_tracker.cpp" />
+    <ClCompile Include="src\trackers\realtime_api_tracker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ui\imgui_extensions.h" />
@@ -86,6 +87,8 @@
     <ClInclude Include="src\core\player_info.h" />
     <ClInclude Include="src\trackers\arcdps_tracker.h" />
     <ClInclude Include="src\trackers\unofficial_extras_tracker.h" />
+    <ClInclude Include="src\trackers\realtime_api_tracker.h" />
+    <ClInclude Include="src\realtime_api\RTAPI.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\resource.rc" />

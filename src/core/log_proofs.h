@@ -16,7 +16,6 @@
 #include "player_tracker_manager.h"
 
 
-
 namespace LogProofs {
 	// Legacy compatibility
 	enum KpState {
@@ -53,6 +52,7 @@ namespace LogProofs {
 	void RemovePlayerFromTracker(const PlayerInfo& playerInfo);
 	void SetSelfFromTracker(const PlayerInfo& playerInfo);
 	void ClearPlayers();
+	std::string StripAccount(std::string account);
 	void InitializeTrackerManager();
 	void ShutdownTrackerManager();
 } // namespace LogProofs

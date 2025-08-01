@@ -9,14 +9,16 @@
 #include "core/log_proofs.h"
 #include "core/settings.h"
 #include "core/shared.h"
-#include "trackers/arcdps_tracker.h"
-#include "trackers/unofficial_extras_tracker.h"
 #include "providers/common/provider_registry.h"
 #include "providers/kpme/kpme_provider.h"
 #include "providers/wingman/wingman_provider.h"
 #include "resource.h"
+#include "trackers/arcdps_tracker.h"
+#include "trackers/realtime_api_tracker.h"
+#include "trackers/unofficial_extras_tracker.h"
 #include "ui/gui.h"
 #include "version.h"
+
 
 
 AddonDefinition AddonDef = {};
@@ -64,9 +66,10 @@ void AddonLoad(AddonAPI* addonApi) {
 	ProviderRegistry::Instance().RegisterProvider("Wingman", []() { return std::make_unique<WingmanProvider>(); });
 	ProviderRegistry::Instance().RegisterProvider("KPME", []() { return std::make_unique<KpmeProvider>(); });
 
-	// Register player trackers
-	LogProofs::trackerManager.RegisterTracker(std::make_unique<ArcdpsTracker>());
+	// Register player trackers (in priority order)
+	LogProofs::trackerManager.RegisterTracker(std::make_unique<RealtimeApiTracker>());
 	LogProofs::trackerManager.RegisterTracker(std::make_unique<UnofficialExtrasTracker>());
+	LogProofs::trackerManager.RegisterTracker(std::make_unique<ArcdpsTracker>());
 
 	// Initialize lazy loading
 	LogProofs::lazyLoadManager.SetLoadFunction(LoadPlayerDataWrapper);
