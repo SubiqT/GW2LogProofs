@@ -65,30 +65,15 @@ void AddonLoad(AddonAPI* addonApi) {
 	ProviderRegistry::Instance().RegisterProvider("Wingman", []() { return std::make_unique<WingmanProvider>(); });
 	ProviderRegistry::Instance().RegisterProvider("KPME", []() { return std::make_unique<KpmeProvider>(); });
 
-	// Register player trackers (in priority order)
 	trackerManager.RegisterTracker(std::make_unique<RealtimeApiTracker>());
 	trackerManager.RegisterTracker(std::make_unique<UnofficialExtrasTracker>());
 	trackerManager.RegisterTracker(std::make_unique<ArcdpsTracker>());
+	auto activeTracker = trackerManager.GetActiveTracker();
 
-	// Initialize lazy loading
 	PlayerManager::lazyLoadManager.SetLoadFunction(LoadPlayerDataWrapper);
 
 	InitializeBossRegistry();
 	InitializeTrackerManager();
-
-	// Initialize player tracker system
-	auto activeTracker = trackerManager.GetActiveTracker();
-	if (activeTracker) {
-		APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Player tracker active: {}", activeTracker->GetName()).c_str());
-	}
-
-	APIDefs->Events.Subscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", UnExSquadEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_JOIN", ArcSquadJoinEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_LEAVE", ArcSquadLeaveEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SELF_JOIN", ArcSelfDetectedEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SELF_LEAVE", ArcSelfLeaveEventHandler);
-	APIDefs->Events.Raise("EV_REPLAY_ARCDPS_SELF_JOIN", nullptr);
-	APIDefs->Events.Raise("EV_REPLAY_ARCDPS_SQUAD_JOIN", nullptr);
 
 	APIDefs->Renderer.Register(ERenderType_Render, AddonRender);
 	APIDefs->Renderer.Register(ERenderType_OptionsRender, AddonOptions);
@@ -107,11 +92,6 @@ void AddonUnload() {
 	if (Settings::ShowQuickAccessShortcut)
 		DeregisterQuickAccessShortcut();
 	APIDefs->InputBinds.Deregister(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_LEAVE", ArcSelfLeaveEventHandler);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_JOIN", ArcSelfDetectedEventHandler);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SQUAD_LEAVE", ArcSquadLeaveEventHandler);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SQUAD_JOIN", ArcSquadJoinEventHandler);
-	APIDefs->Events.Unsubscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", UnExSquadEventHandler);
 
 	ShutdownTrackerManager();
 	DataLoader::Shutdown();

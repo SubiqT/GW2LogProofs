@@ -31,6 +31,8 @@ namespace PlayerManager {
 		players.back().proofData = nullptr;
 		players.back().providerName = "";
 
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player added to tracking: {}", playerInfo.account).c_str());
+
 		if (Settings::ShowWindowLogProofs) {
 			lazyLoadManager.RequestPlayerData(playerInfo.account, GetCurrentProviderName());
 		}
@@ -41,6 +43,7 @@ namespace PlayerManager {
 		long long index = GetPlayerIndex(playerInfo.account);
 		if (index != -1) {
 			players.erase(players.begin() + index);
+			APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player removed from tracking: {}", playerInfo.account).c_str());
 		}
 	}
 
