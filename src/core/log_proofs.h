@@ -27,7 +27,7 @@ namespace LogProofs {
 
 	extern std::vector<Player> players;
 	extern std::string selfAccountName;
-	extern bool unofficalExtrasEnabled;
+	extern bool unofficialExtrasEnabled;
 	extern std::mutex Mutex;
 	extern Threadpool threadpool;
 	extern LazyLoadManager lazyLoadManager;

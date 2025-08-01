@@ -28,18 +28,27 @@ namespace Wingman {
 					}
 				}
 			}
-		} catch (json::parse_error& ex) {
-			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("failed to parse wingman response. \nexception details: {}", ex.what()).c_str());
+		} catch (const json::parse_error& ex) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse Wingman JSON response: {}", ex.what()).c_str());
 		}
 	}
 
 	WingmanResponse WingmanClient::GetKp(const std::string& account) {
 		std::string url = std::format("https://gw2wingman.nevermindcreations.de/api/kp?account={}", account);
 		const char* cUrl = url.c_str();
-		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, cUrl);
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Requesting Wingman data: {}", cUrl).c_str());
 		std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
 		std::string response = HTTPClient::GetRequest(wUrl.c_str());
-		json j = json::parse(response);
-		return j.template get<WingmanResponse>();
+		if (response.empty()) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Empty response from Wingman API for account: {}", account).c_str());
+			return WingmanResponse{};
+		}
+		try {
+			json j = json::parse(response);
+			return j.template get<WingmanResponse>();
+		} catch (const json::parse_error& e) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse Wingman response for {}: {}", account, e.what()).c_str());
+			return WingmanResponse{};
+		}
 	}
 } // namespace Wingman

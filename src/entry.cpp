@@ -20,7 +20,6 @@
 #include "version.h"
 
 
-
 AddonDefinition AddonDef = {};
 
 static void LoadPlayerDataWrapper(const std::string& account, const std::string& provider, const std::string& key) {
@@ -80,7 +79,7 @@ void AddonLoad(AddonAPI* addonApi) {
 	// Initialize player tracker system
 	auto activeTracker = LogProofs::trackerManager.GetActiveTracker();
 	if (activeTracker) {
-		APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Player tracker initialized: {}", activeTracker->GetName()).c_str());
+		APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Player tracker active: {}", activeTracker->GetName()).c_str());
 	}
 
 	APIDefs->Events.Subscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
@@ -96,7 +95,7 @@ void AddonLoad(AddonAPI* addonApi) {
 
 	APIDefs->UI.RegisterCloseOnEscape("Log Proofs", &Settings::ShowWindowLogProofs);
 
-	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "<c=#00ff00>Log Proofs</c> was loaded.");
+	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "Log Proofs loaded successfully");
 }
 
 void AddonUnload() {
@@ -117,7 +116,7 @@ void AddonUnload() {
 	LogProofs::ShutdownTrackerManager();
 	LogProofs::threadpool.shutdown();
 
-	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "<c=#ff0000>Log Proofs</c> was unloaded.");
+	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "Log Proofs unloaded successfully");
 }
 
 extern "C" __declspec(dllexport) AddonDefinition* GetAddonDef() {

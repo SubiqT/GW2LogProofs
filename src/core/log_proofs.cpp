@@ -18,7 +18,7 @@
 namespace LogProofs {
 	std::vector<Player> players;
 	std::string selfAccountName;
-	bool unofficalExtrasEnabled = false; // Legacy flag for tracker availability
+	bool unofficialExtrasEnabled = false; // Legacy flag for tracker availability
 
 	Threadpool threadpool = Threadpool();
 	std::mutex Mutex;
@@ -31,7 +31,7 @@ namespace LogProofs {
 			for (Player& p : players)
 				if (p.account == account) return std::addressof(p) - std::addressof(players.at(0));
 		} catch (const std::exception& e) {
-			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("tried to get index of player with account {} but an error occurred. exception details: {}", account, e.what()).c_str());
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to get player index for account {}: {}", account, e.what()).c_str());
 		}
 		return -1;
 	}
@@ -48,7 +48,7 @@ namespace LogProofs {
 			PlayerProofData data = provider->LoadPlayerData(account);
 			lazyLoadManager.OnLoadComplete(key, std::make_unique<PlayerProofData>(data));
 		} catch (const std::exception& e) {
-			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Error loading {} data for {}: {}", providerName, account, e.what()).c_str());
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to load {} data for {}: {}", providerName, account, e.what()).c_str());
 			lazyLoadManager.OnLoadFailed(key);
 		}
 	}
@@ -57,7 +57,7 @@ namespace LogProofs {
 		try {
 			auto provider = ProviderRegistry::Instance().CreateProvider(providerName);
 			if (!provider) {
-				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Provider {} not found", providerName).c_str());
+				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Provider not found: {}", providerName).c_str());
 				return;
 			}
 
@@ -66,7 +66,7 @@ namespace LogProofs {
 			std::scoped_lock lck(Mutex);
 			long long index = GetPlayerIndex(account);
 			if (index == -1) {
-				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Player {} not found when loading data", account).c_str());
+				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Player not found when loading data: {}", account).c_str());
 				return;
 			}
 
@@ -74,9 +74,9 @@ namespace LogProofs {
 			players[index].state = ::LoadState::READY;
 			players[index].providerName = providerName;
 
-			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Loaded {} data for player: {}", providerName, account).c_str());
+			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Loaded {} data for {}", providerName, account).c_str());
 		} catch (const std::exception& e) {
-			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("Error loading {} data for {}: {}", providerName, account, e.what()).c_str());
+			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("Critical error loading {} data for {}: {}", providerName, account, e.what()).c_str());
 
 			std::scoped_lock lck(Mutex);
 			long long index = GetPlayerIndex(account);
@@ -93,7 +93,7 @@ namespace LogProofs {
 			long long index = GetPlayerIndex(selfAccountName);
 			if (index == -1) {
 				players.clear();
-				APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "removed all players from log proofs table (self was not found).");
+				APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "Cleared all players (self not found)");
 			} else {
 				Player self;
 				self.id = players[index].id;
@@ -103,10 +103,10 @@ namespace LogProofs {
 				self.providerName = players[index].providerName;
 				players.clear();
 				players.emplace_back(std::move(self));
-				APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "removed all players from log proofs table (except for self).");
+				APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "Cleared all players except self");
 			}
 		} catch (const std::exception& e) {
-			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("tried to remove all players but an error occurred. exception details: {}", e.what()).c_str());
+			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("Critical error clearing players: {}", e.what()).c_str());
 			return;
 		}
 	}
@@ -169,7 +169,7 @@ namespace LogProofs {
 		players.back().proofData = nullptr;
 		players.back().providerName = "";
 
-		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player from {}: {}", playerInfo.source, playerInfo.account).c_str());
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player added from {}: {}", playerInfo.source, playerInfo.account).c_str());
 
 		// Trigger lazy loading if window is currently open
 		if (Settings::ShowWindowLogProofs) {
@@ -182,16 +182,16 @@ namespace LogProofs {
 		std::scoped_lock lck(Mutex);
 		long long index = GetPlayerIndex(playerInfo.account);
 		if (index == -1) {
-			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("tried to remove player {} but not found", playerInfo.account).c_str());
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Player not found for removal: {}", playerInfo.account).c_str());
 			return;
 		}
 		players.erase(players.begin() + index);
-		APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("removed player from {}: {}", playerInfo.source, playerInfo.account).c_str());
+		APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Player removed from {}: {}", playerInfo.source, playerInfo.account).c_str());
 	}
 
 	void SetSelfFromTracker(const PlayerInfo& playerInfo) {
 		selfAccountName = playerInfo.account;
-		APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("self detected from {}: {}", playerInfo.source, playerInfo.account).c_str());
+		APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Self detected from {}: {}", playerInfo.source, playerInfo.account).c_str());
 		AddPlayerFromTracker(playerInfo);
 	}
 
@@ -207,14 +207,14 @@ namespace LogProofs {
 	void UnExSquadEventHandler(void* eventArgs) {
 		try {
 			SquadUpdate* squadUpdate = (SquadUpdate*) eventArgs;
-			unofficalExtrasEnabled = true;
+			unofficialExtrasEnabled = true;
 			for (size_t i = 0; i < squadUpdate->UsersCount; i++) {
 				if (!squadUpdate) return;
 				if (!squadUpdate->UserInfo) return;
 				if (!squadUpdate->UserInfo[i].AccountName) return;
 				std::string account = StripAccount(squadUpdate->UserInfo[i].AccountName);
 				int role = int(squadUpdate->UserInfo[i].Role);
-				APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("unex: received event for account: {} - role: {}", account, role).c_str());
+				APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Unofficial Extras event - account: {}, role: {}", account, role).c_str());
 
 				PlayerInfo playerInfo;
 				playerInfo.account = account;
@@ -223,7 +223,7 @@ namespace LogProofs {
 				playerInfo.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 				if (role == 5) {
-					APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: {} has left the squad or party", account).c_str());
+					APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Player left squad: {} (Unofficial Extras)", account).c_str());
 					if (selfAccountName == account) {
 						trackerManager.HandleSquadClear();
 					} else {
@@ -231,12 +231,12 @@ namespace LogProofs {
 					}
 				}
 				if (role <= 2) {
-					APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("unex: detected player with account {} in squad or party", account).c_str());
+					APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Player joined squad: {} (Unofficial Extras)", account).c_str());
 					trackerManager.HandlePlayerJoin(playerInfo);
 				}
 			}
-		} catch (const std::exception e) {
-			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An error occurred in UnExSquadEventHandler: \n{}", e.what()).c_str());
+		} catch (const std::exception& e) {
+			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("Critical error in Unofficial Extras event handler: {}", e.what()).c_str());
 		}
 	}
 
@@ -244,7 +244,7 @@ namespace LogProofs {
 		try {
 			EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*) eventArgs;
 			std::string accountName = StripAccount(evAgentUpdateData->account);
-			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: detected player with account {} in squad or party", accountName).c_str());
+			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Player joined squad: {} (ArcDPS)", accountName).c_str());
 
 			PlayerInfo playerInfo;
 			playerInfo.account = accountName;
@@ -255,15 +255,15 @@ namespace LogProofs {
 			playerInfo.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 			trackerManager.HandlePlayerJoin(playerInfo);
-		} catch (const std::exception e) {
-			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An error occurred in ArcSquadJoinEventHandler: \n{}", e.what()).c_str());
+		} catch (const std::exception& e) {
+			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("Critical error in ArcDPS squad join handler: {}", e.what()).c_str());
 		}
 	}
 
 	void ArcSquadLeaveEventHandler(void* eventArgs) {
 		try {
 			EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*) eventArgs;
-			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: {} has left the squad or party", evAgentUpdateData->id).c_str());
+			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Player left squad: ID {} (ArcDPS)", evAgentUpdateData->id).c_str());
 
 			PlayerInfo playerInfo;
 			playerInfo.account = StripAccount(evAgentUpdateData->account);
@@ -271,18 +271,18 @@ namespace LogProofs {
 			playerInfo.source = "ArcDPS";
 
 			trackerManager.HandlePlayerLeave(playerInfo);
-		} catch (const std::exception e) {
-			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An error occurred in ArcSquadLeaveEventHandler: \n{}", e.what()).c_str());
+		} catch (const std::exception& e) {
+			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("Critical error in ArcDPS squad leave handler: {}", e.what()).c_str());
 		}
 	}
 
 	void ArcSelfLeaveEventHandler(void* eventArgs) {
 		try {
 			EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*) eventArgs;
-			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: {} has left the squad or party", selfAccountName).c_str());
+			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Self left squad: {} (ArcDPS)", selfAccountName).c_str());
 			trackerManager.HandleSquadClear();
-		} catch (const std::exception e) {
-			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An error occurred in ArcSelfLeaveEventHandler: \n{}", e.what()).c_str());
+		} catch (const std::exception& e) {
+			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("Critical error in ArcDPS self leave handler: {}", e.what()).c_str());
 		}
 	}
 
@@ -290,7 +290,7 @@ namespace LogProofs {
 		try {
 			EvAgentUpdateData* evAgentUpdateData = (EvAgentUpdateData*) eventArgs;
 			std::string accountName = StripAccount(evAgentUpdateData->account);
-			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("arc: self detected with id {} account: {}", evAgentUpdateData->id, accountName).c_str());
+			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Self detected: {} (ID: {}, ArcDPS)", accountName, evAgentUpdateData->id).c_str());
 
 			PlayerInfo playerInfo;
 			playerInfo.account = accountName;
@@ -301,8 +301,8 @@ namespace LogProofs {
 			playerInfo.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 			trackerManager.HandleSelfDetected(playerInfo);
-		} catch (const std::exception e) {
-			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("An error occurred in ArcSelfDetectedEventHandler: \n{}", e.what()).c_str());
+		} catch (const std::exception& e) {
+			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("Critical error in ArcDPS self detection handler: {}", e.what()).c_str());
 		}
 	}
 } // namespace LogProofs

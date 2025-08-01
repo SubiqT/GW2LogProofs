@@ -130,8 +130,8 @@ namespace Kpme {
 					}
 				}
 			}
-		} catch (json::parse_error& ex) {
-			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("failed to parse kpme response. \nexception details: {}", ex.what()).c_str());
+		} catch (const json::parse_error& ex) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME JSON response: {}", ex.what()).c_str());
 			r = {"", {}, {}};
 			return;
 		}
@@ -140,13 +140,19 @@ namespace Kpme {
 	KpmeResponse KpmeClient::GetKp(const std::string& account) {
 		std::string url = std::format("https://killproof.me/api/kp/{}?lang=en", account);
 		const char* cUrl = url.c_str();
-		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, cUrl);
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Requesting KPME data: {}", cUrl).c_str());
 		std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
 		std::string kpmeResponse = HTTPClient::GetRequest(wUrl.c_str());
-		if (kpmeResponse == "An error occured.") {
+		if (kpmeResponse.empty()) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Empty response from KPME API for account: {}", account).c_str());
 			return KpmeResponse {"", {}, {}};
 		}
-		json j = json::parse(kpmeResponse);
-		return j.template get<KpmeResponse>();
+		try {
+			json j = json::parse(kpmeResponse);
+			return j.template get<KpmeResponse>();
+		} catch (const json::parse_error& e) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME response for {}: {}", account, e.what()).c_str());
+			return KpmeResponse {"", {}, {}};
+		}
 	}
 } // namespace Kpme

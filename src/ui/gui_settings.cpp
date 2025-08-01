@@ -8,19 +8,18 @@
 void ToggleShowWindowLogProofs(const char* keybindIdentifier, bool isRelease) {
 	if (isRelease)
 		return;
-	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Keybind {} was pressed.", keybindIdentifier).c_str());
 	Settings::ShowWindowLogProofs = !Settings::ShowWindowLogProofs;
 	Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
 	Settings::Save(SettingsPath);
 }
 
 void RegisterQuickAccessShortcut() {
-	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "registering quick access shortcut");
+	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "Registering Log Proofs quick access shortcut");
 	APIDefs->QuickAccess.Add("SHORTCUT_LOG_PROOFS", "TEX_LOG_NORMAL", "TEX_LOG_HOVER", KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS, "Toggle Log Proofs Window");
 }
 
 void DeregisterQuickAccessShortcut() {
-	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "deregistering quick access shortcut");
+	APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, "Deregistering Log Proofs quick access shortcut");
 	APIDefs->QuickAccess.Remove("SHORTCUT_LOG_PROOFS");
 }
 
