@@ -253,6 +253,11 @@ void RenderWindowLogProofs() {
 		wasWindowOpen = isWindowOpen;
 	}
 
+	// Process pending loads when window is open
+	if (isWindowOpen) {
+		PlayerManager::ProcessPendingLoads();
+	}
+
 	if (!Settings::ShowWindowLogProofs) {
 		SaveWindowState();
 		return;

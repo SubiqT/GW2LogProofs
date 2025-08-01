@@ -34,6 +34,7 @@ const char* PROVIDER_CONFIGS = "ProviderConfigs";
 
 const char* CACHE_TIMEOUT_MINUTES = "CacheTimeoutMinutes";
 const char* MAX_RETRY_ATTEMPTS = "MaxRetryAttempts";
+const char* MAX_CONCURRENT_REQUESTS = "MaxConcurrentRequests";
 
 namespace Settings {
 	std::mutex Mutex;
@@ -74,7 +75,7 @@ namespace Settings {
 			Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT].get_to<float>(MaxWindowHeight);
 		}
 
-
+		/* Column Sizing */
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE].get_to<float>(ColumnSizeAccount);
 		}
@@ -123,8 +124,13 @@ namespace Settings {
 				MaxRetryAttempts = value;
 			}
 		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS].is_number_integer()) {
+			int value = Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS].get<int>();
+			if (value >= 1 && value <= 10) {
+				MaxConcurrentRequests = value;
+			}
+		}
 
-		// Load custom tab configurations
 		TabConfigManager::Instance().LoadFromSettings();
 	}
 
@@ -134,7 +140,7 @@ namespace Settings {
 	}
 
 	void SaveInternal(std::filesystem::path filePath) {
-		// Note: Caller must hold Mutex
+		// Caller must hold Mutex
 		std::ofstream file(filePath);
 		file << Settings.dump(4, ' ') << std::endl;
 		file.close();
@@ -147,7 +153,6 @@ namespace Settings {
 	float MinWindowHeight = 100.0f;
 	float MaxWindowWidth = 800.0f;
 	float MaxWindowHeight = 800.0f;
-
 
 	float ColumnSizeAccount = 200.0f;
 	float ColumnSizeBosses = 32.0f;
@@ -163,9 +168,9 @@ namespace Settings {
 
 	bool CustomTabsEnabled = false;
 
-	int CacheTimeoutMinutes = 5;
-	int MaxRetryAttempts = 5;
-
+	int CacheTimeoutMinutes = 10;
+	int MaxRetryAttempts = 3;
+	int MaxConcurrentRequests = 1;
 
 	void ResetToDefaultTabs(const std::string& providerId) {
 		ProviderTabConfig config;
@@ -180,7 +185,6 @@ namespace Settings {
 		auto& tabManager = TabConfigManager::Instance();
 		auto config = tabManager.GetProviderConfig(providerId);
 		if (config.providerId.empty()) {
-			// Provider config doesn't exist, create default
 			ResetToDefaultTabs(providerId);
 		}
 	}

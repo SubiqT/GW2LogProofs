@@ -40,6 +40,7 @@ extern const char* PROVIDER_CONFIGS;
 
 extern const char* CACHE_TIMEOUT_MINUTES;
 extern const char* MAX_RETRY_ATTEMPTS;
+extern const char* MAX_CONCURRENT_REQUESTS;
 
 namespace Settings {
 	extern std::mutex Mutex;
@@ -76,6 +77,7 @@ namespace Settings {
 	// Cache settings
 	extern int CacheTimeoutMinutes;
 	extern int MaxRetryAttempts;
+	extern int MaxConcurrentRequests;
 
 	void ResetToDefaultTabs(const std::string& providerId);
 	void EnsureProviderConfigExists(const std::string& providerId);

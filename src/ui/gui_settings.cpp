@@ -392,6 +392,15 @@ void RenderWindowSettings() {
 			Settings::Save(SettingsPath);
 		}
 
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Max Concurrent Requests");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderInt("##MaxConcurrentRequests", &Settings::MaxConcurrentRequests, 1, 10)) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS] = Settings::MaxConcurrentRequests;
+			Settings::Save(SettingsPath);
+		}
+
 		ImGui::EndTable();
 	}
 
