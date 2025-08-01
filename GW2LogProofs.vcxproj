@@ -39,8 +39,8 @@
     <ClCompile Include="src\providers\kpme\kpme_provider.cpp" />
     <ClCompile Include="src\providers\kpme\kpme_client.cpp" />
     <ClCompile Include="src\core\player_tracker_manager.cpp" />
-    <ClCompile Include="src\core\trackers\arcdps_tracker.cpp" />
-    <ClCompile Include="src\core\trackers\unofficial_extras_tracker.cpp" />
+    <ClCompile Include="src\trackers\arcdps_tracker.cpp" />
+    <ClCompile Include="src\trackers\unofficial_extras_tracker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ui\imgui_extensions.h" />
@@ -84,8 +84,8 @@
     <ClInclude Include="src\core\player_tracker.h" />
     <ClInclude Include="src\core\player_tracker_manager.h" />
     <ClInclude Include="src\core\player_info.h" />
-    <ClInclude Include="src\core\trackers\arcdps_tracker.h" />
-    <ClInclude Include="src\core\trackers\unofficial_extras_tracker.h" />
+    <ClInclude Include="src\trackers\arcdps_tracker.h" />
+    <ClInclude Include="src\trackers\unofficial_extras_tracker.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\resource.rc" />
