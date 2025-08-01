@@ -23,7 +23,9 @@
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\core\log_proofs.cpp" />
+    <ClCompile Include="src\core\event_handlers.cpp" />
+    <ClCompile Include="src\core\player_manager.cpp" />
+    <ClCompile Include="src\core\data_loader.cpp" />
     <ClCompile Include="src\core\settings.cpp" />
     <ClCompile Include="src\core\shared.cpp" />
     <ClCompile Include="src\core\tab_config.cpp" />
@@ -58,7 +60,9 @@
     <ClInclude Include="src\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\core\log_proofs.h" />
+    <ClInclude Include="src\core\event_handlers.h" />
+    <ClInclude Include="src\core\player_manager.h" />
+    <ClInclude Include="src\core\data_loader.h" />
     <ClInclude Include="src\nexus\Nexus.h" />
     <ClInclude Include="src\nlohmann\json.hpp" />
     <ClInclude Include="src\resource.h" />

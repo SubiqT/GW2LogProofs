@@ -1,28 +1,27 @@
 #include "unofficial_extras_tracker.h"
-#include "../core/log_proofs.h"
+#include "../core/player_manager.h"
+
+extern bool unofficialExtrasEnabled;
 
 bool UnofficialExtrasTracker::IsAvailable() const {
-	return LogProofs::unofficialExtrasEnabled;
+	return unofficialExtrasEnabled;
 }
 
-void UnofficialExtrasTracker::Initialize() {
-}
-
-void UnofficialExtrasTracker::Shutdown() {
-}
+void UnofficialExtrasTracker::Initialize() {}
+void UnofficialExtrasTracker::Shutdown() {}
 
 void UnofficialExtrasTracker::OnPlayerJoin(const PlayerInfo& player) {
-	LogProofs::AddPlayerFromTracker(player);
+	PlayerManager::AddPlayer(player);
 }
 
 void UnofficialExtrasTracker::OnPlayerLeave(const PlayerInfo& player) {
-	LogProofs::RemovePlayerFromTracker(player);
+	PlayerManager::RemovePlayer(player);
 }
 
 void UnofficialExtrasTracker::OnSelfDetected(const PlayerInfo& self) {
-	LogProofs::SetSelfFromTracker(self);
+	PlayerManager::SetSelf(self);
 }
 
 void UnofficialExtrasTracker::OnSquadClear() {
-	LogProofs::ClearPlayers();
+	PlayerManager::ClearPlayers();
 }

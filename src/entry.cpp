@@ -1,12 +1,13 @@
 #include <chrono>
 #include <Windows.h>
 
-
 #include "imgui/imgui.h"
 #include "nexus/Nexus.h"
 
 #include "core/bosses.h"
-#include "core/log_proofs.h"
+#include "core/data_loader.h"
+#include "core/event_handlers.h"
+#include "core/player_manager.h"
 #include "core/settings.h"
 #include "core/shared.h"
 #include "providers/common/provider_registry.h"
@@ -19,11 +20,10 @@
 #include "ui/gui.h"
 #include "version.h"
 
-
 AddonDefinition AddonDef = {};
 
 static void LoadPlayerDataWrapper(const std::string& account, const std::string& provider, const std::string& key) {
-	LogProofs::threadpool.spawn([account, provider, key]() { LogProofs::LoadPlayerDataLazy(account, provider, key); return nullptr; });
+	DataLoader::LoadPlayerDataLazy(account, provider, key);
 }
 
 void AddonOptions() {
@@ -36,7 +36,7 @@ void AddonRender() {
 	static auto lastCleanup = std::chrono::steady_clock::now();
 	auto now = std::chrono::steady_clock::now();
 	if (now - lastCleanup > std::chrono::seconds(1)) {
-		LogProofs::lazyLoadManager.CleanupExpiredEntries();
+		PlayerManager::lazyLoadManager.CleanupExpiredEntries();
 		lastCleanup = now;
 	}
 
@@ -46,8 +46,8 @@ void AddonRender() {
 void AddonLoad(AddonAPI* addonApi) {
 	APIDefs = addonApi;
 
-	ImGui::SetCurrentContext((ImGuiContext*) APIDefs->ImguiContext);                                                              // cast to ImGuiContext*
-	ImGui::SetAllocatorFunctions((void* (*) (size_t, void*) ) APIDefs->ImguiMalloc, (void (*)(void*, void*)) APIDefs->ImguiFree); // on imgui 1.80+
+	ImGui::SetCurrentContext((ImGuiContext*) APIDefs->ImguiContext);
+	ImGui::SetAllocatorFunctions((void* (*) (size_t, void*) ) APIDefs->ImguiMalloc, (void (*)(void*, void*)) APIDefs->ImguiFree);
 
 	NexusLink = (NexusLinkData*) APIDefs->DataLink.Get("DL_NEXUS_LINK");
 
@@ -66,27 +66,27 @@ void AddonLoad(AddonAPI* addonApi) {
 	ProviderRegistry::Instance().RegisterProvider("KPME", []() { return std::make_unique<KpmeProvider>(); });
 
 	// Register player trackers (in priority order)
-	LogProofs::trackerManager.RegisterTracker(std::make_unique<RealtimeApiTracker>());
-	LogProofs::trackerManager.RegisterTracker(std::make_unique<UnofficialExtrasTracker>());
-	LogProofs::trackerManager.RegisterTracker(std::make_unique<ArcdpsTracker>());
+	trackerManager.RegisterTracker(std::make_unique<RealtimeApiTracker>());
+	trackerManager.RegisterTracker(std::make_unique<UnofficialExtrasTracker>());
+	trackerManager.RegisterTracker(std::make_unique<ArcdpsTracker>());
 
 	// Initialize lazy loading
-	LogProofs::lazyLoadManager.SetLoadFunction(LoadPlayerDataWrapper);
+	PlayerManager::lazyLoadManager.SetLoadFunction(LoadPlayerDataWrapper);
 
 	InitializeBossRegistry();
-	LogProofs::InitializeTrackerManager();
+	InitializeTrackerManager();
 
 	// Initialize player tracker system
-	auto activeTracker = LogProofs::trackerManager.GetActiveTracker();
+	auto activeTracker = trackerManager.GetActiveTracker();
 	if (activeTracker) {
 		APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Player tracker active: {}", activeTracker->GetName()).c_str());
 	}
 
-	APIDefs->Events.Subscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
+	APIDefs->Events.Subscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", UnExSquadEventHandler);
+	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_JOIN", ArcSquadJoinEventHandler);
+	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_LEAVE", ArcSquadLeaveEventHandler);
+	APIDefs->Events.Subscribe("EV_ARCDPS_SELF_JOIN", ArcSelfDetectedEventHandler);
+	APIDefs->Events.Subscribe("EV_ARCDPS_SELF_LEAVE", ArcSelfLeaveEventHandler);
 	APIDefs->Events.Raise("EV_REPLAY_ARCDPS_SELF_JOIN", nullptr);
 	APIDefs->Events.Raise("EV_REPLAY_ARCDPS_SQUAD_JOIN", nullptr);
 
@@ -107,14 +107,14 @@ void AddonUnload() {
 	if (Settings::ShowQuickAccessShortcut)
 		DeregisterQuickAccessShortcut();
 	APIDefs->InputBinds.Deregister(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
-	APIDefs->Events.Unsubscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
+	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_LEAVE", ArcSelfLeaveEventHandler);
+	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_JOIN", ArcSelfDetectedEventHandler);
+	APIDefs->Events.Unsubscribe("EV_ARCDPS_SQUAD_LEAVE", ArcSquadLeaveEventHandler);
+	APIDefs->Events.Unsubscribe("EV_ARCDPS_SQUAD_JOIN", ArcSquadJoinEventHandler);
+	APIDefs->Events.Unsubscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", UnExSquadEventHandler);
 
-	LogProofs::ShutdownTrackerManager();
-	LogProofs::threadpool.shutdown();
+	ShutdownTrackerManager();
+	DataLoader::Shutdown();
 
 	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "Log Proofs unloaded successfully");
 }

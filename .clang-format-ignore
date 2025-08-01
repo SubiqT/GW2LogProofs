@@ -4,6 +4,7 @@ src/imgui/
 src/unofficial_extras/
 src/arcdps_extension/
 src/nlohmann/
+src/realtime_api/
 
 # Exclude build directories
 GW2LogProofs/x64/

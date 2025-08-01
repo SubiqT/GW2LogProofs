@@ -1,8 +1,15 @@
 #include "realtime_api_tracker.h"
-#include "../core/log_proofs.h"
+#include "../core/player_manager.h"
 #include "../core/shared.h"
 #include <chrono>
 #include <format>
+
+static std::string StripAccount(std::string account) {
+	if (!account.empty() && account.at(0) == ':') {
+		return account.erase(0, 1);
+	}
+	return account;
+}
 
 RealtimeApiTracker* RealtimeApiTracker::instance = nullptr;
 
@@ -34,19 +41,19 @@ void RealtimeApiTracker::Shutdown() {
 }
 
 void RealtimeApiTracker::OnPlayerJoin(const PlayerInfo& player) {
-	LogProofs::AddPlayerFromTracker(player);
+	PlayerManager::AddPlayer(player);
 }
 
 void RealtimeApiTracker::OnPlayerLeave(const PlayerInfo& player) {
-	LogProofs::RemovePlayerFromTracker(player);
+	PlayerManager::RemovePlayer(player);
 }
 
 void RealtimeApiTracker::OnSelfDetected(const PlayerInfo& self) {
-	LogProofs::SetSelfFromTracker(self);
+	PlayerManager::SetSelf(self);
 }
 
 void RealtimeApiTracker::OnSquadClear() {
-	LogProofs::ClearPlayers();
+	PlayerManager::ClearPlayers();
 }
 
 // Static event handlers
@@ -70,7 +77,7 @@ void RealtimeApiTracker::OnGroupMemberJoined(void* eventArgs) {
 	if (!member) return;
 
 	PlayerInfo playerInfo;
-	playerInfo.account = LogProofs::StripAccount(member->AccountName);
+	playerInfo.account = StripAccount(member->AccountName);
 	playerInfo.character = member->CharacterName;
 	playerInfo.id = 0;
 	playerInfo.instanceId = 0;
@@ -81,9 +88,9 @@ void RealtimeApiTracker::OnGroupMemberJoined(void* eventArgs) {
 								   .count();
 
 	if (member->IsSelf) {
-		LogProofs::SetSelfFromTracker(playerInfo);
+		PlayerManager::SetSelf(playerInfo);
 	} else {
-		LogProofs::AddPlayerFromTracker(playerInfo);
+		PlayerManager::AddPlayer(playerInfo);
 	}
 }
 
@@ -94,13 +101,13 @@ void RealtimeApiTracker::OnGroupMemberLeft(void* eventArgs) {
 	if (!member) return;
 
 	PlayerInfo playerInfo;
-	playerInfo.account = LogProofs::StripAccount(member->AccountName);
+	playerInfo.account = StripAccount(member->AccountName);
 	playerInfo.source = "RealTime API";
 
 	if (member->IsSelf) {
-		LogProofs::ClearPlayers();
+		PlayerManager::ClearPlayers();
 	} else {
-		LogProofs::RemovePlayerFromTracker(playerInfo);
+		PlayerManager::RemovePlayer(playerInfo);
 	}
 }
 

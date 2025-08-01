@@ -4,7 +4,8 @@
 
 #include "../core/boss_registry.h"
 #include "../core/bosses.h"
-#include "../core/log_proofs.h"
+#include "../core/data_loader.h"
+#include "../core/player_manager.h"
 #include "../core/settings.h"
 #include "../core/shared.h"
 #include "../core/tab_config.h"
@@ -22,7 +23,7 @@ static std::vector<std::string> GetDataSources() {
 	return BossRegistry::Instance().GetAvailableProviders();
 }
 
-static void DrawPlayerAccountName(const LogProofs::Player& player) {
+static void DrawPlayerAccountName(const Player& player) {
 	if (player.proofData && !player.proofData->profileUrl.empty()) {
 		if (ImGui::TextURL(player.account.c_str())) {
 			ShellExecuteA(0, 0, player.proofData->profileUrl.c_str(), 0, 0, SW_SHOW);
@@ -32,10 +33,10 @@ static void DrawPlayerAccountName(const LogProofs::Player& player) {
 	}
 }
 
-static void DrawPlayerProofValue(const LogProofs::Player& player, const std::string& proofId, const std::string& providerName) {
+static void DrawPlayerProofValue(const Player& player, const std::string& proofId, const std::string& providerName) {
 	// Use lazy loading
-	auto lazyState = LogProofs::lazyLoadManager.GetPlayerState(player.account, providerName);
-	auto lazyData = LogProofs::lazyLoadManager.GetPlayerData(player.account, providerName);
+	auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(player.account, providerName);
+	auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(player.account, providerName);
 
 	if (lazyState == LoadState::READY && lazyData) {
 		auto it = lazyData->proofs.find(proofId);
@@ -51,7 +52,7 @@ static void DrawPlayerProofValue(const LogProofs::Player& player, const std::str
 	}
 }
 
-static void DrawKpmeId(const LogProofs::Player& aPlayer) {
+static void DrawKpmeId(const Player& aPlayer) {
 	if (aPlayer.proofData && !aPlayer.proofData->profileId.empty()) {
 		if (ImGui::TextURL(aPlayer.proofData->profileId.c_str())) {
 			ImGui::SetClipboardText(aPlayer.proofData->profileId.c_str());
@@ -141,7 +142,7 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 	}
 }
 
-static void DrawPlayerRow(const LogProofs::Player& p, const BossGroup& group, IBossProvider* provider, bool showKpmeId, const std::string& providerName) {
+static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider* provider, bool showKpmeId, const std::string& providerName) {
 	ImGui::TableNextColumn();
 	DrawPlayerAccountName(p);
 	if (showKpmeId) {
@@ -168,12 +169,12 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, cons
 	if (ImGui::BeginTable(group.tableName.c_str(), columnCount, tableFlags)) {
 		SetupTableColumns(group, showKpmeId);
 		DrawTableHeaders(group, showKpmeId);
-		std::scoped_lock lck(LogProofs::Mutex);
-		if (LogProofs::players.empty()) {
+		std::scoped_lock lck(PlayerManager::playerMutex);
+		if (PlayerManager::players.empty()) {
 			ImGui::TableNextColumn();
 			ImGui::Text("No players found... ");
 		} else {
-			for (const auto& p : LogProofs::players) {
+			for (const auto& p : PlayerManager::players) {
 				if (!Settings::IncludeMissingAccounts && p.state == LoadState::READY && (!p.proofData || (showKpmeId ? p.proofData->profileId.empty() : p.proofData->accountName.empty()))) {
 					continue;
 				}
@@ -199,7 +200,7 @@ static void DrawProviderCombo(const std::string& currentProvider) {
 				Settings::SelectedDataSource = (provider == "Wingman") ? WINGMAN : KPME;
 				Settings::Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE] = Settings::SelectedDataSource;
 				Settings::Save(SettingsPath);
-				LogProofs::ReloadAllPlayersWithProvider(provider);
+				DataLoader::ReloadAllPlayersWithProvider(provider);
 			}
 			if (is_selected) ImGui::SetItemDefaultFocus();
 		}
@@ -219,7 +220,7 @@ static void DrawControls(const std::string& currentProvider) {
 		if (ImGui::Checkbox("Linked Accounts", &Settings::IncludeLinkedAccounts)) {
 			Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS] = Settings::IncludeLinkedAccounts;
 			Settings::Save(SettingsPath);
-			LogProofs::ReloadKpmePlayersForLinkedAccounts();
+			DataLoader::ReloadAllPlayersWithProvider("KPME");
 		}
 	}
 }
@@ -230,7 +231,7 @@ void RenderWindowLogProofs() {
 
 	// Detect window state changes
 	if (isWindowOpen != wasWindowOpen) {
-		LogProofs::OnWindowStateChanged(isWindowOpen);
+		PlayerManager::OnWindowStateChanged(isWindowOpen);
 		wasWindowOpen = isWindowOpen;
 	}
 
