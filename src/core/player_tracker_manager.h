@@ -12,6 +12,10 @@ private:
 	std::vector<std::unique_ptr<IPlayerTracker>> trackers;
 	IPlayerTracker* activeTracker = nullptr;
 	mutable std::mutex trackerMutex;
+	static PlayerTrackerManager* instance;
+
+	static void OnAddonLoadedStatic(void* eventArgs);
+	static void OnAddonUnloadedStatic(void* eventArgs);
 
 public:
 	void RegisterTracker(std::unique_ptr<IPlayerTracker> tracker);

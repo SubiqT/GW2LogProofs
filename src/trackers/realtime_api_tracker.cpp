@@ -7,6 +7,11 @@
 RealtimeApiTracker* RealtimeApiTracker::instance = nullptr;
 
 bool RealtimeApiTracker::IsAvailable() const {
+	// Check if RTAPI is loaded and functional
+	if (!rtapi) {
+		// Try to get RTAPI data link again
+		rtapi = (RealTimeData*) APIDefs->DataLink.Get(DL_RTAPI);
+	}
 	return rtapi && rtapi->GameBuild != 0;
 }
 

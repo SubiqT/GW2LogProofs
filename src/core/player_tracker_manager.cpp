@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <format>
 
+PlayerTrackerManager* PlayerTrackerManager::instance = nullptr;
+
 void PlayerTrackerManager::RegisterTracker(std::unique_ptr<IPlayerTracker> tracker) {
 	std::scoped_lock lock(trackerMutex);
 	trackers.push_back(std::move(tracker));
@@ -11,10 +13,10 @@ void PlayerTrackerManager::RegisterTracker(std::unique_ptr<IPlayerTracker> track
 
 void PlayerTrackerManager::UpdateActiveTracker() {
 	IPlayerTracker* newActiveTracker = nullptr;
-	int highestPriority = -1;
+	int highestPriority = 999; // Start with very low priority
 
 	for (const auto& tracker : trackers) {
-		if (tracker->IsAvailable() && tracker->GetPriority() > highestPriority) {
+		if (tracker->IsAvailable() && tracker->GetPriority() < highestPriority) {
 			highestPriority = tracker->GetPriority();
 			newActiveTracker = tracker.get();
 		}
@@ -71,16 +73,40 @@ void PlayerTrackerManager::HandleSquadClear() {
 
 void PlayerTrackerManager::Initialize() {
 	std::scoped_lock lock(trackerMutex);
+	instance = this;
 	for (const auto& tracker : trackers) {
 		tracker->Initialize();
 	}
+
+	// Subscribe to addon lifecycle events for dynamic tracker availability
+	APIDefs->Events.Subscribe("EV_ADDON_LOADED", OnAddonLoadedStatic);
+	APIDefs->Events.Subscribe("EV_ADDON_UNLOADED", OnAddonUnloadedStatic);
+
 	UpdateActiveTracker();
 }
 
 void PlayerTrackerManager::Shutdown() {
 	std::scoped_lock lock(trackerMutex);
+
+	// Unsubscribe from addon lifecycle events
+	APIDefs->Events.Unsubscribe("EV_ADDON_LOADED", OnAddonLoadedStatic);
+	APIDefs->Events.Unsubscribe("EV_ADDON_UNLOADED", OnAddonUnloadedStatic);
+
 	for (const auto& tracker : trackers) {
 		tracker->Shutdown();
 	}
 	activeTracker = nullptr;
+	instance = nullptr;
+}
+
+void PlayerTrackerManager::OnAddonLoadedStatic(void* eventArgs) {
+	if (instance) {
+		instance->UpdateActiveTracker();
+	}
+}
+
+void PlayerTrackerManager::OnAddonUnloadedStatic(void* eventArgs) {
+	if (instance) {
+		instance->UpdateActiveTracker();
+	}
 }

@@ -6,7 +6,7 @@
 
 class RealtimeApiTracker : public IPlayerTracker {
 private:
-	RealTimeData* rtapi = nullptr;
+	mutable RealTimeData* rtapi = nullptr;
 	static RealtimeApiTracker* instance;
 
 public:
