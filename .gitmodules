@@ -10,3 +10,6 @@
 [submodule "src/arcdps_extension"]
 	path = src/arcdps_extension
 	url = https://github.com/knoxfighter/arcdps-extension
+[submodule "src/realtime_api"]
+	path = src/realtime_api
+	url = https://github.com/RaidcoreGG/GW2-RealTime-API-Releases.git
