@@ -377,15 +377,6 @@ void RenderWindowSettings() {
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		ImGui::Text("Lazy Loading Enabled");
-		ImGui::TableNextColumn();
-		if (ImGui::Checkbox("##LazyLoading", &Settings::LazyLoadingEnabled)) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][LAZY_LOADING_ENABLED] = Settings::LazyLoadingEnabled;
-			Settings::Save(SettingsPath);
-		}
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
 		ImGui::Text("Cache Timeout (minutes)");
 		ImGui::TableNextColumn();
 		if (ImGui::SliderInt("##CacheTimeout", &Settings::CacheTimeoutMinutes, 1, 30)) {

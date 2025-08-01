@@ -33,34 +33,18 @@ static void DrawPlayerAccountName(const LogProofs::Player& player) {
 }
 
 static void DrawPlayerProofValue(const LogProofs::Player& player, const std::string& proofId, const std::string& providerName) {
-	// Use lazy loading if enabled
-	if (Settings::LazyLoadingEnabled) {
-		auto lazyState = LogProofs::lazyLoadManager.GetPlayerState(player.account, providerName);
-		auto lazyData = LogProofs::lazyLoadManager.GetPlayerData(player.account, providerName);
+	// Use lazy loading
+	auto lazyState = LogProofs::lazyLoadManager.GetPlayerState(player.account, providerName);
+	auto lazyData = LogProofs::lazyLoadManager.GetPlayerData(player.account, providerName);
 
-		if (lazyState == LoadState::READY && lazyData) {
-			auto it = lazyData->proofs.find(proofId);
-			if (it != lazyData->proofs.end()) {
-				ImGui::Text("%i", it->second.amount);
-			} else {
-				ImGui::Text("-");
-			}
-			return;
-		} else if (lazyState == LoadState::LOADING) {
-			ImGui::Text("...");
-			return;
-		}
-	}
-
-	// Fallback to immediate loading system
-	if (player.state == LoadState::READY && player.proofData) {
-		auto it = player.proofData->proofs.find(proofId);
-		if (it != player.proofData->proofs.end()) {
+	if (lazyState == LoadState::READY && lazyData) {
+		auto it = lazyData->proofs.find(proofId);
+		if (it != lazyData->proofs.end()) {
 			ImGui::Text("%i", it->second.amount);
 		} else {
 			ImGui::Text("-");
 		}
-	} else if (player.state == LoadState::LOADING) {
+	} else if (lazyState == LoadState::LOADING) {
 		ImGui::Text("...");
 	} else {
 		ImGui::Text("-");

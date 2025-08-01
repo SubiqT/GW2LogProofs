@@ -23,19 +23,6 @@ extern const char* MIN_WINDOW_HEIGHT;
 extern const char* MAX_WINDOW_WIDTH;
 extern const char* MAX_WINDOW_HEIGHT;
 
-extern const char* SHOW_TAB_RAIDS_NORMAL;
-extern const char* SHOW_TAB_RAIDS_CM;
-extern const char* SHOW_TAB_RAIDS_LM;
-extern const char* SHOW_TAB_FRACTALS_CM;
-extern const char* SHOW_TAB_STRIKES_NORMAL;
-extern const char* SHOW_TAB_STRIKES_CM;
-extern const char* SHOW_TAB_STRIKES_LM;
-
-extern const char* SHOW_TAB_KPME_SUMMARY;
-extern const char* SHOW_TAB_KPME_RAID_TOKENS;
-extern const char* SHOW_TAB_KPME_RAID_CM_COFFERS;
-extern const char* SHOW_TAB_KPME_STRIKE_COFFERS;
-extern const char* SHOW_TAB_KPME_STRIKE_CM_COFFERS;
 
 extern const char* COLUMN_ACCOUNT_SIZE;
 extern const char* COLUMN_BOSSES_SIZE;
@@ -50,9 +37,7 @@ extern const char* HOVER_COLOUR;
 
 extern const char* CUSTOM_TABS_ENABLED;
 extern const char* PROVIDER_CONFIGS;
-extern const char* MIGRATION_COMPLETED;
 
-extern const char* LAZY_LOADING_ENABLED;
 extern const char* CACHE_TIMEOUT_MINUTES;
 extern const char* MAX_RETRY_ATTEMPTS;
 
@@ -72,19 +57,6 @@ namespace Settings {
 	extern float MaxWindowWidth;
 	extern float MaxWindowHeight;
 
-	extern bool ShowTabRaidsNormal;
-	extern bool ShowTabRaidsCM;
-	extern bool ShowTabRaidsLM;
-	extern bool ShowTabFractalsCM;
-	extern bool ShowTabStrikesNormal;
-	extern bool ShowTabStrikesCM;
-	extern bool ShowTabStrikesLM;
-
-	extern bool ShowTabKpmeSummary;
-	extern bool ShowTabKpmeRaidTokens;
-	extern bool ShowTabKpmeRaidCMCoffers;
-	extern bool ShowTabKpmeStrikeCoffers;
-	extern bool ShowTabKpmeStrikeCMCoffers;
 
 	extern float ColumnSizeAccount;
 	extern float ColumnSizeBosses;
@@ -101,13 +73,10 @@ namespace Settings {
 	// Custom tab settings
 	extern bool CustomTabsEnabled;
 
-	// Lazy loading settings
-	extern bool LazyLoadingEnabled;
+	// Cache settings
 	extern int CacheTimeoutMinutes;
 	extern int MaxRetryAttempts;
 
-	// Migration functions
-	void MigrateLegacyTabSettings();
 	void ResetToDefaultTabs(const std::string& providerId);
 	void EnsureProviderConfigExists(const std::string& providerId);
 } // namespace Settings

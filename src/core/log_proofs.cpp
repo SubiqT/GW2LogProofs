@@ -108,12 +108,8 @@ namespace LogProofs {
 			return;
 		}
 		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player to log proofs table with account {}", account).c_str());
-		// Load immediately if lazy loading is disabled OR window is currently open
-		if (!Settings::LazyLoadingEnabled) {
-			std::string providerName = (Settings::SelectedDataSource == WINGMAN) ? "Wingman" : "KPME";
-			threadpool.spawn([=]() { LoadPlayerData(account, providerName); return nullptr; });
-		} else if (Settings::ShowWindowLogProofs) {
-			// Window is open, trigger lazy loading for new player
+		// Trigger lazy loading if window is currently open
+		if (Settings::ShowWindowLogProofs) {
 			std::string providerName = (Settings::SelectedDataSource == WINGMAN) ? "Wingman" : "KPME";
 			lazyLoadManager.RequestPlayerData(account, providerName);
 		}
@@ -135,12 +131,8 @@ namespace LogProofs {
 			return;
 		}
 		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("added player to log proofs table with id {} and account {}", id, account).c_str());
-		// Load immediately if lazy loading is disabled OR window is currently open
-		if (!Settings::LazyLoadingEnabled) {
-			std::string providerName = (Settings::SelectedDataSource == WINGMAN) ? "Wingman" : "KPME";
-			threadpool.spawn([=]() { LoadPlayerData(account, providerName); return nullptr; });
-		} else if (Settings::ShowWindowLogProofs) {
-			// Window is open, trigger lazy loading for new player
+		// Trigger lazy loading if window is currently open
+		if (Settings::ShowWindowLogProofs) {
 			std::string providerName = (Settings::SelectedDataSource == WINGMAN) ? "Wingman" : "KPME";
 			lazyLoadManager.RequestPlayerData(account, providerName);
 		}
@@ -228,8 +220,6 @@ namespace LogProofs {
 	}
 
 	void OnWindowStateChanged(bool isOpen) {
-		if (!Settings::LazyLoadingEnabled) return;
-
 		lazyLoadManager.OnWindowStateChanged(isOpen);
 		if (isOpen) {
 			// Trigger loading for all players when window opens
