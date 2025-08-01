@@ -9,12 +9,15 @@
 #include "core/log_proofs.h"
 #include "core/settings.h"
 #include "core/shared.h"
+#include "core/trackers/arcdps_tracker.h"
+#include "core/trackers/unofficial_extras_tracker.h"
 #include "providers/common/provider_registry.h"
 #include "providers/kpme/kpme_provider.h"
 #include "providers/wingman/wingman_provider.h"
 #include "resource.h"
 #include "ui/gui.h"
 #include "version.h"
+
 
 AddonDefinition AddonDef = {};
 
@@ -61,10 +64,21 @@ void AddonLoad(AddonAPI* addonApi) {
 	ProviderRegistry::Instance().RegisterProvider("Wingman", []() { return std::make_unique<WingmanProvider>(); });
 	ProviderRegistry::Instance().RegisterProvider("KPME", []() { return std::make_unique<KpmeProvider>(); });
 
+	// Register player trackers
+	LogProofs::trackerManager.RegisterTracker(std::make_unique<ArcdpsTracker>());
+	LogProofs::trackerManager.RegisterTracker(std::make_unique<UnofficialExtrasTracker>());
+
 	// Initialize lazy loading
 	LogProofs::lazyLoadManager.SetLoadFunction(LoadPlayerDataWrapper);
 
 	InitializeBossRegistry();
+	LogProofs::InitializeTrackerManager();
+
+	// Initialize player tracker system
+	auto activeTracker = LogProofs::trackerManager.GetActiveTracker();
+	if (activeTracker) {
+		APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Player tracker initialized: {}", activeTracker->GetName()).c_str());
+	}
 
 	APIDefs->Events.Subscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
 	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
@@ -97,6 +111,7 @@ void AddonUnload() {
 	APIDefs->Events.Unsubscribe("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
 	APIDefs->Events.Unsubscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
 
+	LogProofs::ShutdownTrackerManager();
 	LogProofs::threadpool.shutdown();
 
 	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "<c=#ff0000>Log Proofs</c> was unloaded.");

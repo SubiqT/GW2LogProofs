@@ -12,24 +12,29 @@
 #include "../utils/threadpool.hpp"
 #include "lazy_load_manager.h"
 #include "player_data.h"
+#include "player_info.h"
+#include "player_tracker_manager.h"
+
 
 
 namespace LogProofs {
-	// Legacy compatibility - will be removed after full migration
+	// Legacy compatibility
 	enum KpState {
 		LOADING = 0,
 		READY = 1
 	};
 
-	// Use generic Player struct from player_data.h
 	using Player = ::Player;
 
 	extern std::vector<Player> players;
 	extern std::string selfAccountName;
+	extern bool unofficalExtrasEnabled;
 	extern std::mutex Mutex;
 	extern Threadpool threadpool;
 	extern LazyLoadManager lazyLoadManager;
+	extern PlayerTrackerManager trackerManager;
 
+	// Event handlers
 	void UnExSquadEventHandler(void* eventArgs);
 	void ArcSquadJoinEventHandler(void* eventArgs);
 	void ArcSquadLeaveEventHandler(void* eventArgs);
@@ -42,6 +47,14 @@ namespace LogProofs {
 	void ReloadAllPlayersWithProvider(const std::string& providerName);
 	void ReloadKpmePlayersForLinkedAccounts();
 	void OnWindowStateChanged(bool isOpen);
+
+	// Tracker integration functions
+	void AddPlayerFromTracker(const PlayerInfo& playerInfo);
+	void RemovePlayerFromTracker(const PlayerInfo& playerInfo);
+	void SetSelfFromTracker(const PlayerInfo& playerInfo);
+	void ClearPlayers();
+	void InitializeTrackerManager();
+	void ShutdownTrackerManager();
 } // namespace LogProofs
 
 /* Unofficial Extras */
