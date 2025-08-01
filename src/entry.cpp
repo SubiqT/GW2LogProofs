@@ -1,4 +1,6 @@
+#include <chrono>
 #include <Windows.h>
+
 
 #include "imgui/imgui.h"
 #include "nexus/Nexus.h"
@@ -16,12 +18,24 @@
 
 AddonDefinition AddonDef = {};
 
+static void LoadPlayerDataWrapper(const std::string& account, const std::string& provider, const std::string& key) {
+	LogProofs::threadpool.spawn([account, provider, key]() { LogProofs::LoadPlayerDataLazy(account, provider, key); return nullptr; });
+}
+
 void AddonOptions() {
 	ImGui::Separator();
 	RenderWindowSettings();
 }
 
 void AddonRender() {
+	// Periodic cleanup of expired cache entries
+	static auto lastCleanup = std::chrono::steady_clock::now();
+	auto now = std::chrono::steady_clock::now();
+	if (now - lastCleanup > std::chrono::seconds(30)) {
+		LogProofs::lazyLoadManager.CleanupExpiredEntries();
+		lastCleanup = now;
+	}
+
 	RenderWindowLogProofs();
 }
 
@@ -46,6 +60,9 @@ void AddonLoad(AddonAPI* addonApi) {
 
 	ProviderRegistry::Instance().RegisterProvider("Wingman", []() { return std::make_unique<WingmanProvider>(); });
 	ProviderRegistry::Instance().RegisterProvider("KPME", []() { return std::make_unique<KpmeProvider>(); });
+
+	// Initialize lazy loading
+	LogProofs::lazyLoadManager.SetLoadFunction(LoadPlayerDataWrapper);
 
 	InitializeBossRegistry();
 

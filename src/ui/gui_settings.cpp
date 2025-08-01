@@ -377,120 +377,35 @@ void RenderWindowSettings() {
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		ImGui::Text("Hover Enabled");
+		ImGui::Text("Lazy Loading Enabled");
 		ImGui::TableNextColumn();
-		if (ImGui::Checkbox("##HoverEnabled", &Settings::hoverEnabled)) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED] = Settings::hoverEnabled;
-			Settings::Save(SettingsPath);
-		}
-		if (Settings::hoverEnabled) {
-			ImGui::SameLine();
-			static bool showColourModal = false;
-			ImVec4 colour = ImGui::ColorConvertU32ToFloat4(Settings::hoverColour);
-			if (ImGui::ColorButton("Hover Colour", colour)) {
-				showColourModal = true;
-			}
-			if (ImGui::IsItemHovered()) {
-				ImGui::SetTooltip("Click to change hover highlight colour");
-			}
-			if (showColourModal) {
-				ImGui::OpenPopup("Select Hover Colour");
-				showColourModal = false;
-			}
-			if (ImGui::BeginPopupModal("Select Hover Colour", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-				if (ImGui::ColorPicker4("##HoverColourPicker", (float*) &Settings::hoverColourBuffer)) {
-					Settings::hoverColour = ImGui::ColorConvertFloat4ToU32(Settings::hoverColourBuffer);
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR] = Settings::hoverColour;
-					Settings::Save(SettingsPath);
-				}
-				if (ImGui::Button("Use Header Colour")) {
-					Settings::hoverColour = ImGui::GetColorU32(ImGuiCol_TableHeaderBg);
-					Settings::hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(Settings::hoverColour);
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR] = Settings::hoverColour;
-					Settings::Save(SettingsPath);
-				}
-				ImGui::Text("Preview:");
-				if (ImGui::BeginTable("HoverPreview", 2, ImGuiTableFlags_Borders)) {
-					ImGui::TableNextRow();
-					ImGui::TableNextColumn();
-					ImGui::Text("Normal");
-					ImGui::TableNextColumn();
-					ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, Settings::hoverColour);
-					ImGui::Text("Hovered");
-					ImGui::EndTable();
-				}
-				if (ImGui::Button("Close")) {
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::EndPopup();
-			}
-		}
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Min Width");
-		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##MinWidth", &Settings::MinWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
+		if (ImGui::Checkbox("##LazyLoading", &Settings::LazyLoadingEnabled)) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][LAZY_LOADING_ENABLED] = Settings::LazyLoadingEnabled;
 			Settings::Save(SettingsPath);
 		}
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		ImGui::Text("Max Width");
+		ImGui::Text("Cache Timeout (minutes)");
 		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##MaxWidth", &Settings::MaxWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH] = Settings::MaxWindowWidth;
+		if (ImGui::SliderInt("##CacheTimeout", &Settings::CacheTimeoutMinutes, 1, 30)) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES] = Settings::CacheTimeoutMinutes;
 			Settings::Save(SettingsPath);
 		}
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		ImGui::Text("Min Height");
+		ImGui::Text("Max Retry Attempts");
 		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##MinHeight", &Settings::MinWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT] = Settings::MinWindowHeight;
-			Settings::Save(SettingsPath);
-		}
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Max Height");
-		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##MaxHeight", &Settings::MaxWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT] = Settings::MaxWindowHeight;
-			Settings::Save(SettingsPath);
-		}
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Account Column Size");
-		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##AccountSize", &Settings::ColumnSizeAccount, 40.0f, 400.0f, "%.0f px")) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE] = Settings::ColumnSizeAccount;
-			Settings::Save(SettingsPath);
-		}
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Boss Column Size");
-		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##BossSize", &Settings::ColumnSizeBosses, 8.0f, 128.0f, "%.0f px")) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE] = Settings::ColumnSizeBosses;
-			Settings::Save(SettingsPath);
-		}
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("KPME ID Column Size");
-		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##KpmeIdSize", &Settings::ColumnSizeKpmeId, 8.0f, 128.0f, "%.0f px")) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE] = Settings::ColumnSizeKpmeId;
+		if (ImGui::SliderInt("##MaxRetries", &Settings::MaxRetryAttempts, 1, 10)) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS] = Settings::MaxRetryAttempts;
 			Settings::Save(SettingsPath);
 		}
 
 		ImGui::EndTable();
 	}
 
-	DrawTabConfigurationPanel();
+	if (ImGui::CollapsingHeader("Tab Configuration")) {
+		DrawTabConfigurationPanel();
+	}
 }

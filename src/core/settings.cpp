@@ -46,6 +46,10 @@ const char* CUSTOM_TABS_ENABLED = "CustomTabsEnabled";
 const char* PROVIDER_CONFIGS = "ProviderConfigs";
 const char* MIGRATION_COMPLETED = "MigrationCompleted";
 
+const char* LAZY_LOADING_ENABLED = "LazyLoadingEnabled";
+const char* CACHE_TIMEOUT_MINUTES = "CacheTimeoutMinutes";
+const char* MAX_RETRY_ATTEMPTS = "MaxRetryAttempts";
+
 namespace Settings {
 	std::mutex Mutex;
 	json Settings = json::object();
@@ -163,6 +167,17 @@ namespace Settings {
 			Settings[WINDOW_LOG_PROOFS_KEY][CUSTOM_TABS_ENABLED].get_to<bool>(CustomTabsEnabled);
 		}
 
+		/* Lazy loading settings */
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][LAZY_LOADING_ENABLED].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][LAZY_LOADING_ENABLED].get_to<bool>(LazyLoadingEnabled);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].get_to<int>(CacheTimeoutMinutes);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].get_to<int>(MaxRetryAttempts);
+		}
+
 		// Load custom tab configurations
 		TabConfigManager::Instance().LoadFromSettings();
 
@@ -219,6 +234,10 @@ namespace Settings {
 	ImVec4 hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
 
 	bool CustomTabsEnabled = false;
+
+	bool LazyLoadingEnabled = true;
+	int CacheTimeoutMinutes = 5;
+	int MaxRetryAttempts = 5;
 
 	void MigrateLegacyTabSettings() {
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][MIGRATION_COMPLETED].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][MIGRATION_COMPLETED].get<bool>()) {

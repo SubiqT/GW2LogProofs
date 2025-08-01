@@ -32,7 +32,27 @@ static void DrawPlayerAccountName(const LogProofs::Player& player) {
 	}
 }
 
-static void DrawPlayerProofValue(const LogProofs::Player& player, const std::string& proofId) {
+static void DrawPlayerProofValue(const LogProofs::Player& player, const std::string& proofId, const std::string& providerName) {
+	// Use lazy loading if enabled
+	if (Settings::LazyLoadingEnabled) {
+		auto lazyState = LogProofs::lazyLoadManager.GetPlayerState(player.account, providerName);
+		auto lazyData = LogProofs::lazyLoadManager.GetPlayerData(player.account, providerName);
+
+		if (lazyState == LoadState::READY && lazyData) {
+			auto it = lazyData->proofs.find(proofId);
+			if (it != lazyData->proofs.end()) {
+				ImGui::Text("%i", it->second.amount);
+			} else {
+				ImGui::Text("-");
+			}
+			return;
+		} else if (lazyState == LoadState::LOADING) {
+			ImGui::Text("...");
+			return;
+		}
+	}
+
+	// Fallback to immediate loading system
 	if (player.state == LoadState::READY && player.proofData) {
 		auto it = player.proofData->proofs.find(proofId);
 		if (it != player.proofData->proofs.end()) {
@@ -137,7 +157,7 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 	}
 }
 
-static void DrawPlayerRow(const LogProofs::Player& p, const BossGroup& group, IBossProvider* provider, bool showKpmeId) {
+static void DrawPlayerRow(const LogProofs::Player& p, const BossGroup& group, IBossProvider* provider, bool showKpmeId, const std::string& providerName) {
 	ImGui::TableNextColumn();
 	DrawPlayerAccountName(p);
 	if (showKpmeId) {
@@ -148,17 +168,17 @@ static void DrawPlayerRow(const LogProofs::Player& p, const BossGroup& group, IB
 	for (const auto& currency : group.currencies) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
-		DrawPlayerProofValue(p, provider->GetProofIdentifier(currency));
+		DrawPlayerProofValue(p, provider->GetProofIdentifier(currency), providerName);
 	}
 	for (const auto& bossEntry : group.bosses) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
-		DrawPlayerProofValue(p, provider->GetProofIdentifier(bossEntry.boss, group.category));
+		DrawPlayerProofValue(p, provider->GetProofIdentifier(bossEntry.boss, group.category), providerName);
 	}
 	HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 }
 
-static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool showKpmeId = false) {
+static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, const std::string& providerName, bool showKpmeId = false) {
 	if (!ImGui::BeginTabItem(group.name.c_str())) return;
 	int columnCount = static_cast<int>(group.currencies.size() + group.bosses.size()) + (showKpmeId ? 2 : 1);
 	if (ImGui::BeginTable(group.tableName.c_str(), columnCount, tableFlags)) {
@@ -173,7 +193,7 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, bool
 				if (!Settings::IncludeMissingAccounts && p.state == LoadState::READY && (!p.proofData || (showKpmeId ? p.proofData->profileId.empty() : p.proofData->accountName.empty()))) {
 					continue;
 				}
-				DrawPlayerRow(p, group, provider, showKpmeId);
+				DrawPlayerRow(p, group, provider, showKpmeId, providerName);
 			}
 		}
 		ImGui::EndTable();
@@ -221,6 +241,15 @@ static void DrawControls(const std::string& currentProvider) {
 }
 
 void RenderWindowLogProofs() {
+	static bool wasWindowOpen = false;
+	bool isWindowOpen = Settings::ShowWindowLogProofs;
+
+	// Detect window state changes
+	if (isWindowOpen != wasWindowOpen) {
+		LogProofs::OnWindowStateChanged(isWindowOpen);
+		wasWindowOpen = isWindowOpen;
+	}
+
 	if (!Settings::ShowWindowLogProofs) {
 		SaveWindowState();
 		return;
@@ -248,7 +277,7 @@ void RenderWindowLogProofs() {
 						auto bossGroup = bossProvider->CreateCustomBossGroup(customTab);
 						// Only render if the boss group has valid content
 						if (!bossGroup.bosses.empty() || !bossGroup.currencies.empty()) {
-							DrawGenericTab(bossGroup, bossProvider, isKpme);
+							DrawGenericTab(bossGroup, bossProvider, currentProvider, isKpme);
 						}
 					} catch (...) {
 						// Skip invalid tabs silently
@@ -259,7 +288,7 @@ void RenderWindowLogProofs() {
 		} else {
 			// Render default tabs
 			for (const auto& group : bossProvider->GetBossGroups()) {
-				DrawGenericTab(group, bossProvider, isKpme);
+				DrawGenericTab(group, bossProvider, currentProvider, isKpme);
 			}
 		}
 

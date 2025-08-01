@@ -52,6 +52,10 @@ extern const char* CUSTOM_TABS_ENABLED;
 extern const char* PROVIDER_CONFIGS;
 extern const char* MIGRATION_COMPLETED;
 
+extern const char* LAZY_LOADING_ENABLED;
+extern const char* CACHE_TIMEOUT_MINUTES;
+extern const char* MAX_RETRY_ATTEMPTS;
+
 namespace Settings {
 	extern std::mutex Mutex;
 	extern json Settings;
@@ -96,6 +100,11 @@ namespace Settings {
 
 	// Custom tab settings
 	extern bool CustomTabsEnabled;
+
+	// Lazy loading settings
+	extern bool LazyLoadingEnabled;
+	extern int CacheTimeoutMinutes;
+	extern int MaxRetryAttempts;
 
 	// Migration functions
 	void MigrateLegacyTabSettings();
