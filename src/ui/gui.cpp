@@ -34,21 +34,11 @@ static void DrawPlayerAccountName(const Player& player) {
 }
 
 static void DrawPlayerProofValue(const Player& player, const std::string& proofId, const std::string& providerName) {
-	// Use lazy loading
-	auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(player.account, providerName);
-	auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(player.account, providerName);
-
-	if (lazyState == LoadState::READY && lazyData) {
-		auto it = lazyData->proofs.find(proofId);
-		if (it != lazyData->proofs.end()) {
-			ImGui::Text("%i", it->second.amount);
-		} else {
-			ImGui::Text("-");
-		}
-	} else if (lazyState == LoadState::LOADING) {
-		ImGui::Text("...");
+	if (player.state == LoadState::READY && player.proofData) {
+		auto it = player.proofData->proofs.find(proofId);
+		ImGui::Text(it != player.proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : "-");
 	} else {
-		ImGui::Text("-");
+		ImGui::Text(player.state == LoadState::LOADING ? "..." : "-");
 	}
 }
 
@@ -150,15 +140,31 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 		HighlightColumnOnHover();
 		DrawKpmeId(p);
 	}
+
+	// Cache lazy loading data once per row
+	auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
+	auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
+	const auto* proofData = (lazyState == LoadState::READY && lazyData) ? lazyData.get() : nullptr;
+
 	for (const auto& currency : group.currencies) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
-		DrawPlayerProofValue(p, provider->GetProofIdentifier(currency), providerName);
+		if (proofData) {
+			auto it = proofData->proofs.find(provider->GetProofIdentifier(currency));
+			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : "-");
+		} else {
+			ImGui::Text(lazyState == LoadState::LOADING ? "..." : "-");
+		}
 	}
 	for (const auto& bossEntry : group.bosses) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
-		DrawPlayerProofValue(p, provider->GetProofIdentifier(bossEntry.boss, group.category), providerName);
+		if (proofData) {
+			auto it = proofData->proofs.find(provider->GetProofIdentifier(bossEntry.boss, group.category));
+			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : "-");
+		} else {
+			ImGui::Text(lazyState == LoadState::LOADING ? "..." : "-");
+		}
 	}
 	HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 }
@@ -174,11 +180,23 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, cons
 			ImGui::TableNextColumn();
 			ImGui::Text("No players found... ");
 		} else {
+			// Filter players first
+			static std::vector<const Player*> visiblePlayers;
+			visiblePlayers.clear();
 			for (const auto& p : PlayerManager::players) {
 				if (!Settings::IncludeMissingAccounts && p.state == LoadState::READY && (!p.proofData || (showKpmeId ? p.proofData->profileId.empty() : p.proofData->accountName.empty()))) {
 					continue;
 				}
-				DrawPlayerRow(p, group, provider, showKpmeId, providerName);
+				visiblePlayers.push_back(&p);
+			}
+
+			// Use clipper for virtualization
+			ImGuiListClipper clipper;
+			clipper.Begin(static_cast<int>(visiblePlayers.size()));
+			while (clipper.Step()) {
+				for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+					DrawPlayerRow(*visiblePlayers[i], group, provider, showKpmeId, providerName);
+				}
 			}
 		}
 		ImGui::EndTable();
