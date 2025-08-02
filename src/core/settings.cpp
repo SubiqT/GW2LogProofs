@@ -24,7 +24,6 @@ const char* COLUMN_KPME_ID_SIZE = "ColumnKpmeIdSize";
 
 const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
 const char* INCLUDE_LINKED_ACCOUNTS = "IncludeLinkedAccounts";
-const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
 
 const char* HOVER_ENABLED = "HoverEnabled";
 const char* HOVER_COLOUR = "HoverColour";
@@ -93,9 +92,6 @@ namespace Settings {
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS].get_to<bool>(IncludeLinkedAccounts);
 		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].get_to<bool>(IncludeMissingAccounts);
-		}
 
 		/* Hover settings */
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED].is_null()) {
@@ -160,7 +156,6 @@ namespace Settings {
 
 	DataSource SelectedDataSource = WINGMAN;
 	bool IncludeLinkedAccounts = false;
-	bool IncludeMissingAccounts = false;
 
 	bool hoverEnabled = true;
 	ImU32 hoverColour = 4285558896;

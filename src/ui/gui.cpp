@@ -23,10 +23,10 @@ static std::vector<std::string> GetDataSources() {
 	return BossRegistry::Instance().GetAvailableProviders();
 }
 
-static void DrawPlayerAccountName(const Player& player) {
-	if (player.proofData && !player.proofData->profileUrl.empty()) {
+static void DrawPlayerAccountName(const Player& player, const auto* proofData) {
+	if (proofData && !proofData->profileUrl.empty()) {
 		if (ImGui::TextURL(player.account.c_str())) {
-			ShellExecuteA(0, 0, player.proofData->profileUrl.c_str(), 0, 0, SW_SHOW);
+			ShellExecuteA(0, 0, proofData->profileUrl.c_str(), 0, 0, SW_SHOW);
 		}
 	} else {
 		ImGui::Text(player.account.c_str());
@@ -36,19 +36,19 @@ static void DrawPlayerAccountName(const Player& player) {
 static void DrawPlayerProofValue(const Player& player, const std::string& proofId, const std::string& providerName) {
 	if (player.state == LoadState::READY && player.proofData) {
 		auto it = player.proofData->proofs.find(proofId);
-		ImGui::Text(it != player.proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : "-");
+		ImGui::Text(it != player.proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
 	} else {
-		ImGui::Text(player.state == LoadState::LOADING ? "..." : "-");
+		ImGui::Text(player.state == LoadState::LOADING ? "..." : "0");
 	}
 }
 
-static void DrawKpmeId(const Player& aPlayer) {
-	if (aPlayer.proofData && !aPlayer.proofData->profileId.empty()) {
-		if (ImGui::TextURL(aPlayer.proofData->profileId.c_str())) {
-			ImGui::SetClipboardText(aPlayer.proofData->profileId.c_str());
+static void DrawKpmeId(const Player& aPlayer, const auto* proofData) {
+	if (proofData && !proofData->profileId.empty()) {
+		if (ImGui::TextURL(proofData->profileId.c_str())) {
+			ImGui::SetClipboardText(proofData->profileId.c_str());
 		}
 	} else {
-		ImGui::Text("-");
+		ImGui::Text("0");
 	}
 }
 
@@ -133,27 +133,33 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 }
 
 static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider* provider, bool showKpmeId, const std::string& providerName) {
-	ImGui::TableNextColumn();
-	DrawPlayerAccountName(p);
-	if (showKpmeId) {
-		ImGui::TableNextColumn();
-		HighlightColumnOnHover();
-		DrawKpmeId(p);
-	}
-
 	// Cache lazy loading data once per row
 	auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
 	auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
 	const auto* proofData = (lazyState == LoadState::READY && lazyData) ? lazyData.get() : nullptr;
+
+	if (!proofData || proofData->proofs.empty()) {
+		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+	}
+
+	ImGui::TableNextColumn();
+	DrawPlayerAccountName(p, proofData);
+	if (showKpmeId) {
+		ImGui::TableNextColumn();
+		HighlightColumnOnHover();
+		DrawKpmeId(p, proofData);
+	}
+
+	bool isDisabled = !proofData || proofData->proofs.empty();
 
 	for (const auto& currency : group.currencies) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
 		if (proofData) {
 			auto it = proofData->proofs.find(provider->GetProofIdentifier(currency));
-			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : "-");
+			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : (isDisabled ? "" : "0"));
 		} else {
-			ImGui::Text(lazyState == LoadState::LOADING ? "..." : "-");
+			ImGui::Text(lazyState == LoadState::LOADING ? "..." : (isDisabled ? "" : "0"));
 		}
 	}
 	for (const auto& bossEntry : group.bosses) {
@@ -161,11 +167,16 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 		HighlightColumnOnHover();
 		if (proofData) {
 			auto it = proofData->proofs.find(provider->GetProofIdentifier(bossEntry.boss, group.category));
-			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : "-");
+			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : (isDisabled ? "" : "0"));
 		} else {
-			ImGui::Text(lazyState == LoadState::LOADING ? "..." : "-");
+			ImGui::Text(lazyState == LoadState::LOADING ? "..." : (isDisabled ? "" : "0"));
 		}
 	}
+
+	if (!proofData || proofData->proofs.empty()) {
+		ImGui::PopStyleColor();
+	}
+
 	HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 }
 
@@ -180,13 +191,10 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, cons
 			ImGui::TableNextColumn();
 			ImGui::Text("No players found... ");
 		} else {
-			// Filter players first
+			// Show all players
 			static std::vector<const Player*> visiblePlayers;
 			visiblePlayers.clear();
 			for (const auto& p : PlayerManager::players) {
-				if (!Settings::IncludeMissingAccounts && p.state == LoadState::READY && (!p.proofData || (showKpmeId ? p.proofData->profileId.empty() : p.proofData->accountName.empty()))) {
-					continue;
-				}
 				visiblePlayers.push_back(&p);
 			}
 
@@ -228,11 +236,6 @@ static void DrawProviderCombo(const std::string& currentProvider) {
 
 static void DrawControls(const std::string& currentProvider) {
 	DrawProviderCombo(currentProvider);
-	ImGui::SameLine();
-	if (ImGui::Checkbox("Missing Accounts", &Settings::IncludeMissingAccounts)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS] = Settings::IncludeMissingAccounts;
-		Settings::Save(SettingsPath);
-	}
 	if (currentProvider == "KPME") {
 		ImGui::SameLine();
 		if (ImGui::Checkbox("Linked Accounts", &Settings::IncludeLinkedAccounts)) {

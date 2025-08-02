@@ -30,7 +30,6 @@ extern const char* COLUMN_KPME_ID_SIZE;
 
 extern const char* SELECTED_DATA_SOURCE;
 extern const char* INCLUDE_LINKED_ACCOUNTS;
-extern const char* INCLUDE_MISSING_ACCOUNTS;
 
 extern const char* HOVER_ENABLED;
 extern const char* HOVER_COLOUR;
@@ -65,7 +64,6 @@ namespace Settings {
 
 	extern DataSource SelectedDataSource;
 	extern bool IncludeLinkedAccounts;
-	extern bool IncludeMissingAccounts;
 
 	extern bool hoverEnabled;
 	extern ImU32 hoverColour;
