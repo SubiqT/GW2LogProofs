@@ -18,6 +18,7 @@
 #include "trackers/realtime_api_tracker.h"
 #include "trackers/unofficial_extras_tracker.h"
 #include "ui/gui.h"
+#include "utils/httpclient.h"
 #include "version.h"
 
 AddonDefinition AddonDef = {};
@@ -27,7 +28,6 @@ static void LoadPlayerDataWrapper(const std::string& account, const std::string&
 }
 
 void AddonOptions() {
-	ImGui::Separator();
 	RenderWindowSettings();
 }
 
@@ -72,6 +72,7 @@ void AddonLoad(AddonAPI* addonApi) {
 
 	PlayerManager::lazyLoadManager.SetLoadFunction(LoadPlayerDataWrapper);
 
+	HTTPClient::Initialize();
 	InitializeBossRegistry();
 	InitializeTrackerManager();
 

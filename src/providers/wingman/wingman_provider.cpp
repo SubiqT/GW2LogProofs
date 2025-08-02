@@ -5,6 +5,13 @@ PlayerProofData WingmanProvider::LoadPlayerData(const std::string& account) {
 	return ConvertWingmanResponse(response);
 }
 
+void WingmanProvider::LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) {
+	client_.GetKpAsync(account, [this, callback](const Wingman::WingmanResponse& response) {
+		PlayerProofData data = ConvertWingmanResponse(response);
+		callback(data);
+	});
+}
+
 std::vector<std::string> WingmanProvider::GetSupportedProofTypes() const {
 	return {"KILL_PROOF"};
 }
@@ -13,7 +20,7 @@ PlayerProofData WingmanProvider::ConvertWingmanResponse(const Wingman::WingmanRe
 	PlayerProofData data;
 	data.accountName = response.account;
 	data.profileId = response.account;
-	data.profileUrl = "https://gw2wingman.nevermindcreations.de/search/" + response.account;
+	data.profileUrl = "https://gw2wingman.nevermindcreations.de/kp/" + response.account;
 	data.hasLinkedAccounts = false;
 
 	for (const auto& kp : response.kp) {

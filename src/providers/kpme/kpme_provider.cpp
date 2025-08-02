@@ -6,6 +6,13 @@ PlayerProofData KpmeProvider::LoadPlayerData(const std::string& account) {
 	return ConvertKpmeResponse(response);
 }
 
+void KpmeProvider::LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) {
+	client_.GetKpAsync(account, [this, callback](const Kpme::KpmeResponse& response) {
+		PlayerProofData data = ConvertKpmeResponse(response);
+		callback(data);
+	});
+}
+
 std::vector<std::string> KpmeProvider::GetSupportedProofTypes() const {
 	return {"KILL_PROOF", "TOKEN", "COFFER", "TITLE"};
 }

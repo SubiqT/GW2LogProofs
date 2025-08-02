@@ -156,4 +156,26 @@ namespace Kpme {
 			return KpmeResponse {"", {}, {}};
 		}
 	}
+
+	void KpmeClient::GetKpAsync(const std::string& account, std::function<void(const KpmeResponse&)> callback) {
+		std::string url = std::format("https://killproof.me/api/kp/{}?lang=en", account);
+		const char* cUrl = url.c_str();
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Requesting KPME data (async): {}", cUrl).c_str());
+		std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
+
+		HTTPClient::GetRequestAsync(wUrl, [account, callback](const std::string& kpmeResponse) {
+			if (kpmeResponse.empty()) {
+				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Empty response from KPME API for account: {}", account).c_str());
+				callback(KpmeResponse {"", {}, {}});
+				return;
+			}
+			try {
+				json j = json::parse(kpmeResponse);
+				callback(j.template get<KpmeResponse>());
+			} catch (const json::parse_error& e) {
+				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME response for {}: {}", account, e.what()).c_str());
+				callback(KpmeResponse {"", {}, {}});
+			}
+		});
+	}
 } // namespace Kpme

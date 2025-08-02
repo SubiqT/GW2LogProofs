@@ -52,4 +52,26 @@ namespace Wingman {
 			return WingmanResponse {};
 		}
 	}
+
+	void WingmanClient::GetKpAsync(const std::string& account, std::function<void(const WingmanResponse&)> callback) {
+		std::string url = std::format("https://gw2wingman.nevermindcreations.de/api/kp?account={}", account);
+		const char* cUrl = url.c_str();
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Requesting Wingman data (async): {}", cUrl).c_str());
+		std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
+
+		HTTPClient::GetRequestAsync(wUrl, [account, callback](const std::string& response) {
+			if (response.empty()) {
+				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Empty response from Wingman API for account: {}", account).c_str());
+				callback(WingmanResponse {});
+				return;
+			}
+			try {
+				json j = json::parse(response);
+				callback(j.template get<WingmanResponse>());
+			} catch (const json::parse_error& e) {
+				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse Wingman response for {}: {}", account, e.what()).c_str());
+				callback(WingmanResponse {});
+			}
+		});
+	}
 } // namespace Wingman

@@ -1,12 +1,11 @@
 #include "data_loader.h"
 #include "../providers/common/provider_registry.h"
-#include "../utils/threadpool.hpp"
+#include "../utils/httpclient.h"
 #include "player_manager.h"
 #include "shared.h"
 #include <format>
 
 namespace DataLoader {
-	Threadpool threadpool;
 
 	static long long GetPlayerIndex(const std::string& account) {
 		for (Player& p : PlayerManager::players)
@@ -22,8 +21,9 @@ namespace DataLoader {
 				return;
 			}
 
-			PlayerProofData data = provider->LoadPlayerData(account);
-			PlayerManager::lazyLoadManager.OnLoadComplete(key, std::make_unique<PlayerProofData>(data));
+			provider->LoadPlayerDataAsync(account, [key](const PlayerProofData& data) {
+				PlayerManager::lazyLoadManager.OnLoadComplete(key, std::make_unique<PlayerProofData>(data));
+			});
 		} catch (const std::exception& e) {
 			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to load {} data for {}: {}", providerName, account, e.what()).c_str());
 			PlayerManager::lazyLoadManager.OnLoadFailed(key);
@@ -38,20 +38,36 @@ namespace DataLoader {
 				return;
 			}
 
-			PlayerProofData data = provider->LoadPlayerData(account);
+			provider->LoadPlayerDataAsync(account, [account, providerName](const PlayerProofData& data) {
+				try {
+					std::scoped_lock lck(PlayerManager::playerMutex);
+					long long index = GetPlayerIndex(account);
+					if (index == -1) {
+						APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Player not found when loading data: {}", account).c_str());
+						return;
+					}
 
-			std::scoped_lock lck(PlayerManager::playerMutex);
-			long long index = GetPlayerIndex(account);
-			if (index == -1) {
-				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Player not found when loading data: {}", account).c_str());
-				return;
-			}
+					// Check if data is empty (failed request)
+					if (data.accountName.empty() && data.proofs.empty()) {
+						PlayerManager::players[index].state = ::LoadState::FAILED;
+						APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to load {} data for {}", providerName, account).c_str());
+						return;
+					}
 
-			PlayerManager::players[index].proofData = std::make_unique<PlayerProofData>(data);
-			PlayerManager::players[index].state = ::LoadState::READY;
-			PlayerManager::players[index].providerName = providerName;
+					PlayerManager::players[index].proofData = std::make_unique<PlayerProofData>(data);
+					PlayerManager::players[index].state = ::LoadState::READY;
+					PlayerManager::players[index].providerName = providerName;
 
-			APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Loaded {} data for {}", providerName, account).c_str());
+					APIDefs->Log(ELogLevel_INFO, ADDON_NAME, std::format("Loaded {} data for {}", providerName, account).c_str());
+				} catch (const std::exception& e) {
+					APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("Critical error in async callback for {} data for {}: {}", providerName, account, e.what()).c_str());
+					std::scoped_lock lck(PlayerManager::playerMutex);
+					long long index = GetPlayerIndex(account);
+					if (index != -1) {
+						PlayerManager::players[index].state = ::LoadState::FAILED;
+					}
+				}
+			});
 		} catch (const std::exception& e) {
 			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("Critical error loading {} data for {}: {}", providerName, account, e.what()).c_str());
 
@@ -66,18 +82,16 @@ namespace DataLoader {
 	void ReloadAllPlayersWithProvider(const std::string& providerName) {
 		std::scoped_lock lck(PlayerManager::playerMutex);
 		for (auto& player : PlayerManager::players) {
-			if (player.providerName != providerName) {
-				player.state = ::LoadState::LOADING;
-				player.proofData = nullptr;
-				player.providerName = "";
-				std::string account = player.account;
-				threadpool.spawn([account, providerName]() { LoadPlayerData(account, providerName); return nullptr; });
-			}
+			player.state = ::LoadState::LOADING;
+			player.proofData = nullptr;
+			player.providerName = "";
+			std::string account = player.account;
+			LoadPlayerData(account, providerName);
 		}
 	}
 
 
 	void Shutdown() {
-		threadpool.shutdown();
+		HTTPClient::Shutdown();
 	}
 } // namespace DataLoader

@@ -35,6 +35,7 @@ public:
 	virtual ~IDataProvider() = default;
 	virtual std::string GetProviderName() const = 0;
 	virtual PlayerProofData LoadPlayerData(const std::string& account) = 0;
+	virtual void LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) = 0;
 	virtual bool SupportsLinkedAccounts() const = 0;
 	virtual std::vector<std::string> GetSupportedProofTypes() const = 0;
 };
