@@ -11,6 +11,7 @@ public:
 	void LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) override;
 	bool SupportsLinkedAccounts() const override { return true; }
 	std::vector<std::string> GetSupportedProofTypes() const override;
+	PlayerProofData ComputeProofsFromRawData(const PlayerProofData& rawData, bool includeLinkedAccounts) const override;
 
 private:
 	Kpme::KpmeClient client_;

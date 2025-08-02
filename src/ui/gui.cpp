@@ -12,6 +12,7 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_internal.h"
 #include "../providers/common/provider_registry.h"
+
 #include "imgui_extensions.h"
 #include <Windows.h>
 
@@ -136,7 +137,17 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 	// Cache lazy loading data once per row
 	auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
 	auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
-	const auto* proofData = (lazyState == LoadState::READY && lazyData) ? lazyData.get() : nullptr;
+	const auto* rawProofData = (lazyState == LoadState::READY && lazyData) ? lazyData.get() : nullptr;
+
+	// For providers that support linked accounts, compute proofs dynamically
+	std::unique_ptr<PlayerProofData> computedData;
+	if (rawProofData && rawProofData->rawData.has_value()) {
+		auto dataProvider = ProviderRegistry::Instance().CreateProvider(providerName);
+		if (dataProvider && dataProvider->SupportsLinkedAccounts()) {
+			computedData = std::make_unique<PlayerProofData>(dataProvider->ComputeProofsFromRawData(*rawProofData, Settings::IncludeLinkedAccounts));
+		}
+	}
+	const auto* proofData = computedData ? computedData.get() : rawProofData;
 
 	if (!proofData || proofData->proofs.empty()) {
 		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
@@ -245,12 +256,7 @@ static void DrawControls(const std::string& currentProvider) {
 		if (ImGui::Checkbox("Linked Accounts", &Settings::IncludeLinkedAccounts)) {
 			Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS] = Settings::IncludeLinkedAccounts;
 			Settings::Save(SettingsPath);
-			// Clear KPME cache and reload data with new linked accounts setting
-			PlayerManager::lazyLoadManager.ClearProviderCache("KPME");
-			std::scoped_lock lck(PlayerManager::playerMutex);
-			for (const auto& player : PlayerManager::players) {
-				PlayerManager::lazyLoadManager.RequestPlayerData(player.account, "KPME");
-			}
+			// No cache clearing needed - proofs are computed dynamically from raw data
 		}
 	}
 }

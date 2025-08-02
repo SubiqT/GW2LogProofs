@@ -1,11 +1,13 @@
 #ifndef DATA_PROVIDER_H
 #define DATA_PROVIDER_H
 
+#include <any>
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
+
 
 enum class ProofType {
 	KILL_PROOF,
@@ -28,6 +30,7 @@ struct PlayerProofData {
 	std::string profileUrl;
 	std::map<std::string, ProofData> proofs;
 	bool hasLinkedAccounts;
+	std::any rawData; // Provider-specific raw data for dynamic computation
 };
 
 class IDataProvider {
@@ -38,6 +41,7 @@ public:
 	virtual void LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) = 0;
 	virtual bool SupportsLinkedAccounts() const = 0;
 	virtual std::vector<std::string> GetSupportedProofTypes() const = 0;
+	virtual PlayerProofData ComputeProofsFromRawData(const PlayerProofData& rawData, bool includeLinkedAccounts) const { return rawData; }
 };
 
 using DataProviderFactory = std::function<std::unique_ptr<IDataProvider>()>;
