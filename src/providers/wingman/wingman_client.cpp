@@ -4,6 +4,7 @@
 #include "../../utils/httpclient.h"
 #include <format>
 
+
 using json = nlohmann::json;
 
 namespace Wingman {
@@ -41,14 +42,14 @@ namespace Wingman {
 		std::string response = HTTPClient::GetRequest(wUrl.c_str());
 		if (response.empty()) {
 			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Empty response from Wingman API for account: {}", account).c_str());
-			return WingmanResponse{};
+			return WingmanResponse {};
 		}
 		try {
 			json j = json::parse(response);
 			return j.template get<WingmanResponse>();
 		} catch (const json::parse_error& e) {
 			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse Wingman response for {}: {}", account, e.what()).c_str());
-			return WingmanResponse{};
+			return WingmanResponse {};
 		}
 	}
 } // namespace Wingman
