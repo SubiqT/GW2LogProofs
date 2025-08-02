@@ -402,6 +402,24 @@ void RenderWindowSettings() {
 			ImGui::PopStyleColor();
 		}
 
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Linked Accounts Mode");
+		ImGui::TableNextColumn();
+		const char* modeNames[] = {"Hide linked accounts", "Combine linked accounts", "Split linked accounts"};
+		if (ImGui::BeginCombo("##LinkedMode", modeNames[Settings::LinkedAccountsMode])) {
+			for (int i = 0; i < 3; i++) {
+				bool is_selected = (Settings::LinkedAccountsMode == i);
+				if (ImGui::Selectable(modeNames[i], is_selected)) {
+					Settings::LinkedAccountsMode = static_cast<LinkedAccountMode>(i);
+					Settings::Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE] = Settings::LinkedAccountsMode;
+					Settings::Save(SettingsPath);
+				}
+				if (is_selected) ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
 		ImGui::EndTable();
 	}
 

@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 namespace Kpme {
 	struct KpSummary {
@@ -12,10 +13,16 @@ namespace Kpme {
 		std::map<std::string, std::string> titles;
 	};
 
+	struct LinkedAccount {
+		std::string name;
+		KpSummary data;
+	};
+
 	struct KpmeResponse {
 		std::string id;
 		KpSummary self;
 		KpSummary shared;
+		std::vector<LinkedAccount> linked_accounts;
 	};
 } // namespace Kpme
 

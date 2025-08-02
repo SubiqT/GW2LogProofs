@@ -131,9 +131,47 @@ namespace Kpme {
 					}
 				}
 			}
+
+			if (j.contains("linked") && j.at("linked").is_array()) {
+				for (const auto& account : j.at("linked")) {
+					if (account.is_object() && account.contains("account_name")) {
+						LinkedAccount linkedAccount;
+						linkedAccount.name = account.at("account_name").get<std::string>();
+
+						// Parse killproofs
+						if (account.contains("killproofs") && account.at("killproofs").is_array()) {
+							for (const auto& kp : account.at("killproofs")) {
+								if (kp.contains("name") && kp.contains("amount")) {
+									linkedAccount.data.killproofs[kp.at("name")] = kp.at("amount");
+								}
+							}
+						}
+
+						// Parse tokens
+						if (account.contains("tokens") && account.at("tokens").is_array()) {
+							for (const auto& token : account.at("tokens")) {
+								if (token.contains("name") && token.contains("amount")) {
+									linkedAccount.data.tokens[token.at("name")] = token.at("amount");
+								}
+							}
+						}
+
+						// Parse coffers
+						if (account.contains("coffers") && account.at("coffers").is_array()) {
+							for (const auto& coffer : account.at("coffers")) {
+								if (coffer.contains("name") && coffer.contains("amount")) {
+									linkedAccount.data.coffers[coffer.at("name")] = coffer.at("amount");
+								}
+							}
+						}
+
+						r.linked_accounts.push_back(linkedAccount);
+					}
+				}
+			}
 		} catch (const json::parse_error& ex) {
 			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME JSON response: {}", ex.what()).c_str());
-			r = {"", {}, {}};
+			r = {"", {}, {}, {}};
 			return;
 		}
 	}
@@ -146,14 +184,14 @@ namespace Kpme {
 		std::string kpmeResponse = HTTPClient::GetRequest(wUrl.c_str());
 		if (kpmeResponse.empty()) {
 			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Empty response from KPME API for account: {}", account).c_str());
-			return KpmeResponse {"", {}, {}};
+			return KpmeResponse {"", {}, {}, {}};
 		}
 		try {
 			json j = json::parse(kpmeResponse);
 			return j.template get<KpmeResponse>();
 		} catch (const json::parse_error& e) {
 			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME response for {}: {}", account, e.what()).c_str());
-			return KpmeResponse {"", {}, {}};
+			return KpmeResponse {"", {}, {}, {}};
 		}
 	}
 
@@ -166,7 +204,7 @@ namespace Kpme {
 		HTTPClient::GetRequestAsync(wUrl, [account, callback](const std::string& kpmeResponse) {
 			if (kpmeResponse.empty()) {
 				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Empty response from KPME API for account: {}", account).c_str());
-				callback(KpmeResponse {"", {}, {}});
+				callback(KpmeResponse {"", {}, {}, {}});
 				return;
 			}
 			try {
@@ -174,7 +212,7 @@ namespace Kpme {
 				callback(j.template get<KpmeResponse>());
 			} catch (const json::parse_error& e) {
 				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME response for {}: {}", account, e.what()).c_str());
-				callback(KpmeResponse {"", {}, {}});
+				callback(KpmeResponse {"", {}, {}, {}});
 			}
 		});
 	}

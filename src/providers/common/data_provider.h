@@ -24,12 +24,18 @@ struct ProofData {
 	std::string url;
 };
 
+struct LinkedAccountData {
+	std::string accountName;
+	std::map<std::string, ProofData> proofs;
+};
+
 struct PlayerProofData {
 	std::string accountName;
 	std::string profileId;
 	std::string profileUrl;
 	std::map<std::string, ProofData> proofs;
 	bool hasLinkedAccounts;
+	std::vector<LinkedAccountData> linkedAccounts;
 	std::any rawData; // Provider-specific raw data for dynamic computation
 };
 

@@ -23,7 +23,7 @@ const char* COLUMN_BOSSES_SIZE = "ColumnBossesSize";
 const char* COLUMN_KPME_ID_SIZE = "ColumnKpmeIdSize";
 
 const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
-const char* INCLUDE_LINKED_ACCOUNTS = "IncludeLinkedAccounts";
+const char* LINKED_ACCOUNTS_MODE = "LinkedAccountsMode";
 
 const char* HOVER_ENABLED = "HoverEnabled";
 const char* HOVER_COLOUR = "HoverColour";
@@ -89,8 +89,8 @@ namespace Settings {
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE].get_to<DataSource>(SelectedDataSource);
 		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS].get_to<bool>(IncludeLinkedAccounts);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE].get_to<LinkedAccountMode>(LinkedAccountsMode);
 		}
 
 		/* Hover settings */
@@ -155,7 +155,7 @@ namespace Settings {
 	float ColumnSizeKpmeId = 32.0f;
 
 	DataSource SelectedDataSource = WINGMAN;
-	bool IncludeLinkedAccounts = false;
+	LinkedAccountMode LinkedAccountsMode = HIDE_LINKED;
 
 	bool hoverEnabled = true;
 	ImU32 hoverColour = 4285558896;

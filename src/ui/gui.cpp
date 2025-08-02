@@ -144,7 +144,9 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 	if (rawProofData && rawProofData->rawData.has_value()) {
 		auto dataProvider = ProviderRegistry::Instance().CreateProvider(providerName);
 		if (dataProvider && dataProvider->SupportsLinkedAccounts()) {
-			computedData = std::make_unique<PlayerProofData>(dataProvider->ComputeProofsFromRawData(*rawProofData, Settings::IncludeLinkedAccounts));
+			// Determine if linked accounts should be included in main computation
+			bool includeLinked = (Settings::LinkedAccountsMode == COMBINE_LINKED);
+			computedData = std::make_unique<PlayerProofData>(dataProvider->ComputeProofsFromRawData(*rawProofData, includeLinked));
 		}
 	}
 	const auto* proofData = computedData ? computedData.get() : rawProofData;
@@ -189,6 +191,38 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 	}
 
 	HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
+
+	// Draw linked accounts separately if enabled
+	if (Settings::LinkedAccountsMode == SPLIT_LINKED && proofData && !proofData->linkedAccounts.empty()) {
+		for (const auto& linkedAccount : proofData->linkedAccounts) {
+			ImGui::TableNextColumn();
+			ImGui::Indent(20.0f);
+			ImGui::Text(linkedAccount.accountName.c_str());
+			ImGui::Unindent(20.0f);
+
+			if (showKpmeId) {
+				ImGui::TableNextColumn();
+				HighlightColumnOnHover();
+				ImGui::Text("-");
+			}
+
+			for (const auto& currency : group.currencies) {
+				ImGui::TableNextColumn();
+				HighlightColumnOnHover();
+				auto it = linkedAccount.proofs.find(provider->GetProofIdentifier(currency));
+				ImGui::Text(it != linkedAccount.proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
+			}
+
+			for (const auto& bossEntry : group.bosses) {
+				ImGui::TableNextColumn();
+				HighlightColumnOnHover();
+				auto it = linkedAccount.proofs.find(provider->GetProofIdentifier(bossEntry.boss, group.category));
+				ImGui::Text(it != linkedAccount.proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
+			}
+
+			HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
+		}
+	}
 }
 
 static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, const std::string& providerName, bool showKpmeId = false) {
@@ -209,12 +243,29 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, cons
 				visiblePlayers.push_back(&p);
 			}
 
-			// Use clipper for virtualization
-			ImGuiListClipper clipper;
-			clipper.Begin(static_cast<int>(visiblePlayers.size()));
-			while (clipper.Step()) {
-				for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-					DrawPlayerRow(*visiblePlayers[i], group, provider, showKpmeId, providerName);
+			// Calculate total rows including linked accounts
+			int totalRows = static_cast<int>(visiblePlayers.size());
+			if (Settings::LinkedAccountsMode == SPLIT_LINKED && providerName == "KPME") {
+				for (const auto* player : visiblePlayers) {
+					auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(player->account, providerName);
+					if (lazyData && !lazyData->linkedAccounts.empty()) {
+						totalRows += static_cast<int>(lazyData->linkedAccounts.size());
+					}
+				}
+			}
+
+			// Disable clipper when showing separately to avoid row counting issues
+			if (Settings::LinkedAccountsMode == SPLIT_LINKED) {
+				for (const auto* player : visiblePlayers) {
+					DrawPlayerRow(*player, group, provider, showKpmeId, providerName);
+				}
+			} else {
+				ImGuiListClipper clipper;
+				clipper.Begin(static_cast<int>(visiblePlayers.size()));
+				while (clipper.Step()) {
+					for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+						DrawPlayerRow(*visiblePlayers[i], group, provider, showKpmeId, providerName);
+					}
 				}
 			}
 		}
@@ -253,10 +304,18 @@ static void DrawControls(const std::string& currentProvider) {
 	DrawProviderCombo(currentProvider);
 	if (currentProvider == "KPME") {
 		ImGui::SameLine();
-		if (ImGui::Checkbox("Linked Accounts", &Settings::IncludeLinkedAccounts)) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS] = Settings::IncludeLinkedAccounts;
-			Settings::Save(SettingsPath);
-			// No cache clearing needed - proofs are computed dynamically from raw data
+		const char* modeNames[] = {"Hide linked accounts", "Combine linked accounts", "Split linked accounts"};
+		if (ImGui::BeginCombo("##LinkedMode", modeNames[Settings::LinkedAccountsMode])) {
+			for (int i = 0; i < 3; i++) {
+				bool is_selected = (Settings::LinkedAccountsMode == i);
+				if (ImGui::Selectable(modeNames[i], is_selected)) {
+					Settings::LinkedAccountsMode = static_cast<LinkedAccountMode>(i);
+					Settings::Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE] = Settings::LinkedAccountsMode;
+					Settings::Save(SettingsPath);
+				}
+				if (is_selected) ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
 		}
 	}
 }

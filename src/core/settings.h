@@ -14,6 +14,12 @@ enum DataSource {
 	KPME
 };
 
+enum LinkedAccountMode {
+	HIDE_LINKED,
+	COMBINE_LINKED,
+	SPLIT_LINKED
+};
+
 extern const char* SHOW_QUICK_ACCESS_SHORTCUT;
 extern const char* WINDOW_LOG_PROOFS_KEY;
 extern const char* SHOW_WINDOW_LOG_PROOFS;
@@ -29,7 +35,7 @@ extern const char* COLUMN_BOSSES_SIZE;
 extern const char* COLUMN_KPME_ID_SIZE;
 
 extern const char* SELECTED_DATA_SOURCE;
-extern const char* INCLUDE_LINKED_ACCOUNTS;
+extern const char* LINKED_ACCOUNTS_MODE;
 
 extern const char* HOVER_ENABLED;
 extern const char* HOVER_COLOUR;
@@ -63,7 +69,7 @@ namespace Settings {
 	extern float ColumnSizeKpmeId;
 
 	extern DataSource SelectedDataSource;
-	extern bool IncludeLinkedAccounts;
+	extern LinkedAccountMode LinkedAccountsMode;
 
 	extern bool hoverEnabled;
 	extern ImU32 hoverColour;
