@@ -41,6 +41,7 @@ public:
 	std::vector<std::string> CleanExpiredEntries();
 	void OnWindowOpened();
 	void OnWindowClosed();
+	void ClearProvider(const std::string& provider);
 
 private:
 	std::string MakeKey(const std::string& account, const std::string& provider);
@@ -65,6 +66,7 @@ public:
 	void SetLoadFunction(void (*func)(const std::string&, const std::string&, const std::string&));
 	void OnLoadComplete(const std::string& key, std::unique_ptr<PlayerProofData> data);
 	void OnLoadFailed(const std::string& key);
+	void ClearProviderCache(const std::string& provider);
 
 private:
 	std::string MakeKey(const std::string& account, const std::string& provider);

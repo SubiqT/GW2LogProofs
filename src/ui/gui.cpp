@@ -219,7 +219,7 @@ static void SaveWindowState() {
 }
 
 static void DrawProviderCombo(const std::string& currentProvider) {
-	if (ImGui::BeginCombo("Source##DataSource", currentProvider.c_str())) {
+	if (ImGui::BeginCombo("##DataSource", currentProvider.c_str())) {
 		for (const auto& provider : GetDataSources()) {
 			bool is_selected = (provider == currentProvider);
 			if (ImGui::Selectable(provider.c_str(), is_selected)) {
@@ -245,7 +245,12 @@ static void DrawControls(const std::string& currentProvider) {
 		if (ImGui::Checkbox("Linked Accounts", &Settings::IncludeLinkedAccounts)) {
 			Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS] = Settings::IncludeLinkedAccounts;
 			Settings::Save(SettingsPath);
-			DataLoader::ReloadAllPlayersWithProvider("KPME");
+			// Clear KPME cache and reload data with new linked accounts setting
+			PlayerManager::lazyLoadManager.ClearProviderCache("KPME");
+			std::scoped_lock lck(PlayerManager::playerMutex);
+			for (const auto& player : PlayerManager::players) {
+				PlayerManager::lazyLoadManager.RequestPlayerData(player.account, "KPME");
+			}
 		}
 	}
 }

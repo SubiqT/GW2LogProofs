@@ -109,6 +109,19 @@ std::chrono::seconds ProofCache::GetRetryDelay(int retryCount) {
 	return std::chrono::seconds(1 << (std::min) (retryCount - 1, 4)); // 1s, 2s, 4s, 8s, 16s
 }
 
+void ProofCache::ClearProvider(const std::string& provider) {
+	std::scoped_lock lock(cacheMutex);
+	auto it = cache.begin();
+	while (it != cache.end()) {
+		size_t pos = it->first.find('|');
+		if (pos != std::string::npos && it->first.substr(pos + 1) == provider) {
+			it = cache.erase(it);
+		} else {
+			++it;
+		}
+	}
+}
+
 // LazyLoadManager Implementation
 std::string LazyLoadManager::MakeKey(const std::string& account, const std::string& provider) {
 	return account + "|" + provider;
@@ -204,4 +217,19 @@ void LazyLoadManager::OnLoadFailed(const std::string& key) {
 	cache.MarkFailure(key);
 	std::scoped_lock lock(pendingMutex);
 	pendingLoads.erase(key);
+}
+
+void LazyLoadManager::ClearProviderCache(const std::string& provider) {
+	cache.ClearProvider(provider);
+
+	std::scoped_lock lock(pendingMutex);
+	auto it = pendingLoads.begin();
+	while (it != pendingLoads.end()) {
+		size_t pos = it->find('|');
+		if (pos != std::string::npos && it->substr(pos + 1) == provider) {
+			it = pendingLoads.erase(it);
+		} else {
+			++it;
+		}
+	}
 }
