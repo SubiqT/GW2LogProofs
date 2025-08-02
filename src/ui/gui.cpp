@@ -226,7 +226,11 @@ static void DrawProviderCombo(const std::string& currentProvider) {
 				Settings::SelectedDataSource = (provider == "Wingman") ? WINGMAN : KPME;
 				Settings::Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE] = Settings::SelectedDataSource;
 				Settings::Save(SettingsPath);
-				DataLoader::ReloadAllPlayersWithProvider(provider);
+				// Trigger lazy loading for all players with the new provider
+				std::scoped_lock lck(PlayerManager::playerMutex);
+				for (const auto& player : PlayerManager::players) {
+					PlayerManager::lazyLoadManager.RequestPlayerData(player.account, provider);
+				}
 			}
 			if (is_selected) ImGui::SetItemDefaultFocus();
 		}
