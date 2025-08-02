@@ -24,38 +24,77 @@ void DeregisterQuickAccessShortcut() {
 }
 
 static void DrawWindowSizingOptions() {
-	ImGui::Text("Window Sizing");
-	if (ImGui::SliderFloat("Min Width", &Settings::MinWindowWidth, 100.0f, 1500.0f, "%.3f px")) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::SliderFloat("Max Width", &Settings::MaxWindowWidth, 100.0f, 1500.0f, "%.3f px")) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH] = Settings::MaxWindowWidth;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::SliderFloat("Min Height", &Settings::MinWindowHeight, 100.0f, 1500.0f, "%.3f px")) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT] = Settings::MinWindowHeight;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::SliderFloat("Max Height", &Settings::MaxWindowHeight, 100.0f, 1500.0f, "%.3f px")) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT] = Settings::MaxWindowHeight;
-		Settings::Save(SettingsPath);
+	if (ImGui::BeginTable("WindowSizingTable", 3, ImGuiTableFlags_SizingStretchProp)) {
+		ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+		ImGui::TableSetupColumn("Min", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableSetupColumn("Max", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableHeadersRow();
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Width");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##MinWidth", &Settings::MinWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
+			Settings::Save(SettingsPath);
+		}
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##MaxWidth", &Settings::MaxWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH] = Settings::MaxWindowWidth;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Height");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##MinHeight", &Settings::MinWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT] = Settings::MinWindowHeight;
+			Settings::Save(SettingsPath);
+		}
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##MaxHeight", &Settings::MaxWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT] = Settings::MaxWindowHeight;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::EndTable();
 	}
 }
 
 static void DrawColumnOptions() {
-	ImGui::Text("Columns");
-	if (ImGui::SliderFloat("Account Size", &Settings::ColumnSizeAccount, 40.0f, 400.0f, "%.3f px")) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE] = Settings::ColumnSizeAccount;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::SliderFloat("Bosses Size", &Settings::ColumnSizeBosses, 8.0f, 128.0f, "%.3f px")) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE] = Settings::ColumnSizeBosses;
-		Settings::Save(SettingsPath);
-	}
-	if (ImGui::SliderFloat("KPME Id Size", &Settings::ColumnSizeKpmeId, 8.0f, 128.0f, "%.3f px")) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE] = Settings::ColumnSizeKpmeId;
-		Settings::Save(SettingsPath);
+	if (ImGui::BeginTable("ColumnSizingTable", 2, ImGuiTableFlags_SizingStretchProp)) {
+		ImGui::TableSetupColumn("Setting", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Account Size");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##AccountSize", &Settings::ColumnSizeAccount, 40.0f, 400.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE] = Settings::ColumnSizeAccount;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Bosses Size");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##BossesSize", &Settings::ColumnSizeBosses, 8.0f, 128.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE] = Settings::ColumnSizeBosses;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("KPME Id Size");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##KpmeIdSize", &Settings::ColumnSizeKpmeId, 8.0f, 128.0f, "%.0f px")) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE] = Settings::ColumnSizeKpmeId;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::EndTable();
 	}
 }
 
@@ -347,8 +386,8 @@ void DrawTabConfigurationPanel() {
 	}
 }
 
-void RenderWindowSettings() {
-	if (ImGui::BeginTable("SettingsTable", 2, ImGuiTableFlags_SizingStretchProp)) {
+static void DrawGeneralSettings() {
+	if (ImGui::BeginTable("GeneralSettingsTable", 2, ImGuiTableFlags_SizingStretchProp)) {
 		ImGui::TableSetupColumn("Setting", ImGuiTableColumnFlags_WidthFixed, 200.0f);
 		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
@@ -364,6 +403,33 @@ void RenderWindowSettings() {
 			else
 				DeregisterQuickAccessShortcut();
 		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Linked Accounts Mode");
+		ImGui::TableNextColumn();
+		const char* modeNames[] = {"Hide linked accounts", "Combine linked accounts", "Split linked accounts"};
+		if (ImGui::BeginCombo("##LinkedMode", modeNames[Settings::LinkedAccountsMode])) {
+			for (int i = 0; i < 3; i++) {
+				bool is_selected = (Settings::LinkedAccountsMode == i);
+				if (ImGui::Selectable(modeNames[i], is_selected)) {
+					Settings::LinkedAccountsMode = static_cast<LinkedAccountMode>(i);
+					Settings::Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE] = Settings::LinkedAccountsMode;
+					Settings::Save(SettingsPath);
+				}
+				if (is_selected) ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::EndTable();
+	}
+}
+
+static void DrawNetworkSettings() {
+	if (ImGui::BeginTable("NetworkSettingsTable", 2, ImGuiTableFlags_SizingStretchProp)) {
+		ImGui::TableSetupColumn("Setting", ImGuiTableColumnFlags_WidthFixed, 200.0f);
+		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
@@ -402,28 +468,34 @@ void RenderWindowSettings() {
 			ImGui::PopStyleColor();
 		}
 
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Linked Accounts Mode");
-		ImGui::TableNextColumn();
-		const char* modeNames[] = {"Hide linked accounts", "Combine linked accounts", "Split linked accounts"};
-		if (ImGui::BeginCombo("##LinkedMode", modeNames[Settings::LinkedAccountsMode])) {
-			for (int i = 0; i < 3; i++) {
-				bool is_selected = (Settings::LinkedAccountsMode == i);
-				if (ImGui::Selectable(modeNames[i], is_selected)) {
-					Settings::LinkedAccountsMode = static_cast<LinkedAccountMode>(i);
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE] = Settings::LinkedAccountsMode;
-					Settings::Save(SettingsPath);
-				}
-				if (is_selected) ImGui::SetItemDefaultFocus();
-			}
-			ImGui::EndCombo();
-		}
-
 		ImGui::EndTable();
+	}
+}
+
+void RenderWindowSettings() {
+	ImGui::Indent(10.0f);
+	if (ImGui::CollapsingHeader("General")) {
+		DrawGeneralSettings();
+	}
+
+	if (ImGui::CollapsingHeader("Network Settings")) {
+		DrawNetworkSettings();
+	}
+
+	if (ImGui::CollapsingHeader("Window Sizing")) {
+		DrawWindowSizingOptions();
+	}
+
+	if (ImGui::CollapsingHeader("Column Sizing")) {
+		DrawColumnOptions();
+	}
+
+	if (ImGui::CollapsingHeader("Hover Settings")) {
+		DrawHoverOptions();
 	}
 
 	if (ImGui::CollapsingHeader("Tab Configuration")) {
 		DrawTabConfigurationPanel();
 	}
+	ImGui::Unindent(10.0f);
 }
