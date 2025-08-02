@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <format>
+#include <functional>
 #include <thread>
+
 
 #include "../core/boss_registry.h"
 #include "../core/bosses.h"
@@ -13,6 +15,8 @@
 #include "../imgui/imgui_internal.h"
 #include "../providers/common/provider_registry.h"
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+
 #include "imgui_extensions.h"
 #include <Windows.h>
 
@@ -22,6 +26,67 @@ static ImGuiTableFlags tableFlags = (ImGuiTableFlags_Borders | ImGuiTableFlags_C
 
 static std::vector<std::string> GetDataSources() {
 	return BossRegistry::Instance().GetAvailableProviders();
+}
+
+namespace {
+	static float bezier_ease(float t) {
+		// Fast out slow in cubic bezier approximation
+		return t * t * (3.0f - 2.0f * t);
+	}
+
+	static float lerp(float x0, float x1, float t) {
+		return (1.0f - t) * x0 + t * x1;
+	}
+
+	static float sawtooth(float t, int periods) {
+		return ImFmod(((float) periods) * t, 1.0f);
+	}
+
+	static float interval(float t, float t0, float t1) {
+		return t < t0 ? 0.0f : t > t1 ? 1.0f
+									  : bezier_ease((t - t0) / (t1 - t0));
+	}
+} // namespace
+
+static void DrawSpinner() {
+	ImGuiWindow* window = ImGui::GetCurrentWindow();
+	if (window->SkipItems) return;
+
+	ImGuiContext& g = *ImGui::GetCurrentContext();
+	const ImGuiStyle& style = g.Style;
+
+	float radius = 6.0f;
+	int thickness = 2;
+	ImU32 color = ImGui::GetColorU32(ImGuiCol_Text);
+
+	ImVec2 pos = window->DC.CursorPos;
+	ImVec2 size(radius * 2, radius * 2);
+	const ImRect bb(pos, ImVec2(pos.x + size.x, pos.y + size.y));
+	ImGui::ItemSize(bb);
+
+	const ImVec2 center = ImVec2(pos.x + radius, pos.y + radius);
+	const float period = 8.0f;
+	const float t = ImFmod((float) g.Time, period) / period;
+
+	const int num_detents = 5;
+	const float t_saw = sawtooth(t, num_detents);
+	const float head_value = interval(t_saw, 0.0f, 0.5f);
+	const float tail_value = interval(t_saw, 0.5f, 1.0f);
+	const float rotation_value = sawtooth(t, num_detents);
+
+	const float min_arc = 30.0f / 360.0f * 2.0f * IM_PI;
+	const float max_arc = 270.0f / 360.0f * 2.0f * IM_PI;
+	const float start_angle = -IM_PI / 2.0f;
+
+	const float a_min = start_angle + tail_value * max_arc + rotation_value * 2.0f * IM_PI;
+	const float a_max = a_min + (head_value - tail_value) * max_arc + min_arc;
+
+	window->DrawList->PathClear();
+	for (int i = 0; i < 24; i++) {
+		const float a = a_min + ((float) i / 24.0f) * (a_max - a_min);
+		window->DrawList->PathLineTo(ImVec2(center.x + ImCos(a) * radius, center.y + ImSin(a) * radius));
+	}
+	window->DrawList->PathStroke(color, false, (float) thickness);
 }
 
 static void DrawPlayerAccountName(const Player& player, const auto* proofData) {
@@ -39,7 +104,11 @@ static void DrawPlayerProofValue(const Player& player, const std::string& proofI
 		auto it = player.proofData->proofs.find(proofId);
 		ImGui::Text(it != player.proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
 	} else {
-		ImGui::Text(player.state == LoadState::LOADING ? "..." : "0");
+		if (player.state == LoadState::LOADING) {
+			DrawSpinner();
+		} else {
+			ImGui::Text("0");
+		}
 	}
 }
 
@@ -172,7 +241,11 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 			auto it = proofData->proofs.find(provider->GetProofIdentifier(currency));
 			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : (isDisabled ? "" : "0"));
 		} else {
-			ImGui::Text(lazyState == LoadState::LOADING ? "..." : (isDisabled ? "" : "0"));
+			if (lazyState == LoadState::LOADING) {
+				DrawSpinner();
+			} else {
+				ImGui::Text(isDisabled ? "" : "0");
+			}
 		}
 	}
 	for (const auto& bossEntry : group.bosses) {
@@ -182,7 +255,11 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 			auto it = proofData->proofs.find(provider->GetProofIdentifier(bossEntry.boss, group.category));
 			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : (isDisabled ? "" : "0"));
 		} else {
-			ImGui::Text(lazyState == LoadState::LOADING ? "..." : (isDisabled ? "" : "0"));
+			if (lazyState == LoadState::LOADING) {
+				DrawSpinner();
+			} else {
+				ImGui::Text(isDisabled ? "" : "0");
+			}
 		}
 	}
 
