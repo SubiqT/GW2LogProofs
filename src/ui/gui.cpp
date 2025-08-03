@@ -416,8 +416,16 @@ void RenderWindowLogProofs() {
 		SaveWindowState();
 		return;
 	}
-	ImGui::SetNextWindowSizeConstraints(ImVec2(Settings::MinWindowWidth, Settings::MinWindowHeight), ImVec2(Settings::MaxWindowWidth, Settings::MaxWindowHeight));
-	if (!ImGui::Begin("Log Proofs", &Settings::ShowWindowLogProofs, windowFlags)) {
+	ImGuiWindowFlags flags = windowFlags;
+	if (Settings::WindowAutoResize) {
+		flags |= ImGuiWindowFlags_AlwaysAutoResize;
+	} else {
+		flags &= ~ImGuiWindowFlags_AlwaysAutoResize;
+	}
+	if (Settings::WindowRestrictSize) {
+		ImGui::SetNextWindowSizeConstraints(ImVec2(Settings::MinWindowWidth, Settings::MinWindowHeight), ImVec2(Settings::MaxWindowWidth, Settings::MaxWindowHeight));
+	}
+	if (!ImGui::Begin("Log Proofs", &Settings::ShowWindowLogProofs, flags)) {
 		ImGui::End();
 		return;
 	}

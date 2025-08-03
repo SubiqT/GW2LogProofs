@@ -28,6 +28,8 @@ extern const char* MIN_WINDOW_WIDTH;
 extern const char* MIN_WINDOW_HEIGHT;
 extern const char* MAX_WINDOW_WIDTH;
 extern const char* MAX_WINDOW_HEIGHT;
+extern const char* WINDOW_AUTO_RESIZE;
+extern const char* WINDOW_RESTRICT_SIZE;
 
 
 extern const char* COLUMN_ACCOUNT_SIZE;
@@ -62,7 +64,8 @@ namespace Settings {
 	extern float MinWindowHeight;
 	extern float MaxWindowWidth;
 	extern float MaxWindowHeight;
-
+	extern bool WindowAutoResize;
+	extern bool WindowRestrictSize;
 
 	extern float ColumnSizeAccount;
 	extern float ColumnSizeBosses;

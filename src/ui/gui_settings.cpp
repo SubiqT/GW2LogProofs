@@ -24,41 +24,68 @@ void DeregisterQuickAccessShortcut() {
 }
 
 static void DrawWindowSizingOptions() {
-	if (ImGui::BeginTable("WindowSizingTable", 3, ImGuiTableFlags_SizingStretchProp)) {
-		ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 60.0f);
-		ImGui::TableSetupColumn("Min", ImGuiTableColumnFlags_WidthStretch);
-		ImGui::TableSetupColumn("Max", ImGuiTableColumnFlags_WidthStretch);
-		ImGui::TableHeadersRow();
+	if (ImGui::BeginTable("WindowSizingTable", 2, ImGuiTableFlags_SizingStretchProp)) {
+		ImGui::TableSetupColumn("Setting", ImGuiTableColumnFlags_WidthFixed, 150.0f);
+		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		ImGui::Text("Width");
+		ImGui::Text("Auto Resize");
 		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##MinWidth", &Settings::MinWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
-			Settings::Save(SettingsPath);
-		}
-		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##MaxWidth", &Settings::MaxWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH] = Settings::MaxWindowWidth;
+		if (ImGui::Checkbox("##AutoResize", &Settings::WindowAutoResize)) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_AUTO_RESIZE] = Settings::WindowAutoResize;
 			Settings::Save(SettingsPath);
 		}
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		ImGui::Text("Height");
+		ImGui::Text("Restrict Size");
 		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##MinHeight", &Settings::MinWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT] = Settings::MinWindowHeight;
-			Settings::Save(SettingsPath);
-		}
-		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##MaxHeight", &Settings::MaxWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT] = Settings::MaxWindowHeight;
+		if (ImGui::Checkbox("##RestrictSize", &Settings::WindowRestrictSize)) {
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_RESTRICT_SIZE] = Settings::WindowRestrictSize;
 			Settings::Save(SettingsPath);
 		}
 
 		ImGui::EndTable();
+	}
+
+	if (Settings::WindowRestrictSize) {
+		if (ImGui::BeginTable("WindowSizeConstraintsTable", 3, ImGuiTableFlags_SizingStretchProp)) {
+			ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+			ImGui::TableSetupColumn("Min", ImGuiTableColumnFlags_WidthStretch);
+			ImGui::TableSetupColumn("Max", ImGuiTableColumnFlags_WidthStretch);
+			ImGui::TableHeadersRow();
+
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::Text("Width");
+			ImGui::TableNextColumn();
+			if (ImGui::SliderFloat("##MinWidth", &Settings::MinWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
+				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
+				Settings::Save(SettingsPath);
+			}
+			ImGui::TableNextColumn();
+			if (ImGui::SliderFloat("##MaxWidth", &Settings::MaxWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
+				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH] = Settings::MaxWindowWidth;
+				Settings::Save(SettingsPath);
+			}
+
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::Text("Height");
+			ImGui::TableNextColumn();
+			if (ImGui::SliderFloat("##MinHeight", &Settings::MinWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
+				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT] = Settings::MinWindowHeight;
+				Settings::Save(SettingsPath);
+			}
+			ImGui::TableNextColumn();
+			if (ImGui::SliderFloat("##MaxHeight", &Settings::MaxWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
+				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT] = Settings::MaxWindowHeight;
+				Settings::Save(SettingsPath);
+			}
+
+			ImGui::EndTable();
+		}
 	}
 }
 

@@ -16,7 +16,8 @@ const char* MIN_WINDOW_WIDTH = "MinWindowWidth";
 const char* MIN_WINDOW_HEIGHT = "MinWindowHeight";
 const char* MAX_WINDOW_WIDTH = "MaxWindowWidth";
 const char* MAX_WINDOW_HEIGHT = "MaxWindowHeight";
-
+const char* WINDOW_AUTO_RESIZE = "WindowAutoResize";
+const char* WINDOW_RESTRICT_SIZE = "WindowRestrictSize";
 
 const char* COLUMN_ACCOUNT_SIZE = "ColumnAccountSize";
 const char* COLUMN_BOSSES_SIZE = "ColumnBossesSize";
@@ -72,6 +73,12 @@ namespace Settings {
 		}
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT].get_to<float>(MaxWindowHeight);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_AUTO_RESIZE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_AUTO_RESIZE].get_to<bool>(WindowAutoResize);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_RESTRICT_SIZE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_RESTRICT_SIZE].get_to<bool>(WindowRestrictSize);
 		}
 
 		/* Column Sizing */
@@ -149,6 +156,8 @@ namespace Settings {
 	float MinWindowHeight = 100.0f;
 	float MaxWindowWidth = 800.0f;
 	float MaxWindowHeight = 800.0f;
+	bool WindowAutoResize = true;
+	bool WindowRestrictSize = true;
 
 	float ColumnSizeAccount = 200.0f;
 	float ColumnSizeBosses = 32.0f;
