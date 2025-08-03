@@ -61,11 +61,21 @@ static void DrawWindowSizingOptions() {
 			ImGui::Text("Width");
 			ImGui::TableNextColumn();
 			if (ImGui::SliderFloat("##MinWidth", &Settings::MinWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
+				Settings::MinWindowWidth = std::clamp(Settings::MinWindowWidth, 100.0f, 1500.0f);
+				if (Settings::MinWindowWidth > Settings::MaxWindowWidth) {
+					Settings::MaxWindowWidth = Settings::MinWindowWidth;
+					Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH] = Settings::MaxWindowWidth;
+				}
 				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
 				Settings::Save(SettingsPath);
 			}
 			ImGui::TableNextColumn();
 			if (ImGui::SliderFloat("##MaxWidth", &Settings::MaxWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
+				Settings::MaxWindowWidth = std::clamp(Settings::MaxWindowWidth, 100.0f, 1500.0f);
+				if (Settings::MaxWindowWidth < Settings::MinWindowWidth) {
+					Settings::MinWindowWidth = Settings::MaxWindowWidth;
+					Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
+				}
 				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH] = Settings::MaxWindowWidth;
 				Settings::Save(SettingsPath);
 			}
@@ -75,11 +85,21 @@ static void DrawWindowSizingOptions() {
 			ImGui::Text("Height");
 			ImGui::TableNextColumn();
 			if (ImGui::SliderFloat("##MinHeight", &Settings::MinWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
+				Settings::MinWindowHeight = std::clamp(Settings::MinWindowHeight, 100.0f, 1500.0f);
+				if (Settings::MinWindowHeight > Settings::MaxWindowHeight) {
+					Settings::MaxWindowHeight = Settings::MinWindowHeight;
+					Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT] = Settings::MaxWindowHeight;
+				}
 				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT] = Settings::MinWindowHeight;
 				Settings::Save(SettingsPath);
 			}
 			ImGui::TableNextColumn();
 			if (ImGui::SliderFloat("##MaxHeight", &Settings::MaxWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
+				Settings::MaxWindowHeight = std::clamp(Settings::MaxWindowHeight, 100.0f, 1500.0f);
+				if (Settings::MaxWindowHeight < Settings::MinWindowHeight) {
+					Settings::MinWindowHeight = Settings::MaxWindowHeight;
+					Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT] = Settings::MinWindowHeight;
+				}
 				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT] = Settings::MaxWindowHeight;
 				Settings::Save(SettingsPath);
 			}
@@ -99,6 +119,7 @@ static void DrawColumnOptions() {
 		ImGui::Text("Account Size");
 		ImGui::TableNextColumn();
 		if (ImGui::SliderFloat("##AccountSize", &Settings::ColumnSizeAccount, 40.0f, 400.0f, "%.0f px")) {
+			Settings::ColumnSizeAccount = std::clamp(Settings::ColumnSizeAccount, 40.0f, 400.0f);
 			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE] = Settings::ColumnSizeAccount;
 			Settings::Save(SettingsPath);
 		}
@@ -108,6 +129,7 @@ static void DrawColumnOptions() {
 		ImGui::Text("Bosses Size");
 		ImGui::TableNextColumn();
 		if (ImGui::SliderFloat("##BossesSize", &Settings::ColumnSizeBosses, 8.0f, 128.0f, "%.0f px")) {
+			Settings::ColumnSizeBosses = std::clamp(Settings::ColumnSizeBosses, 8.0f, 128.0f);
 			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE] = Settings::ColumnSizeBosses;
 			Settings::Save(SettingsPath);
 		}
@@ -117,6 +139,7 @@ static void DrawColumnOptions() {
 		ImGui::Text("KPME Id Size");
 		ImGui::TableNextColumn();
 		if (ImGui::SliderFloat("##KpmeIdSize", &Settings::ColumnSizeKpmeId, 8.0f, 128.0f, "%.0f px")) {
+			Settings::ColumnSizeKpmeId = std::clamp(Settings::ColumnSizeKpmeId, 8.0f, 128.0f);
 			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE] = Settings::ColumnSizeKpmeId;
 			Settings::Save(SettingsPath);
 		}
@@ -463,6 +486,7 @@ static void DrawNetworkSettings() {
 		ImGui::Text("Cache Timeout (minutes)");
 		ImGui::TableNextColumn();
 		if (ImGui::SliderInt("##CacheTimeout", &Settings::CacheTimeoutMinutes, 1, 30)) {
+			Settings::CacheTimeoutMinutes = std::clamp(Settings::CacheTimeoutMinutes, 1, 30);
 			Settings::Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES] = Settings::CacheTimeoutMinutes;
 			Settings::Save(SettingsPath);
 		}
@@ -472,6 +496,7 @@ static void DrawNetworkSettings() {
 		ImGui::Text("Max Retry Attempts");
 		ImGui::TableNextColumn();
 		if (ImGui::SliderInt("##MaxRetries", &Settings::MaxRetryAttempts, 1, 10)) {
+			Settings::MaxRetryAttempts = std::clamp(Settings::MaxRetryAttempts, 1, 10);
 			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS] = Settings::MaxRetryAttempts;
 			Settings::Save(SettingsPath);
 		}
@@ -482,6 +507,7 @@ static void DrawNetworkSettings() {
 		ImGui::TableNextColumn();
 		static bool showConcurrencyWarning = false;
 		if (ImGui::SliderInt("##MaxConcurrentRequests", &Settings::MaxConcurrentRequests, 1, 10)) {
+			Settings::MaxConcurrentRequests = std::clamp(Settings::MaxConcurrentRequests, 1, 10);
 			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS] = Settings::MaxConcurrentRequests;
 			Settings::Save(SettingsPath);
 			showConcurrencyWarning = true;
