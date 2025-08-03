@@ -317,6 +317,13 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, cons
 			static std::vector<const Player*> visiblePlayers;
 			visiblePlayers.clear();
 			for (const auto& p : PlayerManager::players) {
+				if (!Settings::IncludeMissingAccounts) {
+					auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
+					auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
+					if (lazyState == LoadState::READY && (!lazyData || lazyData->proofs.empty())) {
+						continue;
+					}
+				}
 				visiblePlayers.push_back(&p);
 			}
 

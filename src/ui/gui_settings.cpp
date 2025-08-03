@@ -456,6 +456,25 @@ static void DrawGeneralSettings() {
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
+		ImGui::Text("Visibility Mode");
+		ImGui::TableNextColumn();
+		const char* visibilityModes[] = {"Show all accounts", "Hide accounts with no data"};
+		int currentMode = Settings::IncludeMissingAccounts ? 0 : 1;
+		if (ImGui::BeginCombo("##VisibilityMode", visibilityModes[currentMode])) {
+			for (int i = 0; i < 2; i++) {
+				bool is_selected = (currentMode == i);
+				if (ImGui::Selectable(visibilityModes[i], is_selected)) {
+					Settings::IncludeMissingAccounts = (i == 0);
+					Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS] = Settings::IncludeMissingAccounts;
+					Settings::Save(SettingsPath);
+				}
+				if (is_selected) ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
 		ImGui::Text("Linked Accounts Mode");
 		ImGui::TableNextColumn();
 		const char* modeNames[] = {"Hide linked accounts", "Combine linked accounts", "Split linked accounts"};

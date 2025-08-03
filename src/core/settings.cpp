@@ -25,6 +25,7 @@ const char* COLUMN_KPME_ID_SIZE = "ColumnKpmeIdSize";
 
 const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
 const char* LINKED_ACCOUNTS_MODE = "LinkedAccountsMode";
+const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
 
 const char* HOVER_ENABLED = "HoverEnabled";
 const char* HOVER_COLOUR = "HoverColour";
@@ -99,6 +100,9 @@ namespace Settings {
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE].get_to<LinkedAccountMode>(LinkedAccountsMode);
 		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].get_to<bool>(IncludeMissingAccounts);
+		}
 
 		/* Hover settings */
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED].is_null()) {
@@ -165,6 +169,7 @@ namespace Settings {
 
 	DataSource SelectedDataSource = WINGMAN;
 	LinkedAccountMode LinkedAccountsMode = HIDE_LINKED;
+	bool IncludeMissingAccounts = true;
 
 	bool hoverEnabled = true;
 	ImU32 hoverColour = 4285558896;
@@ -174,7 +179,7 @@ namespace Settings {
 
 	int CacheTimeoutMinutes = 10;
 	int MaxRetryAttempts = 3;
-	int MaxConcurrentRequests = 1;
+	int MaxConcurrentRequests = 3;
 
 	void ResetToDefaultTabs(const std::string& providerId) {
 		ProviderTabConfig config;
