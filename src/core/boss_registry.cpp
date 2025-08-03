@@ -21,3 +21,19 @@ std::vector<std::string> BossRegistry::GetAvailableProviders() const {
 	}
 	return providers;
 }
+
+void BossGroup::InitializeCache(const IBossProvider* provider) const {
+	if (cacheInitialized) return;
+
+	cachedCurrencyIds.clear();
+	for (const auto& currency : currencies) {
+		cachedCurrencyIds.push_back(provider->GetProofIdentifier(currency));
+	}
+
+	cachedBossIds.clear();
+	for (const auto& bossEntry : bosses) {
+		cachedBossIds.push_back(provider->GetProofIdentifier(bossEntry.boss, bossEntry.type));
+	}
+
+	cacheInitialized = true;
+}

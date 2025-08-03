@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <vector>
 
+class IBossProvider; // Forward declaration
+
 enum class BossCategory {
 	RAID_NORMAL,
 	RAID_CM,
@@ -30,6 +32,13 @@ struct BossGroup {
 	BossCategory category;
 	std::vector<BossEntry> bosses;
 	std::vector<std::string> currencies; // For summary/currency groups
+
+	// Cached proof identifiers to avoid repeated GetProofIdentifier calls
+	mutable std::vector<std::string> cachedCurrencyIds;
+	mutable std::vector<std::string> cachedBossIds;
+	mutable bool cacheInitialized = false;
+
+	void InitializeCache(const IBossProvider* provider) const;
 };
 
 class IBossProvider {

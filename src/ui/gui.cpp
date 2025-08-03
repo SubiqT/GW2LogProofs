@@ -150,15 +150,27 @@ static void HighlightRowOnHover(ImGuiTable* table) {
 }
 
 static void SetupTableColumns(const BossGroup& group, bool showKpmeId) {
-	ImGui::TableSetupColumn("Account", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
+	static std::vector<std::pair<std::string, float>> columnSpecs;
+	columnSpecs.clear();
+
+	columnSpecs.emplace_back("Account", Settings::ColumnSizeAccount);
 	if (showKpmeId) {
-		ImGui::TableSetupColumn("Id", ImGuiTableColumnFlags_WidthFixed, Settings::ColumnSizeKpmeId);
+		columnSpecs.emplace_back("Id", Settings::ColumnSizeKpmeId);
 	}
 	for (const auto& currency : group.currencies) {
-		ImGui::TableSetupColumn(currency.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
+		columnSpecs.emplace_back(currency, Settings::ColumnSizeBosses);
 	}
 	for (const auto& bossEntry : group.bosses) {
-		ImGui::TableSetupColumn(GetBossName(bossEntry.boss, bossEntry.type).c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
+		columnSpecs.emplace_back(GetBossName(bossEntry.boss, bossEntry.type), Settings::ColumnSizeBosses);
+	}
+
+	// Setup all columns at once
+	for (size_t i = 0; i < columnSpecs.size(); ++i) {
+		ImGuiTableColumnFlags flags = ImGuiTableColumnFlags_WidthFixed;
+		if (i == 0) flags |= ImGuiTableColumnFlags_NoHide; // Account column
+		else if (i > (showKpmeId ? 1 : 0))
+			flags |= ImGuiTableColumnFlags_NoResize; // Boss/currency columns
+		ImGui::TableSetupColumn(columnSpecs[i].first.c_str(), flags, columnSpecs[i].second);
 	}
 }
 
@@ -204,6 +216,9 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 }
 
 static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider* provider, bool showKpmeId, const std::string& providerName) {
+	// Initialize cached proof identifiers
+	group.InitializeCache(provider);
+
 	// Cache lazy loading data once per row
 	auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
 	auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
@@ -235,11 +250,12 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 
 	bool isDisabled = !proofData || proofData->proofs.empty();
 
-	for (const auto& currency : group.currencies) {
+	// Use cached currency identifiers
+	for (size_t i = 0; i < group.cachedCurrencyIds.size(); ++i) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
 		if (proofData) {
-			auto it = proofData->proofs.find(provider->GetProofIdentifier(currency));
+			auto it = proofData->proofs.find(group.cachedCurrencyIds[i]);
 			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : (isDisabled ? "" : "0"));
 		} else {
 			if (lazyState == LoadState::LOADING) {
@@ -249,13 +265,12 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 			}
 		}
 	}
-	for (const auto& bossEntry : group.bosses) {
+	// Use cached boss identifiers
+	for (size_t i = 0; i < group.cachedBossIds.size(); ++i) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
 		if (proofData) {
-			std::string proofId;
-			proofId = provider->GetProofIdentifier(bossEntry.boss, bossEntry.type);
-			auto it = proofData->proofs.find(proofId);
+			auto it = proofData->proofs.find(group.cachedBossIds[i]);
 			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : (isDisabled ? "" : "0"));
 		} else {
 			if (lazyState == LoadState::LOADING) {
@@ -286,19 +301,19 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 				ImGui::Text("-");
 			}
 
-			for (const auto& currency : group.currencies) {
+			// Use cached currency identifiers for linked accounts
+			for (size_t i = 0; i < group.cachedCurrencyIds.size(); ++i) {
 				ImGui::TableNextColumn();
 				HighlightColumnOnHover();
-				auto it = linkedAccount.proofs.find(provider->GetProofIdentifier(currency));
+				auto it = linkedAccount.proofs.find(group.cachedCurrencyIds[i]);
 				ImGui::Text(it != linkedAccount.proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
 			}
 
-			for (const auto& bossEntry : group.bosses) {
+			// Use cached boss identifiers for linked accounts
+			for (size_t i = 0; i < group.cachedBossIds.size(); ++i) {
 				ImGui::TableNextColumn();
 				HighlightColumnOnHover();
-				std::string proofId;
-				proofId = provider->GetProofIdentifier(bossEntry.boss, bossEntry.type);
-				auto it = linkedAccount.proofs.find(proofId);
+				auto it = linkedAccount.proofs.find(group.cachedBossIds[i]);
 				ImGui::Text(it != linkedAccount.proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
 			}
 
@@ -313,14 +328,21 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, cons
 	if (ImGui::BeginTable(group.tableName.c_str(), columnCount, tableFlags)) {
 		SetupTableColumns(group, showKpmeId);
 		DrawTableHeaders(group, showKpmeId);
-		std::scoped_lock lck(PlayerManager::playerMutex);
-		if (PlayerManager::players.empty()) {
-			ImGui::TableNextColumn();
-			ImGui::Text("No players found... ");
-		} else {
-			// Show all players
-			static std::vector<const Player*> visiblePlayers;
-			visiblePlayers.clear();
+
+		static std::vector<const Player*> visiblePlayers;
+		visiblePlayers.clear();
+
+		{
+			std::scoped_lock lck(PlayerManager::playerMutex);
+			if (PlayerManager::players.empty()) {
+				ImGui::TableNextColumn();
+				ImGui::Text("No players found... ");
+				ImGui::EndTable();
+				ImGui::EndTabItem();
+				return;
+			}
+
+			// Filter players while holding lock
 			for (const auto& p : PlayerManager::players) {
 				if (!Settings::IncludeMissingAccounts) {
 					auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
@@ -331,32 +353,11 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, cons
 				}
 				visiblePlayers.push_back(&p);
 			}
+		}
 
-			// Calculate total rows including linked accounts
-			int totalRows = static_cast<int>(visiblePlayers.size());
-			if (Settings::LinkedAccountsMode == SPLIT_LINKED && providerName == "KPME") {
-				for (const auto* player : visiblePlayers) {
-					auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(player->account, providerName);
-					if (lazyData && !lazyData->linkedAccounts.empty()) {
-						totalRows += static_cast<int>(lazyData->linkedAccounts.size());
-					}
-				}
-			}
-
-			// Disable clipper when showing separately to avoid row counting issues
-			if (Settings::LinkedAccountsMode == SPLIT_LINKED) {
-				for (const auto* player : visiblePlayers) {
-					DrawPlayerRow(*player, group, provider, showKpmeId, providerName);
-				}
-			} else {
-				ImGuiListClipper clipper;
-				clipper.Begin(static_cast<int>(visiblePlayers.size()));
-				while (clipper.Step()) {
-					for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-						DrawPlayerRow(*visiblePlayers[i], group, provider, showKpmeId, providerName);
-					}
-				}
-			}
+		// Render all players without clipping
+		for (const auto* player : visiblePlayers) {
+			DrawPlayerRow(*player, group, provider, showKpmeId, providerName);
 		}
 		ImGui::EndTable();
 	}
