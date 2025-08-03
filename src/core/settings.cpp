@@ -22,6 +22,7 @@ const char* WINDOW_RESTRICT_SIZE = "WindowRestrictSize";
 const char* COLUMN_ACCOUNT_SIZE = "ColumnAccountSize";
 const char* COLUMN_BOSSES_SIZE = "ColumnBossesSize";
 const char* COLUMN_KPME_ID_SIZE = "ColumnKpmeIdSize";
+const char* BOSS_ICON_SCALE = "BossIconScale";
 
 const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
 const char* LINKED_ACCOUNTS_MODE = "LinkedAccountsMode";
@@ -91,6 +92,9 @@ namespace Settings {
 		}
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE].get_to<float>(ColumnSizeKpmeId);
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][BOSS_ICON_SCALE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][BOSS_ICON_SCALE].get_to<float>(BossIconScale);
 		}
 
 		/* Data settings */
@@ -166,6 +170,7 @@ namespace Settings {
 	float ColumnSizeAccount = 200.0f;
 	float ColumnSizeBosses = 32.0f;
 	float ColumnSizeKpmeId = 32.0f;
+	float BossIconScale = 32.0f;
 
 	DataSource SelectedDataSource = WINGMAN;
 	LinkedAccountMode LinkedAccountsMode = HIDE_LINKED;

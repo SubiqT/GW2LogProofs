@@ -116,7 +116,7 @@ static void DrawColumnOptions() {
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		ImGui::Text("Account Size");
+		ImGui::Text("Account Width");
 		ImGui::TableNextColumn();
 		if (ImGui::SliderFloat("##AccountSize", &Settings::ColumnSizeAccount, 40.0f, 400.0f, "%.0f px")) {
 			Settings::ColumnSizeAccount = std::clamp(Settings::ColumnSizeAccount, 40.0f, 400.0f);
@@ -126,7 +126,17 @@ static void DrawColumnOptions() {
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		ImGui::Text("Bosses Size");
+		ImGui::Text("Id Width");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderFloat("##KpmeIdSize", &Settings::ColumnSizeKpmeId, 8.0f, 128.0f, "%.0f px")) {
+			Settings::ColumnSizeKpmeId = std::clamp(Settings::ColumnSizeKpmeId, 8.0f, 128.0f);
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE] = Settings::ColumnSizeKpmeId;
+			Settings::Save(SettingsPath);
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Proof Width");
 		ImGui::TableNextColumn();
 		if (ImGui::SliderFloat("##BossesSize", &Settings::ColumnSizeBosses, 8.0f, 128.0f, "%.0f px")) {
 			Settings::ColumnSizeBosses = std::clamp(Settings::ColumnSizeBosses, 8.0f, 128.0f);
@@ -136,11 +146,11 @@ static void DrawColumnOptions() {
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
-		ImGui::Text("KPME Id Size");
+		ImGui::Text("Proof Icon Size");
 		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##KpmeIdSize", &Settings::ColumnSizeKpmeId, 8.0f, 128.0f, "%.0f px")) {
-			Settings::ColumnSizeKpmeId = std::clamp(Settings::ColumnSizeKpmeId, 8.0f, 128.0f);
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE] = Settings::ColumnSizeKpmeId;
+		if (ImGui::SliderFloat("##BossIconScale", &Settings::BossIconScale, 8.0f, 128.0f, "%.0f px")) {
+			Settings::BossIconScale = std::clamp(Settings::BossIconScale, 8.0f, 128.0f);
+			Settings::Settings[WINDOW_LOG_PROOFS_KEY][BOSS_ICON_SCALE] = Settings::BossIconScale;
 			Settings::Save(SettingsPath);
 		}
 

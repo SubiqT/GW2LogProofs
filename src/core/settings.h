@@ -35,6 +35,7 @@ extern const char* WINDOW_RESTRICT_SIZE;
 extern const char* COLUMN_ACCOUNT_SIZE;
 extern const char* COLUMN_BOSSES_SIZE;
 extern const char* COLUMN_KPME_ID_SIZE;
+extern const char* BOSS_ICON_SCALE;
 
 extern const char* SELECTED_DATA_SOURCE;
 extern const char* LINKED_ACCOUNTS_MODE;
@@ -71,6 +72,7 @@ namespace Settings {
 	extern float ColumnSizeAccount;
 	extern float ColumnSizeBosses;
 	extern float ColumnSizeKpmeId;
+	extern float BossIconScale;
 
 	extern DataSource SelectedDataSource;
 	extern LinkedAccountMode LinkedAccountsMode;

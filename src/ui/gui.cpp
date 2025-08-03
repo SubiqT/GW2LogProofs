@@ -194,7 +194,11 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 		HighlightColumnOnHover();
 		Texture* texture = GetCurrencyTexture(currency);
 		if (texture) {
-			ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+			float columnWidth = Settings::ColumnSizeBosses;
+			float iconSize = Settings::BossIconScale;
+			float padding = (columnWidth - iconSize) * 0.5f;
+			if (padding > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding);
+			ImGui::Image((void*) texture->Resource, ImVec2(iconSize, iconSize));
 		} else {
 			ImGui::Text(currency.c_str());
 		}
@@ -216,7 +220,11 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 		}
 		const std::string& bossName = it->second;
 		if (texture) {
-			ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
+			float columnWidth = Settings::ColumnSizeBosses;
+			float iconSize = Settings::BossIconScale;
+			float padding = (columnWidth - iconSize) * 0.5f;
+			if (padding > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding);
+			ImGui::Image((void*) texture->Resource, ImVec2(iconSize, iconSize));
 		} else {
 			ImGui::Text(bossName.c_str());
 		}
