@@ -15,6 +15,7 @@
 #include "../imgui/imgui_internal.h"
 #include "../providers/common/provider_registry.h"
 
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 
 #include "imgui_extensions.h"
@@ -252,7 +253,9 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
 		if (proofData) {
-			auto it = proofData->proofs.find(provider->GetProofIdentifier(bossEntry.boss, group.category));
+			std::string proofId;
+			proofId = provider->GetProofIdentifier(bossEntry.boss, bossEntry.type);
+			auto it = proofData->proofs.find(proofId);
 			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : (isDisabled ? "" : "0"));
 		} else {
 			if (lazyState == LoadState::LOADING) {
@@ -293,7 +296,9 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 			for (const auto& bossEntry : group.bosses) {
 				ImGui::TableNextColumn();
 				HighlightColumnOnHover();
-				auto it = linkedAccount.proofs.find(provider->GetProofIdentifier(bossEntry.boss, group.category));
+				std::string proofId;
+				proofId = provider->GetProofIdentifier(bossEntry.boss, bossEntry.type);
+				auto it = linkedAccount.proofs.find(proofId);
 				ImGui::Text(it != linkedAccount.proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
 			}
 
