@@ -161,7 +161,13 @@ static void SetupTableColumns(const BossGroup& group, bool showKpmeId) {
 		columnSpecs.emplace_back(currency, Settings::ColumnSizeBosses);
 	}
 	for (const auto& bossEntry : group.bosses) {
-		columnSpecs.emplace_back(GetBossName(bossEntry.boss, bossEntry.type), Settings::ColumnSizeBosses);
+		static std::unordered_map<std::string, std::string> bossNameCache;
+		std::string key = std::to_string(int(bossEntry.boss)) + "_" + std::to_string(int(bossEntry.type));
+		auto it = bossNameCache.find(key);
+		if (it == bossNameCache.end()) {
+			it = bossNameCache.emplace(key, GetBossName(bossEntry.boss, bossEntry.type)).first;
+		}
+		columnSpecs.emplace_back(it->second, Settings::ColumnSizeBosses);
 	}
 
 	// Setup all columns at once
@@ -202,14 +208,21 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
 		Texture* texture = GetBossTexture(bossEntry.boss);
+		static std::unordered_map<std::string, std::string> bossNameCache;
+		std::string key = std::to_string(int(bossEntry.boss)) + "_" + std::to_string(int(bossEntry.type));
+		auto it = bossNameCache.find(key);
+		if (it == bossNameCache.end()) {
+			it = bossNameCache.emplace(key, GetBossName(bossEntry.boss, bossEntry.type)).first;
+		}
+		const std::string& bossName = it->second;
 		if (texture) {
 			ImGui::Image((void*) texture->Resource, ImVec2(Settings::ColumnSizeBosses, Settings::ColumnSizeBosses));
 		} else {
-			ImGui::Text(GetBossName(bossEntry.boss, bossEntry.type).c_str());
+			ImGui::Text(bossName.c_str());
 		}
 		if (ImGui::IsItemHovered()) {
 			ImGui::BeginTooltip();
-			ImGui::Text(GetBossName(bossEntry.boss, bossEntry.type).c_str());
+			ImGui::Text(bossName.c_str());
 			ImGui::EndTooltip();
 		}
 	}
@@ -224,17 +237,8 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 	auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
 	const auto* rawProofData = (lazyState == LoadState::READY && lazyData) ? lazyData.get() : nullptr;
 
-	// For providers that support linked accounts, compute proofs dynamically
-	std::unique_ptr<PlayerProofData> computedData;
-	if (rawProofData && rawProofData->rawData.has_value()) {
-		auto dataProvider = ProviderRegistry::Instance().CreateProvider(providerName);
-		if (dataProvider && dataProvider->SupportsLinkedAccounts()) {
-			// Determine if linked accounts should be included in main computation
-			bool includeLinked = (Settings::LinkedAccountsMode == COMBINE_LINKED);
-			computedData = std::make_unique<PlayerProofData>(dataProvider->ComputeProofsFromRawData(*rawProofData, includeLinked));
-		}
-	}
-	const auto* proofData = computedData ? computedData.get() : rawProofData;
+	// Use raw proof data directly - no dynamic computation
+	const auto* proofData = rawProofData;
 
 	if (!proofData || proofData->proofs.empty()) {
 		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
@@ -346,9 +350,11 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, cons
 			for (const auto& p : PlayerManager::players) {
 				if (!Settings::IncludeMissingAccounts) {
 					auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
-					auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
-					if (lazyState == LoadState::READY && (!lazyData || lazyData->proofs.empty())) {
-						continue;
+					if (lazyState == LoadState::READY) {
+						auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
+						if (!lazyData || lazyData->proofs.empty()) {
+							continue;
+						}
 					}
 				}
 				visiblePlayers.push_back(&p);

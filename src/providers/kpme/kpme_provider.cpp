@@ -25,39 +25,54 @@ PlayerProofData KpmeProvider::ConvertKpmeResponse(const Kpme::KpmeResponse& resp
 	data.profileId = response.id;
 	data.profileUrl = "https://killproof.me/proof/" + response.id;
 	data.hasLinkedAccounts = !response.shared.killproofs.empty() || !response.shared.tokens.empty() || !response.shared.coffers.empty() || !response.shared.titles.empty();
-	data.rawData = response; // Store raw response for dynamic computation
+	data.rawData = response;
 
-	// Populate proofs directly
-	bool includeLinked = Settings::LinkedAccountsMode == COMBINE_LINKED;
+	// Pre-compute based on current linked account mode
+	bool includeLinked = (Settings::LinkedAccountsMode == COMBINE_LINKED);
 
-	for (const auto& kp : response.self.killproofs) {
-		ProofData proof;
-		proof.identifier = kp.first;
-		proof.amount = includeLinked && response.shared.killproofs.count(kp.first) ? response.shared.killproofs.at(kp.first) : kp.second;
-		proof.type = ProofType::KILL_PROOF;
-		proof.displayName = kp.first;
-		proof.url = "";
-		data.proofs[kp.first] = proof;
+	// Add killproofs
+	for (const auto& [id, amount] : response.self.killproofs) {
+		int finalAmount = includeLinked && response.shared.killproofs.count(id) ? response.shared.killproofs.at(id) : amount;
+		data.proofs.emplace(id, ProofData {id, finalAmount, ProofType::KILL_PROOF, id, ""});
+	}
+	if (includeLinked) {
+		for (const auto& [id, amount] : response.shared.killproofs) {
+			if (!response.self.killproofs.count(id)) {
+				data.proofs.emplace(id, ProofData {id, amount, ProofType::KILL_PROOF, id, ""});
+			}
+		}
 	}
 
-	for (const auto& token : response.self.tokens) {
-		ProofData proof;
-		proof.identifier = token.first;
-		proof.amount = includeLinked && response.shared.tokens.count(token.first) ? response.shared.tokens.at(token.first) : token.second;
-		proof.type = ProofType::TOKEN;
-		proof.displayName = token.first;
-		proof.url = "";
-		data.proofs[token.first] = proof;
+	// Add tokens
+	for (const auto& [id, amount] : response.self.tokens) {
+		int finalAmount = includeLinked && response.shared.tokens.count(id) ? response.shared.tokens.at(id) : amount;
+		data.proofs.emplace(id, ProofData {id, finalAmount, ProofType::TOKEN, id, ""});
 	}
 
-	for (const auto& coffer : response.self.coffers) {
-		ProofData proof;
-		proof.identifier = coffer.first;
-		proof.amount = includeLinked && response.shared.coffers.count(coffer.first) ? response.shared.coffers.at(coffer.first) : coffer.second;
-		proof.type = ProofType::COFFER;
-		proof.displayName = coffer.first;
-		proof.url = "";
-		data.proofs[coffer.first] = proof;
+	// Add coffers
+	for (const auto& [id, amount] : response.self.coffers) {
+		int finalAmount = includeLinked && response.shared.coffers.count(id) ? response.shared.coffers.at(id) : amount;
+		data.proofs.emplace(id, ProofData {id, finalAmount, ProofType::COFFER, id, ""});
+	}
+
+	// Add linked accounts for SPLIT_LINKED mode
+	if (Settings::LinkedAccountsMode == SPLIT_LINKED && !response.linked_accounts.empty()) {
+		for (const auto& linkedAccount : response.linked_accounts) {
+			LinkedAccountData linkedData;
+			linkedData.accountName = linkedAccount.name;
+
+			for (const auto& [id, amount] : linkedAccount.data.killproofs) {
+				linkedData.proofs.emplace(id, ProofData {id, amount, ProofType::KILL_PROOF, id, ""});
+			}
+			for (const auto& [id, amount] : linkedAccount.data.tokens) {
+				linkedData.proofs.emplace(id, ProofData {id, amount, ProofType::TOKEN, id, ""});
+			}
+			for (const auto& [id, amount] : linkedAccount.data.coffers) {
+				linkedData.proofs.emplace(id, ProofData {id, amount, ProofType::COFFER, id, ""});
+			}
+
+			data.linkedAccounts.push_back(linkedData);
+		}
 	}
 
 	return data;
