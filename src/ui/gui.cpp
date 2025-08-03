@@ -237,8 +237,16 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 	auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
 	const auto* rawProofData = (lazyState == LoadState::READY && lazyData) ? lazyData.get() : nullptr;
 
-	// Use raw proof data directly - no dynamic computation
-	const auto* proofData = rawProofData;
+	// For KPME providers, compute proofs dynamically from raw data
+	std::unique_ptr<PlayerProofData> computedData;
+	if (rawProofData && rawProofData->rawData.has_value() && providerName == "KPME") {
+		auto dataProvider = ProviderRegistry::Instance().CreateProvider(providerName);
+		if (dataProvider && dataProvider->SupportsLinkedAccounts()) {
+			bool includeLinked = (Settings::LinkedAccountsMode == COMBINE_LINKED);
+			computedData = std::make_unique<PlayerProofData>(dataProvider->ComputeProofsFromRawData(*rawProofData, includeLinked));
+		}
+	}
+	const auto* proofData = computedData ? computedData.get() : rawProofData;
 
 	if (!proofData || proofData->proofs.empty()) {
 		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);

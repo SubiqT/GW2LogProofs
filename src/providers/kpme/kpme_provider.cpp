@@ -79,6 +79,15 @@ PlayerProofData KpmeProvider::ConvertKpmeResponse(const Kpme::KpmeResponse& resp
 }
 
 PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& rawData, bool includeLinkedAccounts) const {
+	// Cache computed data per account and mode
+	static std::unordered_map<std::string, std::array<std::unique_ptr<PlayerProofData>, 3>> computeCache;
+	int modeIndex = includeLinkedAccounts ? 1 : (Settings::LinkedAccountsMode == SPLIT_LINKED ? 2 : 0);
+
+	auto& playerCache = computeCache[rawData.accountName];
+	if (playerCache[modeIndex]) {
+		return *playerCache[modeIndex];
+	}
+
 	PlayerProofData data = rawData;
 	data.proofs.clear();
 	data.linkedAccounts.clear();
@@ -173,5 +182,7 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 		APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to cast raw data for {}: {}", rawData.accountName, e.what()).c_str());
 	}
 
+	// Cache the computed result
+	computeCache[rawData.accountName][modeIndex] = std::make_unique<PlayerProofData>(data);
 	return data;
 }
