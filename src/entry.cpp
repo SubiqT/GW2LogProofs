@@ -1,32 +1,53 @@
+#include <chrono>
 #include <Windows.h>
 
 #include "imgui/imgui.h"
 #include "nexus/Nexus.h"
 
-#include "gui.h"
-#include "log_proofs.h"
+#include "core/bosses.h"
+#include "core/data_loader.h"
+#include "core/event_handlers.h"
+#include "core/player_manager.h"
+#include "core/settings.h"
+#include "core/shared.h"
+#include "providers/common/provider_registry.h"
+#include "providers/kpme/kpme_provider.h"
+#include "providers/wingman/wingman_provider.h"
 #include "resource.h"
-#include "settings.h"
-#include "shared.h"
+#include "trackers/arcdps_tracker.h"
+#include "trackers/realtime_api_tracker.h"
+#include "trackers/unofficial_extras_tracker.h"
+#include "ui/gui.h"
+#include "utils/httpclient.h"
 #include "version.h"
 
 AddonDefinition AddonDef = {};
 
+static void LoadPlayerDataWrapper(const std::string& account, const std::string& provider, const std::string& key) {
+	DataLoader::LoadPlayerDataLazy(account, provider, key);
+}
+
 void AddonOptions() {
-	ImGui::Separator();
-	ImGui::Text(ADDON_NAME);
 	RenderWindowSettings();
 }
 
 void AddonRender() {
+	// Periodic cleanup of expired cache entries
+	static auto lastCleanup = std::chrono::steady_clock::now();
+	auto now = std::chrono::steady_clock::now();
+	if (now - lastCleanup > std::chrono::seconds(1)) {
+		PlayerManager::lazyLoadManager.CleanupExpiredEntries();
+		lastCleanup = now;
+	}
+
 	RenderWindowLogProofs();
 }
 
 void AddonLoad(AddonAPI* addonApi) {
 	APIDefs = addonApi;
 
-	ImGui::SetCurrentContext((ImGuiContext*) APIDefs->ImguiContext);                                                              // cast to ImGuiContext*
-	ImGui::SetAllocatorFunctions((void* (*) (size_t, void*) ) APIDefs->ImguiMalloc, (void (*)(void*, void*)) APIDefs->ImguiFree); // on imgui 1.80+
+	ImGui::SetCurrentContext((ImGuiContext*) APIDefs->ImguiContext);
+	ImGui::SetAllocatorFunctions((void* (*) (size_t, void*) ) APIDefs->ImguiMalloc, (void (*)(void*, void*)) APIDefs->ImguiFree);
 
 	NexusLink = (NexusLinkData*) APIDefs->DataLink.Get("DL_NEXUS_LINK");
 
@@ -41,20 +62,26 @@ void AddonLoad(AddonAPI* addonApi) {
 	if (Settings::ShowQuickAccessShortcut)
 		RegisterQuickAccessShortcut();
 
-	APIDefs->Events.Subscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
-	APIDefs->Events.Subscribe("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
-	APIDefs->Events.Raise("EV_REPLAY_ARCDPS_SELF_JOIN", nullptr);
-	APIDefs->Events.Raise("EV_REPLAY_ARCDPS_SQUAD_JOIN", nullptr);
+	ProviderRegistry::Instance().RegisterProvider("Wingman", []() { return std::make_unique<WingmanProvider>(); });
+	ProviderRegistry::Instance().RegisterProvider("KPME", []() { return std::make_unique<KpmeProvider>(); });
+
+	trackerManager.RegisterTracker(std::make_unique<RealtimeApiTracker>());
+	trackerManager.RegisterTracker(std::make_unique<UnofficialExtrasTracker>());
+	trackerManager.RegisterTracker(std::make_unique<ArcdpsTracker>());
+	auto activeTracker = trackerManager.GetActiveTracker();
+
+	PlayerManager::lazyLoadManager.SetLoadFunction(LoadPlayerDataWrapper);
+
+	HTTPClient::Initialize();
+	InitializeBossRegistry();
+	InitializeTrackerManager();
 
 	APIDefs->Renderer.Register(ERenderType_Render, AddonRender);
 	APIDefs->Renderer.Register(ERenderType_OptionsRender, AddonOptions);
 
 	APIDefs->UI.RegisterCloseOnEscape("Log Proofs", &Settings::ShowWindowLogProofs);
 
-	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "<c=#00ff00>Log Proofs</c> was loaded.");
+	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "Log Proofs loaded successfully");
 }
 
 void AddonUnload() {
@@ -63,18 +90,14 @@ void AddonUnload() {
 	APIDefs->Renderer.Deregister(AddonOptions);
 	APIDefs->Renderer.Deregister(AddonRender);
 
-	if (&Settings::ShowQuickAccessShortcut)
+	if (Settings::ShowQuickAccessShortcut)
 		DeregisterQuickAccessShortcut();
 	APIDefs->InputBinds.Deregister(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_LEAVE", LogProofs::ArcSelfLeaveEventHandler);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SELF_JOIN", LogProofs::ArcSelfDetectedEventHandler);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SQUAD_LEAVE", LogProofs::ArcSquadLeaveEventHandler);
-	APIDefs->Events.Unsubscribe("EV_ARCDPS_SQUAD_JOIN", LogProofs::ArcSquadJoinEventHandler);
-	APIDefs->Events.Unsubscribe("EV_UNOFFICIAL_EXTRAS_SQUAD_UPDATE", LogProofs::UnExSquadEventHandler);
 
-	LogProofs::threadpool.shutdown();
+	ShutdownTrackerManager();
+	DataLoader::Shutdown();
 
-	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "<c=#ff0000>Log Proofs</c> was unloaded.");
+	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "Log Proofs unloaded successfully");
 }
 
 extern "C" __declspec(dllexport) AddonDefinition* GetAddonDef() {

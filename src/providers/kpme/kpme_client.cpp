@@ -1,55 +1,13 @@
-#include "nlohmann/json.hpp"
+#include "kpme_client.h"
+#include "../../core/shared.h"
+#include "../../nlohmann/json.hpp"
+#include "../../utils/httpclient.h"
+#include <format>
+
 
 using json = nlohmann::json;
 
-#include <map>
-#include <string>
-
-#include "httpclient.hpp"
-#include "kp_loader.h"
-#include "shared.h"
-
-namespace Wingman {
-
-	void from_json(const json& j, WingmanResponse& r) {
-		try {
-			if (j.contains("account")) {
-				if (j.at("account").is_string()) {
-					j.at("account").get_to(r.account);
-				}
-			}
-
-			if (j.contains("kp")) {
-				if (j.at("kp").is_object()) {
-					for (const auto& item : j.at("kp").items()) {
-						if (item.value().is_object()) {
-							if (item.value().contains("total")) {
-								if (item.value().at("total").is_number_integer()) {
-									r.kp[item.key()] = item.value().at("total"); // { boss_id, total_kills }
-								}
-							}
-						}
-					}
-				}
-			}
-		} catch (json::parse_error& ex) {
-			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("failed to parse wingman response. \nexception details: {}", ex.what()).c_str());
-		}
-	}
-
-	WingmanResponse GetKp(std::string account) {
-		std::string url = std::format("https://gw2wingman.nevermindcreations.de/api/kp?account={}", account);
-		const char* cUrl = url.c_str();
-		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, cUrl);
-		std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
-		std::string response = HTTPClient::GetRequest(wUrl.c_str());
-		json j = json::parse(response);
-		return j.template get<WingmanResponse>();
-	}
-} // namespace Wingman
-
 namespace Kpme {
-
 	void from_json(const json& j, KpmeResponse& r) {
 		try {
 			if (j.contains("kpid")) {
@@ -116,7 +74,6 @@ namespace Kpme {
 
 			if (j.contains("linked_totals")) {
 				if (j.at("linked_totals").is_object()) {
-
 					if (j.at("linked_totals").contains("killproofs")) {
 						if (j.at("linked_totals").at("killproofs").is_array()) {
 							for (const auto& item : j.at("linked_totals").at("killproofs")) {
@@ -175,23 +132,88 @@ namespace Kpme {
 				}
 			}
 
-		} catch (json::parse_error& ex) {
-			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("failed to parse kpme response. \nexception details: {}", ex.what()).c_str());
-			r = {"", {}, {}};
+			if (j.contains("linked") && j.at("linked").is_array()) {
+				for (const auto& account : j.at("linked")) {
+					if (account.is_object() && account.contains("account_name")) {
+						LinkedAccount linkedAccount;
+						linkedAccount.name = account.at("account_name").get<std::string>();
+
+						// Parse killproofs
+						if (account.contains("killproofs") && account.at("killproofs").is_array()) {
+							for (const auto& kp : account.at("killproofs")) {
+								if (kp.contains("name") && kp.contains("amount")) {
+									linkedAccount.data.killproofs[kp.at("name")] = kp.at("amount");
+								}
+							}
+						}
+
+						// Parse tokens
+						if (account.contains("tokens") && account.at("tokens").is_array()) {
+							for (const auto& token : account.at("tokens")) {
+								if (token.contains("name") && token.contains("amount")) {
+									linkedAccount.data.tokens[token.at("name")] = token.at("amount");
+								}
+							}
+						}
+
+						// Parse coffers
+						if (account.contains("coffers") && account.at("coffers").is_array()) {
+							for (const auto& coffer : account.at("coffers")) {
+								if (coffer.contains("name") && coffer.contains("amount")) {
+									linkedAccount.data.coffers[coffer.at("name")] = coffer.at("amount");
+								}
+							}
+						}
+
+						r.linked_accounts.push_back(linkedAccount);
+					}
+				}
+			}
+		} catch (const json::parse_error& ex) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME JSON response: {}", ex.what()).c_str());
+			r = {"", {}, {}, {}};
 			return;
 		}
 	}
 
-	KpmeResponse GetKp(std::string account) {
+	KpmeResponse KpmeClient::GetKp(const std::string& account) {
 		std::string url = std::format("https://killproof.me/api/kp/{}?lang=en", account);
 		const char* cUrl = url.c_str();
-		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, cUrl);
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Requesting KPME data: {}", cUrl).c_str());
 		std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
 		std::string kpmeResponse = HTTPClient::GetRequest(wUrl.c_str());
-		if (kpmeResponse == "An error occured.") {
-			return KpmeResponse {"", {}, {}};
+		if (kpmeResponse.empty()) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Empty response from KPME API for account: {}", account).c_str());
+			return KpmeResponse {"", {}, {}, {}};
 		}
-		json j = json::parse(kpmeResponse);
-		return j.template get<KpmeResponse>();
+		try {
+			json j = json::parse(kpmeResponse);
+			return j.template get<KpmeResponse>();
+		} catch (const json::parse_error& e) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME response for {}: {}", account, e.what()).c_str());
+			return KpmeResponse {"", {}, {}, {}};
+		}
+	}
+
+	void KpmeClient::GetKpAsync(const std::string& account, std::function<void(const KpmeResponse&)> callback) {
+		std::string url = std::format("https://killproof.me/api/kp/{}?lang=en", account);
+		const char* cUrl = url.c_str();
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Requesting KPME data (async): {}", cUrl).c_str());
+		std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
+
+		HTTPClient::GetRequestAsync(wUrl, [account, callback](const std::string& kpmeResponse) {
+			if (kpmeResponse.empty()) {
+				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Empty response from KPME API for account: {}", account).c_str());
+				callback(KpmeResponse {"", {}, {}, {}});
+				return;
+			}
+			try {
+				json j = json::parse(kpmeResponse);
+				callback(j.template get<KpmeResponse>());
+			} catch (const json::parse_error& e) {
+				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME response for {}: {}", account, e.what()).c_str());
+				callback(KpmeResponse {"", {}, {}, {}});
+			}
+		});
 	}
 } // namespace Kpme

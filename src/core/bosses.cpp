@@ -1,5 +1,5 @@
 #include "bosses.h"
-#include "resource.h"
+#include "../resource.h"
 #include "shared.h"
 
 std::vector<Boss> sortedRaidBosses {
@@ -81,7 +81,7 @@ std::vector<Boss> sortedKpmeStrikeCMBosses {
 		DagdaCM, CerusCM
 };
 
-const char* GetBossName(Boss boss) {
+std::string GetBossName(Boss boss) {
 	boss = Boss(abs(boss));
 	switch (boss) {
 		/* Raids */
@@ -197,6 +197,30 @@ const char* GetBossName(Boss boss) {
 			return "Cerus";
 		default:
 			return "Unknown";
+	}
+}
+
+std::string GetBossName(Boss boss, BossType type) {
+	std::string baseName = GetBossName(boss);
+	switch (type) {
+		case BossType::CM:
+			return baseName + " CM";
+		case BossType::LCM:
+			return baseName + " LCM";
+		default:
+			return baseName;
+	}
+}
+
+std::string GetBossName(Boss boss, BossType type, BossProofType proofType) {
+	std::string name = GetBossName(boss, type);
+	switch (proofType) {
+		case BossProofType::TOKEN:
+			return name + " Token";
+		case BossProofType::COFFER:
+			return name + " Coffer";
+		default:
+			return name;
 	}
 }
 
@@ -319,158 +343,6 @@ Texture* GetBossTexture(Boss boss) {
 	}
 }
 
-std::string GetKpMeBossToken(Boss boss) {
-	switch (boss) {
-		/* Raids */
-		case ValeGuardian:
-			return "Vale Guardian Fragment";
-		case Gorseval:
-			return "Gorseval Tentacle Piece";
-		case Sabetha:
-			return "Sabetha Flamethrower Fragment Piece";
-		case Slothasor:
-			return "Slothasor Mushroom";
-		case Matthias:
-			return "White Mantle Abomination Crystal";
-		case Escort:
-			return "Turret Fragment";
-		case KeepConstruct:
-			return "Keep Construct Rubble";
-		case Xera:
-			return "Ribbon Scrap";
-		case Cairn:
-			return "Cairn Fragment";
-		case MursaatOverseer:
-			return "Recreation Room Floor Fragment";
-		case Samarog:
-			return "Impaled Prisoner Token";
-		case Deimos:
-			return "Fragment of Saul's Burden";
-		case SoullessHorror:
-			return "Desmina's Token";
-		case RiverOfSouls:
-			return "River of Souls Token";
-		case BrokenKing:
-			return "Statue Token";
-		case Dhuum:
-			return "Dhuum's Token";
-		case ConjuredAmalgamate:
-			return "Conjured Amalgamate Token";
-		case TwinLargos:
-			return "Twin Largos Token";
-		case Qadim:
-			return "Qadim's Token";
-		case Adina:
-			return "Cardinal Adina's Token";
-		case Sabir:
-			return "Cardinal Sabir's Token";
-		case QadimThePeerless:
-			return "Ether Djinn's Token";
-		case Greer:
-			return "Greer's Token";
-		case Decima:
-			return "Decima's Token";
-		case Ura:
-			return "Ura's Token";
-		default:
-			return "Unknown";
-	}
-}
-
-std::string GetKpMeBossCoffer(Boss boss) {
-	switch (boss) {
-			/* Raids */
-		case ValeGuardian:
-			return "Vale Guardian Coffer";
-		case Gorseval:
-			return "Gorseval's Coffer";
-		case Sabetha:
-			return "Sabetha's Coffer";
-		case Slothasor:
-			return "Slothasor's Coffer";
-		case Matthias:
-			return "Matthias's Coffer";
-		case Escort:
-			return "McLeod's Coffer";
-		case KeepConstruct:
-			return "Keep Construct's Coffer";
-		case Xera:
-			return "Xera's Coffer";
-		case Cairn:
-			return "Cairn's Coffer";
-		case MursaatOverseer:
-			return "Mursaat Overseer's Coffer";
-		case Samarog:
-			return "Samarog's Coffer";
-		case Deimos:
-			return "Deimos's Coffer";
-		case SoullessHorror:
-			return "Desmina's Coffer";
-		case RiverOfSouls:
-			return "River of Souls Coffer";
-		case BrokenKing:
-			return "Statue of Grenth Coffer";
-		case Dhuum:
-			return "Dhuum's Coffer";
-		case ConjuredAmalgamate:
-			return "Conjured Amalgamate's Coffer";
-		case TwinLargos:
-			return "Twin Largos' Coffer";
-		case Qadim:
-			return "Qadim's Coffer";
-		case Adina:
-			return "Cardinal Adina's Coffer";
-		case Sabir:
-			return "Cardinal Sabir's Coffer";
-		case QadimThePeerless:
-			return "Qadim the Peerless's Coffer";
-		case Greer:
-			return "Greer's Coffer";
-		case Decima:
-			return "Decima's Coffer";
-		case Ura:
-			return "Ura's Coffer";
-			/* Raid CMs */
-		case GreerCM:
-			return "Greer's Magnificent Coffer";
-		case DecimaCM:
-			return "Decima's Magnificent Coffer";
-		case UraCM:
-			return "Ura's Magnificent Coffer";
-			/* Strikes */
-		case CaptainMaiTrin:
-			return "Mai Trin's Coffer";
-		case Ankka:
-			return "Ankka's Coffer";
-		case MinisterLi:
-			return "Minister Li's Coffer";
-		case VoidAmalgamate:
-			return "Void's Coffer";
-		case OldLionsCourt:
-			return "Assault Knights' Coffer";
-		case Dagda:
-			return "Dagda's Coffer";
-		case Cerus:
-			return "Cerus's Coffer";
-			/* Strike CMs */
-		case CaptainMaiTrinCM:
-			return "Mai Trin's Magnificent Coffer";
-		case AnkkaCM:
-			return "Ankka's Magnificent Coffer";
-		case MinisterLiCM:
-			return "Minister Li's Magnificent Coffer";
-		case VoidAmalgamateCM:
-			return "Void's Magnificent Coffer";
-		case OldLionsCourtCM:
-			return "Assault Knights' Magnificent Coffer";
-		case DagdaCM:
-			return "Dagda's Magnificent Coffer";
-		case CerusCM:
-			return "Cerus's Magnificent Coffer";
-		default:
-			return "Unknown";
-	}
-}
 
 Texture* GetCurrencyTexture(std::string name) {
 	if (name == "Legendary Insight")

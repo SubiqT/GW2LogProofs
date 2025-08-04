@@ -1,6 +1,6 @@
 #include <filesystem>
 
-#include "nexus/Nexus.h"
+#include "../nexus/Nexus.h"
 
 const char* ADDON_NAME = "Log Proofs";
 

@@ -1,21 +1,9 @@
-#ifndef KP_LOADER_H
-#define KP_LOADER_H
+#ifndef KPME_TYPES_H
+#define KPME_TYPES_H
 
 #include <map>
 #include <string>
 #include <vector>
-
-namespace Wingman {
-	struct WingmanResponse {
-		std::string account;
-		std::map<std::string, int> kp;
-		// Not used fields:
-		// std::vector<std::string> characters;
-		// std::vector<std::string> groups;
-	};
-
-	WingmanResponse GetKp(std::string account);
-} // namespace Wingman
 
 namespace Kpme {
 	struct KpSummary {
@@ -25,13 +13,17 @@ namespace Kpme {
 		std::map<std::string, std::string> titles;
 	};
 
+	struct LinkedAccount {
+		std::string name;
+		KpSummary data;
+	};
+
 	struct KpmeResponse {
 		std::string id;
 		KpSummary self;
 		KpSummary shared;
+		std::vector<LinkedAccount> linked_accounts;
 	};
-
-	KpmeResponse GetKp(std::string account);
 } // namespace Kpme
 
 #endif

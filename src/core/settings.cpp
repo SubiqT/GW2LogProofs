@@ -1,11 +1,12 @@
 #include "settings.h"
 #include "shared.h"
+#include "tab_config.h"
 
 #include <filesystem>
 #include <format>
 #include <fstream>
 
-#include "imgui/imgui.h"
+#include "../imgui/imgui.h"
 
 const char* SHOW_QUICK_ACCESS_SHORTCUT = "ShowQuickAccessShortcut";
 const char* WINDOW_LOG_PROOFS_KEY = "WindowLogProofs";
@@ -15,31 +16,27 @@ const char* MIN_WINDOW_WIDTH = "MinWindowWidth";
 const char* MIN_WINDOW_HEIGHT = "MinWindowHeight";
 const char* MAX_WINDOW_WIDTH = "MaxWindowWidth";
 const char* MAX_WINDOW_HEIGHT = "MaxWindowHeight";
-
-const char* SHOW_TAB_RAIDS_NORMAL = "ShowTabRaidsNormal";
-const char* SHOW_TAB_RAIDS_CM = "ShowTabRaidsCM";
-const char* SHOW_TAB_RAIDS_LM = "ShowTabRaidsLCM";
-const char* SHOW_TAB_FRACTALS_CM = "ShowTabFractalsCM";
-const char* SHOW_TAB_STRIKES_NORMAL = "ShowTabStrikesNormal";
-const char* SHOW_TAB_STRIKES_CM = "ShowTabStrikesCM";
-const char* SHOW_TAB_STRIKES_LM = "ShowTabStrikesLM";
-
-const char* SHOW_TAB_KPME_SUMMARY = "ShowTabKpmeSummary";
-const char* SHOW_TAB_KPME_RAID_TOKENS = "ShowTabKpmeRaidTokens";
-const char* SHOW_TAB_KPME_RAID_CM_COFFERS = "ShowTabKpmeRaidCMCoffers";
-const char* SHOW_TAB_KPME_STRIKE_COFFERS = "ShowTabKpmeStrikeCoffers";
-const char* SHOW_TAB_KPME_STRIKE_CM_COFFERS = "ShowTabKpmeStrikeCMCoffers";
+const char* WINDOW_AUTO_RESIZE = "WindowAutoResize";
+const char* WINDOW_RESTRICT_SIZE = "WindowRestrictSize";
 
 const char* COLUMN_ACCOUNT_SIZE = "ColumnAccountSize";
 const char* COLUMN_BOSSES_SIZE = "ColumnBossesSize";
 const char* COLUMN_KPME_ID_SIZE = "ColumnKpmeIdSize";
+const char* BOSS_ICON_SCALE = "BossIconScale";
 
 const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
-const char* INCLUDE_LINKED_ACCOUNTS = "IncludeLinkedAccounts";
+const char* LINKED_ACCOUNTS_MODE = "LinkedAccountsMode";
 const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
 
 const char* HOVER_ENABLED = "HoverEnabled";
 const char* HOVER_COLOUR = "HoverColour";
+
+const char* CUSTOM_TABS_ENABLED = "CustomTabsEnabled";
+const char* PROVIDER_CONFIGS = "ProviderConfigs";
+
+const char* CACHE_TIMEOUT_MINUTES = "CacheTimeoutMinutes";
+const char* MAX_RETRY_ATTEMPTS = "MaxRetryAttempts";
+const char* MAX_CONCURRENT_REQUESTS = "MaxConcurrentRequests";
 
 namespace Settings {
 	std::mutex Mutex;
@@ -79,50 +76,14 @@ namespace Settings {
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT].get_to<float>(MaxWindowHeight);
 		}
-
-		/* Wingman Tabs */
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_NORMAL].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_NORMAL].get_to<bool>(ShowTabRaidsNormal);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_AUTO_RESIZE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_AUTO_RESIZE].get_to<bool>(WindowAutoResize);
 		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_CM].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_CM].get_to<bool>(ShowTabRaidsCM);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_LM].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_RAIDS_LM].get_to<bool>(ShowTabRaidsLM);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_RESTRICT_SIZE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_RESTRICT_SIZE].get_to<bool>(WindowRestrictSize);
 		}
 
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_CM].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_FRACTALS_CM].get_to<bool>(ShowTabFractalsCM);
-		}
-
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_NORMAL].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_NORMAL].get_to<bool>(ShowTabStrikesNormal);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_CM].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_CM].get_to<bool>(ShowTabStrikesCM);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_LM].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_STRIKES_LM].get_to<bool>(ShowTabStrikesLM);
-		}
-
-		/* Kpme Tabs */
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_SUMMARY].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_SUMMARY].get_to<bool>(ShowTabKpmeSummary);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_TOKENS].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_TOKENS].get_to<bool>(ShowTabKpmeRaidTokens);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_CM_COFFERS].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_RAID_CM_COFFERS].get_to<bool>(ShowTabKpmeRaidCMCoffers);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_COFFERS].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_COFFERS].get_to<bool>(ShowTabKpmeStrikeCoffers);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_CM_COFFERS].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_TAB_KPME_STRIKE_CM_COFFERS].get_to<bool>(ShowTabKpmeStrikeCMCoffers);
-		}
-
-		/* Columns */
+		/* Column Sizing */
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE].get_to<float>(ColumnSizeAccount);
 		}
@@ -132,13 +93,16 @@ namespace Settings {
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE].get_to<float>(ColumnSizeKpmeId);
 		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][BOSS_ICON_SCALE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][BOSS_ICON_SCALE].get_to<float>(BossIconScale);
+		}
 
 		/* Data settings */
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE].get_to<DataSource>(SelectedDataSource);
 		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_LINKED_ACCOUNTS].get_to<bool>(IncludeLinkedAccounts);
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE].get_to<LinkedAccountMode>(LinkedAccountsMode);
 		}
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].is_null()) {
 			Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].get_to<bool>(IncludeMissingAccounts);
@@ -152,9 +116,42 @@ namespace Settings {
 			Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR].get_to<ImU32>(hoverColour);
 			hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
 		}
+
+		/* Custom tabs settings */
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][CUSTOM_TABS_ENABLED].is_null()) {
+			Settings[WINDOW_LOG_PROOFS_KEY][CUSTOM_TABS_ENABLED].get_to<bool>(CustomTabsEnabled);
+		}
+
+		/* Cache settings */
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].is_number_integer()) {
+			int value = Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].get<int>();
+			if (value >= 1 && value <= 30) {
+				CacheTimeoutMinutes = value;
+			}
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].is_number_integer()) {
+			int value = Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].get<int>();
+			if (value >= 1 && value <= 10) {
+				MaxRetryAttempts = value;
+			}
+		}
+		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS].is_number_integer()) {
+			int value = Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS].get<int>();
+			if (value >= 1 && value <= 10) {
+				MaxConcurrentRequests = value;
+			}
+		}
+
+		TabConfigManager::Instance().LoadFromSettings();
 	}
+
 	void Save(std::filesystem::path filePath) {
 		std::scoped_lock lck(Mutex);
+		SaveInternal(filePath);
+	}
+
+	void SaveInternal(std::filesystem::path filePath) {
+		// Caller must hold Mutex
 		std::ofstream file(filePath);
 		file << Settings.dump(4, ' ') << std::endl;
 		file.close();
@@ -167,30 +164,42 @@ namespace Settings {
 	float MinWindowHeight = 100.0f;
 	float MaxWindowWidth = 800.0f;
 	float MaxWindowHeight = 800.0f;
-
-	bool ShowTabRaidsNormal = true;
-	bool ShowTabRaidsCM = true;
-	bool ShowTabRaidsLM = true;
-	bool ShowTabFractalsCM = true;
-	bool ShowTabStrikesNormal = true;
-	bool ShowTabStrikesCM = true;
-	bool ShowTabStrikesLM = true;
-
-	bool ShowTabKpmeSummary = true;
-	bool ShowTabKpmeRaidTokens = true;
-	bool ShowTabKpmeRaidCMCoffers = true;
-	bool ShowTabKpmeStrikeCoffers = true;
-	bool ShowTabKpmeStrikeCMCoffers = true;
+	bool WindowAutoResize = true;
+	bool WindowRestrictSize = true;
 
 	float ColumnSizeAccount = 200.0f;
 	float ColumnSizeBosses = 32.0f;
 	float ColumnSizeKpmeId = 32.0f;
+	float BossIconScale = 32.0f;
 
 	DataSource SelectedDataSource = WINGMAN;
-	bool IncludeLinkedAccounts = false;
-	bool IncludeMissingAccounts = false;
+	LinkedAccountMode LinkedAccountsMode = HIDE_LINKED;
+	bool IncludeMissingAccounts = true;
 
 	bool hoverEnabled = true;
 	ImU32 hoverColour = 4285558896;
 	ImVec4 hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
+
+	bool CustomTabsEnabled = false;
+
+	int CacheTimeoutMinutes = 10;
+	int MaxRetryAttempts = 3;
+	int MaxConcurrentRequests = 3;
+
+	void ResetToDefaultTabs(const std::string& providerId) {
+		ProviderTabConfig config;
+		config.providerId = providerId;
+		config.useCustomTabs = false;
+		config.tabs.clear();
+		TabConfigManager::Instance().SetProviderConfig(providerId, config);
+		TabConfigManager::Instance().SaveAndPersist();
+	}
+
+	void EnsureProviderConfigExists(const std::string& providerId) {
+		auto& tabManager = TabConfigManager::Instance();
+		auto config = tabManager.GetProviderConfig(providerId);
+		if (config.providerId.empty()) {
+			ResetToDefaultTabs(providerId);
+		}
+	}
 } // namespace Settings

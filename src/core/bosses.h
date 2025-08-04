@@ -1,10 +1,22 @@
 #ifndef BOSSES_H
 #define BOSSES_H
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "nexus/Nexus.h"
+#include "../nexus/Nexus.h"
+
+enum class BossType {
+	NORMAL,
+	CM,
+	LCM
+};
+
+enum class BossProofType {
+	KILL_PROOF,
+	TOKEN,
+	COFFER
+};
 
 enum Boss {
 	/* Raids */
@@ -115,10 +127,13 @@ extern std::vector<Boss> sortedKpmeRaidCMBosses;
 extern std::vector<Boss> sortedKpmeStrikeBosses;
 extern std::vector<Boss> sortedKpmeStrikeCMBosses;
 
-const char* GetBossName(Boss boss);
+std::string GetBossName(Boss boss);
+std::string GetBossName(Boss boss, BossType type);
+std::string GetBossName(Boss boss, BossType type, BossProofType proofType);
 Texture* GetBossTexture(Boss boss);
-std::string GetKpMeBossToken(Boss boss);
-std::string GetKpMeBossCoffer(Boss boss);
 Texture* GetCurrencyTexture(std::string name);
+
+// Initialize boss registry with providers
+void InitializeBossRegistry();
 
 #endif
