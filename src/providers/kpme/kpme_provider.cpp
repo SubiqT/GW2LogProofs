@@ -104,6 +104,14 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 			ProofData proof;
 			proof.identifier = kp.first;
 			proof.amount = includeLinkedAccounts && response.shared.killproofs.count(kp.first) ? response.shared.killproofs.at(kp.first) : kp.second;
+			
+			// Combine Legendary Divination with Legendary Insight
+			if (kp.first == "Legendary Insight") {
+				int divination = includeLinkedAccounts && response.shared.killproofs.count("Legendary Divination") ? response.shared.killproofs.at("Legendary Divination") : 
+								 (response.self.killproofs.count("Legendary Divination") ? response.self.killproofs.at("Legendary Divination") : 0);
+				proof.amount += divination;
+			}
+			
 			proof.type = ProofType::KILL_PROOF;
 			proof.displayName = kp.first;
 			proof.url = "";
@@ -112,7 +120,7 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 
 		if (includeLinkedAccounts) {
 			for (const auto& kp : response.shared.killproofs) {
-				if (!response.self.killproofs.count(kp.first)) {
+				if (!response.self.killproofs.count(kp.first) && kp.first != "Legendary Divination") { // Skip Legendary Divination as it's combined with Legendary Insight
 					ProofData proof;
 					proof.identifier = kp.first;
 					proof.amount = kp.second;
@@ -120,6 +128,14 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 					proof.displayName = kp.first;
 					proof.url = "";
 					data.proofs[kp.first] = proof;
+				}
+			}
+		} else {
+			// For non-linked accounts, still need to skip Legendary Divination if it exists
+			for (const auto& kp : response.self.killproofs) {
+				if (kp.first == "Legendary Divination" && !data.proofs.count(kp.first)) {
+					// Skip standalone Legendary Divination as it should be combined with Legendary Insight
+					continue;
 				}
 			}
 		}
