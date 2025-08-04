@@ -336,7 +336,6 @@ void DrawCustomTabEditor(const std::string& providerId) {
 	if (ImGui::BeginTable(("CustomTabList_" + providerId).c_str(), 4, ImGuiTableFlags_Borders | ImGuiTableFlags_SizingStretchProp)) {
 		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
 		ImGui::TableSetupColumn("Visible", ImGuiTableColumnFlags_WidthFixed, 60.0f);
-		ImGui::TableSetupColumn("Proofs", ImGuiTableColumnFlags_WidthFixed, 60.0f);
 		ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 80.0f);
 		ImGui::TableHeadersRow();
 
@@ -357,9 +356,6 @@ void DrawCustomTabEditor(const std::string& providerId) {
 			if (ImGui::Checkbox("##Visible", &tab.visible)) {
 				TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
 			}
-
-			ImGui::TableNextColumn();
-			ImGui::Text("%d", static_cast<int>(tab.proofs.size()));
 
 			ImGui::TableNextColumn();
 			if (ImGui::SmallButton("Edit")) {

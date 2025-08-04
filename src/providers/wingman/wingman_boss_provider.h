@@ -6,7 +6,6 @@
 class WingmanBossProvider : public IBossProvider {
 public:
 	std::vector<BossGroup> GetBossGroups() const override;
-	std::string GetProofIdentifier(Boss boss, BossCategory category) const override;
 	std::string GetProofIdentifier(Boss boss, BossType type) const override;
 	std::string GetProofIdentifier(const std::string& currency) const override;
 
