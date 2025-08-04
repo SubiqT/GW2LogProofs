@@ -14,6 +14,7 @@ public:
 	BossGroup CreateCustomBossGroup(const CustomTab& tab) const override;
 };
 
-std::string GetKpMeBossIdentifier(Boss boss);
+std::string GetKpMeBossToken(Boss boss);
+std::string GetKpMeBossCoffer(Boss boss);
 
 #endif

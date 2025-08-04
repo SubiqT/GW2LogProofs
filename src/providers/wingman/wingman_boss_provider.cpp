@@ -25,37 +25,32 @@ std::string WingmanBossProvider::GetProofIdentifier(const std::string& currency)
 }
 
 std::vector<ProofOption> WingmanBossProvider::GetAvailableProofs() const {
+	static const std::vector<Boss> raidNormal = {ValeGuardian, Gorseval, Sabetha, Slothasor, BanditTrio, Matthias, Escort, KeepConstruct, TwistedCastle, Xera, Cairn, MursaatOverseer, Samarog, Deimos, SoullessHorror, RiverOfSouls, BrokenKing, EaterOfSouls, Eyes, Dhuum, ConjuredAmalgamate, TwinLargos, Qadim, Adina, Sabir, QadimThePeerless, Greer, Decima, Ura};
+	static const std::vector<Boss> raidCM = {KeepConstructCM, CairnCM, MursaatOverseerCM, SamarogCM, DeimosCM, SoullessHorrorCM, DhuumCM, ConjuredAmalgamateCM, TwinLargosCM, QadimCM, AdinaCM, SabirCM, QadimThePeerlessCM, GreerCM, DecimaCM, UraCM};
+	static const std::vector<Boss> fractalCM = {MAMACM, SiaxTheCorruptedCM, EnsolyssOfTheEndlessTormentCM, SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM, ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM, KanaxaiScytheOfHouseAurkusCM, EparchCM};
+	static const std::vector<Boss> strikeNormal = {IcebroodConstruct, TheVoiceAndTheClaw, FraenirOfJormag, Boneskinner, WhisperOfJormag, Freezie, CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate, OldLionsCourt, Dagda, Cerus};
+	static const std::vector<Boss> strikeCM = {CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM, OldLionsCourtCM, DagdaCM, CerusCM};
+
 	std::vector<ProofOption> proofs;
 
-	// Raid Normal
-	for (const auto& boss : {ValeGuardian, Gorseval, Sabetha, Slothasor, BanditTrio, Matthias, Escort, KeepConstruct, TwistedCastle, Xera, Cairn, MursaatOverseer, Samarog, Deimos, SoullessHorror, RiverOfSouls, BrokenKing, EaterOfSouls, Eyes, Dhuum, ConjuredAmalgamate, TwinLargos, Qadim, Adina, Sabir, QadimThePeerless, Greer, Decima, Ura}) {
+	for (const auto& boss : raidNormal) {
 		proofs.push_back({std::to_string(int(boss)), GetBossName(boss), "Raid", "Normal", "Normal"});
 	}
-
-	// Raid CM
-	for (const auto& boss : {KeepConstructCM, CairnCM, MursaatOverseerCM, SamarogCM, DeimosCM, SoullessHorrorCM, DhuumCM, ConjuredAmalgamateCM, TwinLargosCM, QadimCM, AdinaCM, SabirCM, QadimThePeerlessCM, GreerCM, DecimaCM, UraCM}) {
+	for (const auto& boss : raidCM) {
 		proofs.push_back({std::to_string(int(boss)), GetBossName(boss, BossType::CM), "Raid", "CM", "CM"});
 	}
-
-	// Raid LM
 	proofs.push_back({std::to_string(-int(UraCM)), GetBossName(UraCM, BossType::LCM), "Raid", "LM", "LCM"});
 
-	// Fractal CM
-	for (const auto& boss : {MAMACM, SiaxTheCorruptedCM, EnsolyssOfTheEndlessTormentCM, SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM, ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM, KanaxaiScytheOfHouseAurkusCM, EparchCM}) {
+	for (const auto& boss : fractalCM) {
 		proofs.push_back({std::to_string(int(boss)), GetBossName(boss, BossType::CM), "Fractal", "CM", "CM"});
 	}
 
-	// Strike Normal
-	for (const auto& boss : {IcebroodConstruct, TheVoiceAndTheClaw, FraenirOfJormag, Boneskinner, WhisperOfJormag, Freezie, CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate, OldLionsCourt, Dagda, Cerus}) {
+	for (const auto& boss : strikeNormal) {
 		proofs.push_back({std::to_string(int(boss)), GetBossName(boss), "Strike", "Normal", "Normal"});
 	}
-
-	// Strike CM
-	for (const auto& boss : {CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM, OldLionsCourtCM, DagdaCM, CerusCM}) {
+	for (const auto& boss : strikeCM) {
 		proofs.push_back({std::to_string(int(boss)), GetBossName(boss, BossType::CM), "Strike", "CM", "CM"});
 	}
-
-	// Strike LM
 	proofs.push_back({std::to_string(-int(CerusCM)), GetBossName(CerusCM, BossType::LCM), "Strike", "LM", "LCM"});
 
 	return proofs;
@@ -67,10 +62,10 @@ BossGroup WingmanBossProvider::CreateCustomBossGroup(const CustomTab& tab) const
 
 	for (const auto& proof : tab.proofs) {
 		int bossId = std::stoi(proof.proofId);
-		Boss boss = static_cast<Boss>(bossId);
+		Boss boss = static_cast<Boss>(abs(bossId)); // Handle negative IDs for LCM
 		BossType type = BossType::NORMAL;
 		if (proof.bossType == "CM") type = BossType::CM;
-		else if (proof.bossType == "LCM")
+		else if (proof.bossType == "LCM" || bossId < 0)
 			type = BossType::LCM;
 		bosses.push_back({boss, type});
 	}
