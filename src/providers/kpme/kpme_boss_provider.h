@@ -6,7 +6,7 @@
 class KpmeBossProvider : public IBossProvider {
 public:
 	std::vector<BossGroup> GetBossGroups() const override;
-	std::string GetProofIdentifier(Boss boss, BossCategory category) const override;
+	std::string GetProofIdentifier(Boss boss, BossType type) const override;
 	std::string GetProofIdentifier(const std::string& currency) const override;
 
 	// Custom tab support
@@ -14,7 +14,6 @@ public:
 	BossGroup CreateCustomBossGroup(const CustomTab& tab) const override;
 };
 
-std::string GetKpMeBossToken(Boss boss);
-std::string GetKpMeBossCoffer(Boss boss);
+std::string GetKpMeBossIdentifier(Boss boss);
 
 #endif

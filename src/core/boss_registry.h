@@ -45,8 +45,7 @@ class IBossProvider {
 public:
 	virtual ~IBossProvider() = default;
 	virtual std::vector<BossGroup> GetBossGroups() const = 0;
-	virtual std::string GetProofIdentifier(Boss boss, BossCategory category) const = 0;
-	virtual std::string GetProofIdentifier(Boss boss, BossType type) const { return GetProofIdentifier(boss, BossCategory::SUMMARY); }
+	virtual std::string GetProofIdentifier(Boss boss, BossType type) const = 0;
 	virtual std::string GetProofIdentifier(const std::string& currency) const = 0;
 
 	// Custom tab support

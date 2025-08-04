@@ -14,15 +14,9 @@ std::vector<BossGroup> WingmanBossProvider::GetBossGroups() const {
 	};
 }
 
-std::string WingmanBossProvider::GetProofIdentifier(Boss boss, BossCategory category) const {
-	return (category == BossCategory::RAID_LM || category == BossCategory::STRIKE_LM)
-				   ? std::format("--{}", int(boss))
-				   : std::format("{}", int(boss));
-}
-
 std::string WingmanBossProvider::GetProofIdentifier(Boss boss, BossType type) const {
 	return (type == BossType::LCM)
-				   ? std::format("--{}", int(boss))
+				   ? std::format("--{}", abs(int(boss)))
 				   : std::format("{}", int(boss));
 }
 

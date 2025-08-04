@@ -11,73 +11,60 @@ std::vector<BossGroup> KpmeBossProvider::GetBossGroups() const {
 	};
 }
 
-std::string KpmeBossProvider::GetProofIdentifier(Boss boss, BossCategory category) const {
-	switch (category) {
-		case BossCategory::RAID_NORMAL:
-			return GetKpMeBossToken(boss);
-		case BossCategory::RAID_CM:
-		case BossCategory::STRIKE_NORMAL:
-		case BossCategory::STRIKE_CM:
-			return GetKpMeBossCoffer(boss);
-		default:
-			return std::to_string(int(boss));
-	}
+std::string KpmeBossProvider::GetProofIdentifier(Boss boss, BossType type) const {
+	return GetKpMeBossIdentifier(boss);
 }
 
 std::string KpmeBossProvider::GetProofIdentifier(const std::string& currency) const {
 	return currency;
 }
 
-std::string GetKpMeBossToken(Boss boss) {
+std::string GetKpMeBossIdentifier(Boss boss) {
 	switch (boss) {
-		case ValeGuardian: return "vale_guardian_token";
-		case Gorseval: return "gorseval_token";
-		case Sabetha: return "sabetha_token";
-		case Slothasor: return "slothasor_token";
-		case Matthias: return "matthias_token";
-		case Escort: return "escort_token";
-		case KeepConstruct: return "keep_construct_token";
-		case Xera: return "xera_token";
-		case Cairn: return "cairn_token";
-		case MursaatOverseer: return "mursaat_overseer_token";
-		case Samarog: return "samarog_token";
-		case Deimos: return "deimos_token";
-		case SoullessHorror: return "soulless_horror_token";
-		case RiverOfSouls: return "river_of_souls_token";
-		case BrokenKing: return "broken_king_token";
-		case Dhuum: return "dhuum_token";
-		case ConjuredAmalgamate: return "conjured_amalgamate_token";
-		case TwinLargos: return "twin_largos_token";
-		case Qadim: return "qadim_token";
-		case Adina: return "adina_token";
-		case Sabir: return "sabir_token";
-		case QadimThePeerless: return "qadim_the_peerless_token";
-		case Greer: return "greer_token";
-		case Decima: return "decima_token";
-		case Ura: return "ura_token";
-		default: return "";
-	}
-}
-
-std::string GetKpMeBossCoffer(Boss boss) {
-	switch (boss) {
-		case GreerCM: return "greer_coffer";
-		case DecimaCM: return "decima_coffer";
-		case UraCM: return "ura_coffer";
-		case CaptainMaiTrin: return "captain_mai_trin_coffer";
-		case Ankka: return "ankka_coffer";
-		case MinisterLi: return "minister_li_coffer";
-		case VoidAmalgamate: return "void_amalgamate_coffer";
-		case OldLionsCourt: return "old_lions_court_coffer";
-		case Dagda: return "dagda_coffer";
-		case Cerus: return "cerus_coffer";
-		case CaptainMaiTrinCM: return "captain_mai_trin_cm_coffer";
-		case AnkkaCM: return "ankka_cm_coffer";
-		case MinisterLiCM: return "minister_li_cm_coffer";
-		case VoidAmalgamateCM: return "void_amalgamate_cm_coffer";
-		case OldLionsCourtCM: return "old_lions_court_cm_coffer";
-		case DagdaCM: return "dagda_cm_coffer";
-		case CerusCM: return "cerus_cm_coffer";
+		// Raid tokens
+		case ValeGuardian: return "Vale Guardian Fragment";
+		case Gorseval: return "Gorseval Tentacle Piece";
+		case Sabetha: return "Sabetha Flamethrower Fragment Piece";
+		case Slothasor: return "Slothasor Mushroom";
+		case Matthias: return "White Mantle Abomination Crystal";
+		case Escort: return "Turret Fragment";
+		case KeepConstruct: return "Keep Construct Rubble";
+		case Xera: return "Ribbon Scrap";
+		case Cairn: return "Cairn Fragment";
+		case MursaatOverseer: return "Recreation Room Floor Fragment";
+		case Samarog: return "Fragment of Saul's Burden";
+		case Deimos: return "Impaled Prisoner Token";
+		case SoullessHorror: return "Desmina's Token";
+		case RiverOfSouls: return "River of Souls Token";
+		case BrokenKing: return "Statue Token";
+		case Dhuum: return "Dhuum's Token";
+		case ConjuredAmalgamate: return "Conjured Amalgamate Token";
+		case TwinLargos: return "Twin Largos Token";
+		case Qadim: return "Qadim's Token";
+		case Adina: return "Cardinal Adina's Token";
+		case Sabir: return "Cardinal Sabir's Token";
+		case QadimThePeerless: return "Ether Djinn's Token";
+		case Greer: return "Greer's Token";
+		case Decima: return "Decima's Token";
+		case Ura: return "Ura's Token";
+		// Coffers
+		case GreerCM: return "Greer's Coffer";
+		case DecimaCM: return "Decima's Coffer";
+		case UraCM: return "Ura's Coffer";
+		case CaptainMaiTrin: return "Mai Trin's Coffer";
+		case Ankka: return "Ankka's Coffer";
+		case MinisterLi: return "Minister Li's Coffer";
+		case VoidAmalgamate: return "Void's Coffer";
+		case OldLionsCourt: return "Assault Knights' Coffer";
+		case Dagda: return "Dagda's Coffer";
+		case Cerus: return "Cerus's Coffer";
+		case CaptainMaiTrinCM: return "Mai Trin's Magnificent Coffer";
+		case AnkkaCM: return "Ankka's Magnificent Coffer";
+		case MinisterLiCM: return "Minister Li's Magnificent Coffer";
+		case VoidAmalgamateCM: return "Void's Magnificent Coffer";
+		case OldLionsCourtCM: return "Assault Knights' Magnificent Coffer";
+		case DagdaCM: return "Dagda's Magnificent Coffer";
+		case CerusCM: return "Cerus's Magnificent Coffer";
 		default: return "";
 	}
 }
@@ -92,22 +79,22 @@ std::vector<ProofOption> KpmeBossProvider::GetAvailableProofs() const {
 
 	// Raid tokens
 	for (const auto& boss : {ValeGuardian, Gorseval, Sabetha, Slothasor, Matthias, Escort, KeepConstruct, Xera, Cairn, MursaatOverseer, Samarog, Deimos, SoullessHorror, RiverOfSouls, BrokenKing, Dhuum, ConjuredAmalgamate, TwinLargos, Qadim, Adina, Sabir, QadimThePeerless, Greer, Decima, Ura}) {
-		proofs.push_back({GetKpMeBossToken(boss), GetBossName(boss, BossType::NORMAL, BossProofType::TOKEN), "Raid", "Token", "Normal"});
+		proofs.push_back({GetKpMeBossIdentifier(boss), GetBossName(boss, BossType::NORMAL, BossProofType::TOKEN), "Raid", "Token", "Normal"});
 	}
 
 	// Raid CM coffers
 	for (const auto& boss : {GreerCM, DecimaCM, UraCM}) {
-		proofs.push_back({GetKpMeBossCoffer(boss), GetBossName(boss, BossType::CM, BossProofType::COFFER), "Raid", "CM Coffer", "CM"});
+		proofs.push_back({GetKpMeBossIdentifier(boss), GetBossName(boss, BossType::CM, BossProofType::COFFER), "Raid", "CM Coffer", "CM"});
 	}
 
 	// Strike coffers
 	for (const auto& boss : {CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate, OldLionsCourt, Dagda, Cerus}) {
-		proofs.push_back({GetKpMeBossCoffer(boss), GetBossName(boss, BossType::NORMAL, BossProofType::COFFER), "Strike", "Coffer", "Normal"});
+		proofs.push_back({GetKpMeBossIdentifier(boss), GetBossName(boss, BossType::NORMAL, BossProofType::COFFER), "Strike", "Coffer", "Normal"});
 	}
 
 	// Strike CM coffers
 	for (const auto& boss : {CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM, OldLionsCourtCM, DagdaCM, CerusCM}) {
-		proofs.push_back({GetKpMeBossCoffer(boss), GetBossName(boss, BossType::CM, BossProofType::COFFER), "Strike", "CM Coffer", "CM"});
+		proofs.push_back({GetKpMeBossIdentifier(boss), GetBossName(boss, BossType::CM, BossProofType::COFFER), "Strike", "CM Coffer", "CM"});
 	}
 
 	return proofs;
@@ -138,19 +125,10 @@ BossGroup KpmeBossProvider::CreateCustomBossGroup(const CustomTab& tab) const {
 			else if (proof.bossType == "LCM")
 				type = BossType::LCM;
 
-			for (const auto& boss : {ValeGuardian, Gorseval, Sabetha, Slothasor, Matthias, Escort, KeepConstruct, Xera, Cairn, MursaatOverseer, Samarog, Deimos, SoullessHorror, RiverOfSouls, BrokenKing, Dhuum, ConjuredAmalgamate, TwinLargos, Qadim, Adina, Sabir, QadimThePeerless, Greer, Decima, Ura}) {
-				if (GetKpMeBossToken(boss) == proof.proofId) {
+			for (const auto& boss : {ValeGuardian, Gorseval, Sabetha, Slothasor, Matthias, Escort, KeepConstruct, Xera, Cairn, MursaatOverseer, Samarog, Deimos, SoullessHorror, RiverOfSouls, BrokenKing, Dhuum, ConjuredAmalgamate, TwinLargos, Qadim, Adina, Sabir, QadimThePeerless, Greer, Decima, Ura, GreerCM, DecimaCM, UraCM, CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate, OldLionsCourt, Dagda, Cerus, CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM, OldLionsCourtCM, DagdaCM, CerusCM}) {
+				if (GetKpMeBossIdentifier(boss) == proof.proofId) {
 					bosses.push_back({boss, type});
-					found = true;
 					break;
-				}
-			}
-			if (!found) {
-				for (const auto& boss : {GreerCM, DecimaCM, UraCM, CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate, OldLionsCourt, Dagda, Cerus, CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM, OldLionsCourtCM, DagdaCM, CerusCM}) {
-					if (GetKpMeBossCoffer(boss) == proof.proofId) {
-						bosses.push_back({boss, type});
-						break;
-					}
 				}
 			}
 		}
