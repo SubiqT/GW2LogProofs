@@ -90,6 +90,8 @@ enum Boss {
 	CerusAndDeimosCM = -26257,
 	Eparch = 26231,
 	EparchCM = -26231,
+	Kinfall = 27010,
+	KinfallCM = -27010,
 	/* Strikes */
 	IcebroodConstruct = 22154,
 	TheVoiceAndTheClaw = 22343,

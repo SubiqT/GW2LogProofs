@@ -168,6 +168,8 @@ std::string GetBossName(Boss boss) {
 			return "Cerus & Deimos";
 		case Eparch:
 			return "Eparch";
+		case Kinfall:
+			return "Kinfall";
 		/* Strikes */
 		case IcebroodConstruct:
 			return "Icebrood Construct";
@@ -311,6 +313,8 @@ Texture* GetBossTexture(Boss boss) {
 			return APIDefs->Textures.GetOrCreateFromResource("TEX_CERUS_AND_DEIMOS", IDB_CERUS_AND_DEIMOS, hSelf);
 		case Eparch:
 			return APIDefs->Textures.GetOrCreateFromResource("TEX_EPARCH", IDB_EPARCH, hSelf);
+		case Kinfall:
+			return APIDefs->Textures.GetOrCreateFromResource("TEX_KINFALL", IDB_KINFALL, hSelf);
 		/* Strikes */
 		case IcebroodConstruct:
 			return APIDefs->Textures.GetOrCreateFromResource("TEX_ICEBROOD_CONSTRUCT", IDB_ICEBROOD_CONSTRUCT, hSelf);
