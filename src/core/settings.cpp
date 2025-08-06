@@ -36,7 +36,6 @@ const char* PROVIDER_CONFIGS = "ProviderConfigs";
 
 const char* CACHE_TIMEOUT_MINUTES = "CacheTimeoutMinutes";
 const char* MAX_RETRY_ATTEMPTS = "MaxRetryAttempts";
-const char* MAX_CONCURRENT_REQUESTS = "MaxConcurrentRequests";
 
 namespace Settings {
 	std::mutex Mutex;
@@ -135,12 +134,7 @@ namespace Settings {
 				MaxRetryAttempts = value;
 			}
 		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS].is_number_integer()) {
-			int value = Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS].get<int>();
-			if (value >= 1 && value <= 10) {
-				MaxConcurrentRequests = value;
-			}
-		}
+
 
 		TabConfigManager::Instance().LoadFromSettings();
 	}
@@ -184,7 +178,6 @@ namespace Settings {
 
 	int CacheTimeoutMinutes = 10;
 	int MaxRetryAttempts = 3;
-	int MaxConcurrentRequests = 3;
 
 	void ResetToDefaultTabs(const std::string& providerId) {
 		ProviderTabConfig config;

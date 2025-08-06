@@ -2,15 +2,12 @@
 #include "settings.h"
 #include "shared.h"
 #include <format>
-#include <queue>
 
 namespace PlayerManager {
 	std::vector<Player> players;
 	std::string selfAccountName;
 	std::mutex playerMutex;
 	LazyLoadManager lazyLoadManager;
-	static std::queue<std::pair<std::string, std::string>> loadQueue;
-
 	static long long GetPlayerIndex(const std::string& account) {
 		for (Player& p : players)
 			if (p.account == account) return std::addressof(p) - std::addressof(players.at(0));
@@ -66,47 +63,20 @@ namespace PlayerManager {
 		}
 	}
 
-	static void ProcessLoadQueue() {
-		if (loadQueue.empty()) return;
 
-		// Count currently loading players
-		int loadingCount = 0;
-		std::scoped_lock lck(playerMutex);
-		for (const auto& player : players) {
-			auto state = lazyLoadManager.GetPlayerState(player.account, GetCurrentProviderName());
-			if (state == LoadState::LOADING) loadingCount++;
-		}
-
-		// Start new requests to maintain up to MaxConcurrentRequests concurrent
-		while (loadingCount < Settings::MaxConcurrentRequests && !loadQueue.empty()) {
-			auto [account, provider] = loadQueue.front();
-			loadQueue.pop();
-			lazyLoadManager.RequestPlayerData(account, provider);
-			loadingCount++;
-		}
-	}
 
 	void OnWindowStateChanged(bool isOpen) {
 		lazyLoadManager.OnWindowStateChanged(isOpen);
 		if (isOpen) {
 			std::string providerName = GetCurrentProviderName();
 			std::scoped_lock lck(playerMutex);
-			// Clear any existing queue
-			while (!loadQueue.empty()) loadQueue.pop();
-			// Load first MaxConcurrentRequests immediately, queue the rest
-			int requestCount = 0;
 			for (const auto& player : players) {
-				if (requestCount < Settings::MaxConcurrentRequests) {
-					lazyLoadManager.RequestPlayerData(player.account, providerName);
-					requestCount++;
-				} else {
-					loadQueue.push({player.account, providerName});
-				}
+				lazyLoadManager.RequestPlayerData(player.account, providerName);
 			}
 		}
 	}
 
 	void ProcessPendingLoads() {
-		ProcessLoadQueue();
+		// No longer needed with async HTTP
 	}
 } // namespace PlayerManager

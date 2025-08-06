@@ -70,7 +70,7 @@
     <ClInclude Include="src\core\shared.h" />
     <ClInclude Include="src\core\tab_config.h" />
     <ClInclude Include="src\core\lazy_load_manager.h" />
-    <ClInclude Include="src\utils\threadpool.hpp" />
+
     <ClInclude Include="src\unofficial_extras\Definitions.h" />
     <ClInclude Include="src\unofficial_extras\KeyBindHelper.h" />
     <ClInclude Include="src\unofficial_extras\KeyBindsTranslation.h" />

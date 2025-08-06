@@ -4,6 +4,7 @@
 #include <functional>
 #include <future>
 #include <string>
+#include <mutex>
 
 namespace HTTPClient {
 	void Initialize();

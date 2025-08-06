@@ -526,25 +526,7 @@ static void DrawNetworkSettings() {
 			Settings::Save(SettingsPath);
 		}
 
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Max Concurrent Requests");
-		ImGui::TableNextColumn();
-		static bool showConcurrencyWarning = false;
-		if (ImGui::SliderInt("##MaxConcurrentRequests", &Settings::MaxConcurrentRequests, 1, 10)) {
-			Settings::MaxConcurrentRequests = std::clamp(Settings::MaxConcurrentRequests, 1, 10);
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_CONCURRENT_REQUESTS] = Settings::MaxConcurrentRequests;
-			Settings::Save(SettingsPath);
-			showConcurrencyWarning = true;
-		}
-		if (showConcurrencyWarning) {
-			ImGui::TableNextRow();
-			ImGui::TableNextColumn();
-			ImGui::TableNextColumn();
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.0f, 1.0f));
-			ImGui::TextWrapped("Reload the addon for thread pool changes to take effect.");
-			ImGui::PopStyleColor();
-		}
+
 
 		ImGui::EndTable();
 	}
