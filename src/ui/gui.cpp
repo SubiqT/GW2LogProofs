@@ -439,6 +439,7 @@ void RenderWindowLogProofs() {
 	// Detect window state changes
 	if (isWindowOpen != wasWindowOpen) {
 		PlayerManager::OnWindowStateChanged(isWindowOpen);
+		if (!isWindowOpen) SaveWindowState(); // Save when window closes
 		wasWindowOpen = isWindowOpen;
 	}
 
@@ -448,7 +449,6 @@ void RenderWindowLogProofs() {
 	}
 
 	if (!Settings::ShowWindowLogProofs) {
-		SaveWindowState();
 		return;
 	}
 	ImGuiWindowFlags flags = windowFlags;
