@@ -1,10 +1,5 @@
 #include "wingman_provider.h"
 
-PlayerProofData WingmanProvider::LoadPlayerData(const std::string& account) {
-	Wingman::WingmanResponse response = client_.GetKp(account);
-	return ConvertWingmanResponse(response);
-}
-
 void WingmanProvider::LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) {
 	client_.GetKpAsync(account, [this, callback](const Wingman::WingmanResponse& response) {
 		PlayerProofData data = ConvertWingmanResponse(response);

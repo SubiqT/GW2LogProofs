@@ -176,25 +176,6 @@ namespace Kpme {
 		}
 	}
 
-	KpmeResponse KpmeClient::GetKp(const std::string& account) {
-		std::string url = std::format("https://killproof.me/api/kp/{}?lang=en", account);
-		const char* cUrl = url.c_str();
-		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Requesting KPME data: {}", cUrl).c_str());
-		std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
-		std::string kpmeResponse = HTTPClient::GetRequest(wUrl.c_str());
-		if (kpmeResponse.empty()) {
-			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Empty response from KPME API for account: {}", account).c_str());
-			return KpmeResponse {"", {}, {}, {}};
-		}
-		try {
-			json j = json::parse(kpmeResponse);
-			return j.template get<KpmeResponse>();
-		} catch (const json::parse_error& e) {
-			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME response for {}: {}", account, e.what()).c_str());
-			return KpmeResponse {"", {}, {}, {}};
-		}
-	}
-
 	void KpmeClient::GetKpAsync(const std::string& account, std::function<void(const KpmeResponse&)> callback) {
 		std::string url = std::format("https://killproof.me/api/kp/{}?lang=en", account);
 		const char* cUrl = url.c_str();

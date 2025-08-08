@@ -63,16 +63,6 @@ static void CALLBACK AsyncCallback(HINTERNET hInternet, DWORD_PTR dwContext, DWO
 }
 
 namespace HTTPClient {
-	std::string GetRequest(const std::wstring& wUrl) {
-		// Fallback sync implementation for compatibility
-		std::promise<std::string> promise;
-		auto future = promise.get_future();
-		GetRequestAsync(wUrl, [&promise](const std::string& result) {
-			promise.set_value(result);
-		});
-		return future.get();
-	}
-
 	void Initialize() {
 		std::lock_guard<std::mutex> lock(sessionMutex);
 		if (!hSession) {

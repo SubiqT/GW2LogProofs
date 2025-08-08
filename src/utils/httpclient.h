@@ -8,7 +8,7 @@
 
 namespace HTTPClient {
 	void Initialize();
-	std::string GetRequest(const std::wstring& wUrl);
+
 	std::future<std::string> GetRequestAsync(const std::wstring& wUrl);
 	void GetRequestAsync(const std::wstring& wUrl, std::function<void(const std::string&)> callback);
 	void Shutdown();
