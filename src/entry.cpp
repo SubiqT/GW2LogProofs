@@ -33,11 +33,13 @@ void AddonOptions() {
 
 void AddonRender() {
 	// Periodic cleanup of expired cache entries
-	static auto lastCleanup = std::chrono::steady_clock::now();
-	auto now = std::chrono::steady_clock::now();
-	if (now - lastCleanup > std::chrono::seconds(1)) {
-		PlayerManager::lazyLoadManager.CleanupExpiredEntries();
-		lastCleanup = now;
+	if (Settings::ShowWindowLogProofs) {
+		static auto lastCleanup = std::chrono::steady_clock::now();
+		auto now = std::chrono::steady_clock::now();
+		if (now - lastCleanup > std::chrono::seconds(1)) {
+			PlayerManager::lazyLoadManager.CleanupExpiredEntries();
+			lastCleanup = now;
+		}
 	}
 
 	RenderWindowLogProofs();
