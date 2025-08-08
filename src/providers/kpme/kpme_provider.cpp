@@ -99,14 +99,13 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 			ProofData proof;
 			proof.identifier = kp.first;
 			proof.amount = includeLinkedAccounts && response.shared.killproofs.count(kp.first) ? response.shared.killproofs.at(kp.first) : kp.second;
-			
+
 			// Combine Legendary Divination with Legendary Insight
 			if (kp.first == "Legendary Insight") {
-				int divination = includeLinkedAccounts && response.shared.killproofs.count("Legendary Divination") ? response.shared.killproofs.at("Legendary Divination") : 
-								 (response.self.killproofs.count("Legendary Divination") ? response.self.killproofs.at("Legendary Divination") : 0);
+				int divination = includeLinkedAccounts && response.shared.killproofs.count("Legendary Divination") ? response.shared.killproofs.at("Legendary Divination") : (response.self.killproofs.count("Legendary Divination") ? response.self.killproofs.at("Legendary Divination") : 0);
 				proof.amount += divination;
 			}
-			
+
 			proof.type = ProofType::KILL_PROOF;
 			proof.displayName = kp.first;
 			proof.url = "";
@@ -126,10 +125,10 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 				}
 			}
 		} else {
-			// For non-linked accounts, still need to skip Legendary Divination if it exists
+
 			for (const auto& kp : response.self.killproofs) {
 				if (kp.first == "Legendary Divination" && !data.proofs.count(kp.first)) {
-					// Skip standalone Legendary Divination as it should be combined with Legendary Insight
+
 					continue;
 				}
 			}
@@ -167,7 +166,7 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 			data.proofs[token.first] = proof;
 		}
 
-		// Add remaining coffers (strikes are in tokens array, so check both)
+
 		for (const auto& coffer : response.self.coffers) {
 			// Skip raid coffers as they're already combined with tokens above
 			bool isRaidCoffer = false;
@@ -177,7 +176,7 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 					break;
 				}
 			}
-			// Skip if already added from tokens array
+
 			if (isRaidCoffer || data.proofs.count(coffer.first)) continue;
 
 			ProofData proof;
@@ -195,7 +194,7 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 				LinkedAccountData linkedData;
 				linkedData.accountName = linkedAccount.name;
 
-				// Add killproofs
+
 				for (const auto& kp : linkedAccount.data.killproofs) {
 					ProofData proof;
 					proof.identifier = kp.first;
@@ -205,7 +204,7 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 					linkedData.proofs[kp.first] = proof;
 				}
 
-				// Add tokens
+
 				for (const auto& token : linkedAccount.data.tokens) {
 					ProofData proof;
 					proof.identifier = token.first;
@@ -215,7 +214,7 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 					linkedData.proofs[token.first] = proof;
 				}
 
-				// Add coffers
+
 				for (const auto& coffer : linkedAccount.data.coffers) {
 					ProofData proof;
 					proof.identifier = coffer.first;
@@ -232,7 +231,7 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 		APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to cast raw data for {}: {}", rawData.accountName, e.what()).c_str());
 	}
 
-	// Cache the computed result
+
 	computeCache[rawData.accountName][modeIndex] = std::make_unique<PlayerProofData>(data);
 	return data;
 }

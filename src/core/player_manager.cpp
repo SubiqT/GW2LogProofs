@@ -64,7 +64,6 @@ namespace PlayerManager {
 	}
 
 
-
 	void OnWindowStateChanged(bool isOpen) {
 		lazyLoadManager.OnWindowStateChanged(isOpen);
 		if (isOpen) {
@@ -74,9 +73,5 @@ namespace PlayerManager {
 				lazyLoadManager.RequestPlayerData(player.account, providerName);
 			}
 		}
-	}
-
-	void ProcessPendingLoads() {
-		// No longer needed with async HTTP
 	}
 } // namespace PlayerManager

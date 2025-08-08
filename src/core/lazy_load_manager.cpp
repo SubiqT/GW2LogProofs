@@ -4,7 +4,7 @@
 #include "shared.h"
 #include <algorithm>
 
-// ProofCache Implementation
+
 std::string ProofCache::MakeKey(const std::string& account, const std::string& provider) {
 	return account + "|" + provider;
 }
@@ -106,7 +106,7 @@ int ProofCache::GetMaxRetries() const {
 }
 
 std::chrono::seconds ProofCache::GetRetryDelay(int retryCount) {
-	return std::chrono::seconds(1 << (std::min) (retryCount - 1, 4)); // 1s, 2s, 4s, 8s, 16s
+	return std::chrono::seconds(1 << (std::min) (retryCount - 1, 4));
 }
 
 void ProofCache::ClearProvider(const std::string& provider) {
@@ -122,7 +122,7 @@ void ProofCache::ClearProvider(const std::string& provider) {
 	}
 }
 
-// LazyLoadManager Implementation
+
 std::string LazyLoadManager::MakeKey(const std::string& account, const std::string& provider) {
 	return account + "|" + provider;
 }
@@ -150,7 +150,7 @@ void LazyLoadManager::RequestPlayerData(const std::string& account, const std::s
 		pendingLoads.insert(key);
 	}
 
-	// Use external threadpool (will be injected)
+
 	if (loadFunction) {
 		loadFunction(account, provider, key);
 	}
@@ -181,7 +181,7 @@ std::unique_ptr<PlayerProofData> LazyLoadManager::GetPlayerData(const std::strin
 void LazyLoadManager::CleanupExpiredEntries() {
 	auto expiredKeys = cache.CleanExpiredEntries();
 
-	// Trigger refresh for expired entries if window is open
+
 	for (const auto& key : expiredKeys) {
 		size_t pos = key.find('|');
 		if (pos != std::string::npos) {
@@ -192,7 +192,7 @@ void LazyLoadManager::CleanupExpiredEntries() {
 	}
 
 	std::scoped_lock lock(pendingMutex);
-	// Clear pending loads for expired entries
+
 	auto it = pendingLoads.begin();
 	while (it != pendingLoads.end()) {
 		if (!cache.HasValidEntry(*it) && !cache.ShouldRetry(*it)) {

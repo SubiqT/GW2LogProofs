@@ -5,7 +5,6 @@
 #include "nexus/Nexus.h"
 
 #include "core/bosses.h"
-#include "core/data_loader.h"
 #include "core/event_handlers.h"
 #include "core/player_manager.h"
 #include "core/settings.h"
@@ -20,11 +19,26 @@
 #include "ui/gui.h"
 #include "utils/httpclient.h"
 #include "version.h"
+#include <format>
+
 
 AddonDefinition AddonDef = {};
 
 static void LoadPlayerDataWrapper(const std::string& account, const std::string& provider, const std::string& key) {
-	DataLoader::LoadPlayerDataLazy(account, provider, key);
+	try {
+		auto providerInstance = ProviderRegistry::Instance().CreateProvider(provider);
+		if (!providerInstance) {
+			PlayerManager::lazyLoadManager.OnLoadFailed(key);
+			return;
+		}
+
+		providerInstance->LoadPlayerDataAsync(account, [key](const PlayerProofData& data) {
+			PlayerManager::lazyLoadManager.OnLoadComplete(key, std::make_unique<PlayerProofData>(data));
+		});
+	} catch (const std::exception& e) {
+		APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to load {} data for {}: {}", provider, account, e.what()).c_str());
+		PlayerManager::lazyLoadManager.OnLoadFailed(key);
+	}
 }
 
 void AddonOptions() {
@@ -97,7 +111,7 @@ void AddonUnload() {
 	APIDefs->InputBinds.Deregister(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
 
 	ShutdownTrackerManager();
-	DataLoader::Shutdown();
+	HTTPClient::Shutdown();
 
 	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "Log Proofs unloaded successfully");
 }

@@ -31,7 +31,7 @@ const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
 const char* HOVER_ENABLED = "HoverEnabled";
 const char* HOVER_COLOUR = "HoverColour";
 
-const char* CUSTOM_TABS_ENABLED = "CustomTabsEnabled";
+
 const char* PROVIDER_CONFIGS = "ProviderConfigs";
 
 const char* CACHE_TIMEOUT_MINUTES = "CacheTimeoutMinutes";
@@ -117,9 +117,7 @@ namespace Settings {
 		}
 
 		/* Custom tabs settings */
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][CUSTOM_TABS_ENABLED].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][CUSTOM_TABS_ENABLED].get_to<bool>(CustomTabsEnabled);
-		}
+
 
 		/* Cache settings */
 		if (!Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].is_number_integer()) {
@@ -145,7 +143,7 @@ namespace Settings {
 	}
 
 	void SaveInternal(std::filesystem::path filePath) {
-		// Caller must hold Mutex
+
 		std::ofstream file(filePath);
 		file << Settings.dump(4, ' ') << std::endl;
 		file.close();
@@ -174,7 +172,6 @@ namespace Settings {
 	ImU32 hoverColour = 4285558896;
 	ImVec4 hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
 
-	bool CustomTabsEnabled = false;
 
 	int CacheTimeoutMinutes = 10;
 	int MaxRetryAttempts = 3;

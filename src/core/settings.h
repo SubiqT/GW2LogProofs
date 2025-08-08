@@ -44,7 +44,7 @@ extern const char* INCLUDE_MISSING_ACCOUNTS;
 extern const char* HOVER_ENABLED;
 extern const char* HOVER_COLOUR;
 
-extern const char* CUSTOM_TABS_ENABLED;
+
 extern const char* PROVIDER_CONFIGS;
 
 extern const char* CACHE_TIMEOUT_MINUTES;
@@ -81,8 +81,6 @@ namespace Settings {
 	extern ImU32 hoverColour;
 	extern ImVec4 hoverColourBuffer;
 
-	// Custom tab settings
-	extern bool CustomTabsEnabled;
 
 	// Cache settings
 	extern int CacheTimeoutMinutes;

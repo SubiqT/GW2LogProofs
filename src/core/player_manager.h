@@ -19,7 +19,6 @@ namespace PlayerManager {
 	void SetSelf(const PlayerInfo& playerInfo);
 	void ClearPlayers();
 	void OnWindowStateChanged(bool isOpen);
-	void ProcessPendingLoads();
 } // namespace PlayerManager
 
 #endif

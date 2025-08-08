@@ -6,7 +6,7 @@
 
 #include "../core/boss_registry.h"
 #include "../core/bosses.h"
-#include "../core/data_loader.h"
+
 #include "../core/player_manager.h"
 #include "../core/settings.h"
 #include "../core/shared.h"
@@ -31,7 +31,7 @@ static std::vector<std::string> GetDataSources() {
 
 namespace {
 	static float bezier_ease(float t) {
-		// Fast out slow in cubic bezier approximation
+
 		return t * t * (3.0f - 2.0f * t);
 	}
 
@@ -170,7 +170,7 @@ static void SetupTableColumns(const BossGroup& group, bool showKpmeId) {
 		columnSpecs.emplace_back(it->second, Settings::ColumnSizeBosses);
 	}
 
-	// Setup all columns at once
+
 	for (size_t i = 0; i < columnSpecs.size(); ++i) {
 		ImGuiTableColumnFlags flags = ImGuiTableColumnFlags_WidthFixed;
 		if (i == 0) flags |= ImGuiTableColumnFlags_NoHide; // Account column
@@ -237,15 +237,15 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 }
 
 static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider* provider, bool showKpmeId, const std::string& providerName) {
-	// Initialize cached proof identifiers
+
 	group.InitializeCache(provider);
 
-	// Cache lazy loading data once per row
+
 	auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
 	auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
 	const auto* rawProofData = (lazyState == LoadState::READY && lazyData) ? lazyData.get() : nullptr;
 
-	// For KPME providers, compute proofs dynamically from raw data
+
 	std::unique_ptr<PlayerProofData> computedData;
 	if (rawProofData && rawProofData->rawData.has_value() && providerName == "KPME") {
 		auto dataProvider = ProviderRegistry::Instance().CreateProvider(providerName);
@@ -270,7 +270,6 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 
 	bool isDisabled = !proofData || proofData->proofs.empty();
 
-	// Use cached currency identifiers
 	for (size_t i = 0; i < group.cachedCurrencyIds.size(); ++i) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
@@ -285,7 +284,6 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 			}
 		}
 	}
-	// Use cached boss identifiers
 	for (size_t i = 0; i < group.cachedBossIds.size(); ++i) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
@@ -307,7 +305,7 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 
 	HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 
-	// Draw linked accounts separately if enabled
+
 	if (Settings::LinkedAccountsMode == SPLIT_LINKED && proofData && !proofData->linkedAccounts.empty()) {
 		for (const auto& linkedAccount : proofData->linkedAccounts) {
 			ImGui::TableNextColumn();
@@ -321,7 +319,6 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 				ImGui::Text("-");
 			}
 
-			// Use cached currency identifiers for linked accounts
 			for (size_t i = 0; i < group.cachedCurrencyIds.size(); ++i) {
 				ImGui::TableNextColumn();
 				HighlightColumnOnHover();
@@ -329,7 +326,6 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 				ImGui::Text(it != linkedAccount.proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
 			}
 
-			// Use cached boss identifiers for linked accounts
 			for (size_t i = 0; i < group.cachedBossIds.size(); ++i) {
 				ImGui::TableNextColumn();
 				HighlightColumnOnHover();
@@ -362,7 +358,7 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, cons
 				return;
 			}
 
-			// Filter players while holding lock
+
 			for (const auto& p : PlayerManager::players) {
 				if (!Settings::IncludeMissingAccounts) {
 					auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
@@ -377,7 +373,7 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, cons
 			}
 		}
 
-		// Render all players without clipping
+
 		for (const auto* player : visiblePlayers) {
 			DrawPlayerRow(*player, group, provider, showKpmeId, providerName);
 		}
@@ -400,7 +396,7 @@ static void DrawProviderCombo(const std::string& currentProvider) {
 				Settings::SelectedDataSource = (provider == "Wingman") ? WINGMAN : KPME;
 				Settings::Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE] = Settings::SelectedDataSource;
 				Settings::Save(SettingsPath);
-				// Trigger lazy loading for all players with the new provider
+
 				std::scoped_lock lck(PlayerManager::playerMutex);
 				for (const auto& player : PlayerManager::players) {
 					PlayerManager::lazyLoadManager.RequestPlayerData(player.account, provider);
@@ -436,17 +432,13 @@ void RenderWindowLogProofs() {
 	static bool wasWindowOpen = false;
 	bool isWindowOpen = Settings::ShowWindowLogProofs;
 
-	// Detect window state changes
+
 	if (isWindowOpen != wasWindowOpen) {
 		PlayerManager::OnWindowStateChanged(isWindowOpen);
-		if (!isWindowOpen) SaveWindowState(); // Save when window closes
+		if (!isWindowOpen) SaveWindowState();
 		wasWindowOpen = isWindowOpen;
 	}
 
-	// Process pending loads when window is open
-	if (isWindowOpen) {
-		PlayerManager::ProcessPendingLoads();
-	}
 
 	if (!Settings::ShowWindowLogProofs) {
 		return;
@@ -470,17 +462,17 @@ void RenderWindowLogProofs() {
 	if (bossProvider && ImGui::BeginTabBar(("##" + currentProvider).c_str(), ImGuiTabBarFlags_None)) {
 		bool isKpme = (currentProvider == "KPME");
 
-		// Ensure provider configuration exists
+
 		Settings::EnsureProviderConfigExists(currentProvider);
 		auto config = TabConfigManager::Instance().GetProviderConfig(currentProvider);
 
 		if (config.useCustomTabs) {
-			// Render custom tabs only
+
 			for (const auto& customTab : config.tabs) {
 				if (customTab.visible && !customTab.displayName.empty()) {
 					try {
 						auto bossGroup = bossProvider->CreateCustomBossGroup(customTab);
-						// Only render if the boss group has valid content
+
 						if (!bossGroup.bosses.empty() || !bossGroup.currencies.empty()) {
 							DrawGenericTab(bossGroup, bossProvider, currentProvider, isKpme);
 						}
