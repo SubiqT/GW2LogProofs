@@ -5,15 +5,13 @@ ProviderRegistry& ProviderRegistry::Instance() {
 	return instance;
 }
 
-void ProviderRegistry::RegisterProvider(const std::string& name, DataProviderFactory factory) {
-	providers_[name] = factory;
+void ProviderRegistry::Register(std::unique_ptr<IProvider> provider) {
+	providers_.push_back(std::move(provider));
 }
 
-std::unique_ptr<IDataProvider> ProviderRegistry::CreateProvider(const std::string& name) {
-	auto it = providers_.find(name);
-	if (it != providers_.end()) {
-		return it->second();
+IProvider* ProviderRegistry::Find(std::string_view name) const {
+	for (const auto& provider : providers_) {
+		if (provider->Name() == name) return provider.get();
 	}
 	return nullptr;
 }
-

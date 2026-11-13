@@ -1,5 +1,4 @@
-#include "kpme_boss_provider.h"
-#include "../../core/bosses.h"
+#include "kpme_provider.h"
 #include <algorithm>
 #include <optional>
 
@@ -32,44 +31,33 @@ namespace {
 		for (const auto& boss : AllBosses()) {
 			if (tab.content && boss.content != *tab.content) continue;
 			if (!ItemName(boss, tab.type, tab.kind)) continue;
-			entries.push_back({&boss, tab.type, tab.kind});
+			entries.push_back({&boss, tab.type, tab.kind, ItemName(boss, tab.type, tab.kind)});
 		}
 		return entries;
 	}
 } // namespace
 
-std::vector<BossGroup> KpmeBossProvider::GetBossGroups() const {
-	std::vector<BossGroup> groups;
-	groups.push_back({"Summary", "kpmeSummaryTable", {}, {std::begin(currencies), std::end(currencies)}});
+KpmeProvider::KpmeProvider() {
+	bossGroups_.push_back({"Summary", "kpmeSummaryTable", {}, {std::begin(currencies), std::end(currencies)}});
 	for (const auto& tab : tabs) {
-		groups.push_back({tab.name, tab.tableName, EntriesFor(tab), {}});
+		bossGroups_.push_back({tab.name, tab.tableName, EntriesFor(tab), {}});
 	}
-	return groups;
 }
 
-std::string KpmeBossProvider::GetProofIdentifier(const BossEntry& entry) const {
-	const char* name = ItemName(*entry.boss, entry.type, entry.kind);
-	return name ? name : "";
-}
-
-std::string KpmeBossProvider::GetProofIdentifier(const std::string& currency) const {
-	return currency;
-}
-
-std::vector<ProofOption> KpmeBossProvider::GetAvailableProofs() const {
+std::vector<ProofOption> KpmeProvider::GetAvailableProofs() const {
 	std::vector<ProofOption> proofs;
 	for (const auto* currency : currencies) {
 		proofs.push_back({currency, currency, "Summary", "Normal"});
 	}
 	for (const auto& tab : tabs) {
 		for (const auto& entry : EntriesFor(tab)) {
-			proofs.push_back({GetProofIdentifier(entry), GetBossName(*entry.boss, entry.type, entry.kind), tab.category, entry.type == BossType::CM ? "CM" : "Normal"});
+			proofs.push_back({entry.proofId, GetBossName(*entry.boss, entry.type, entry.kind), tab.category, entry.type == BossType::CM ? "CM" : "Normal"});
 		}
 	}
 	return proofs;
 }
 
-BossGroup KpmeBossProvider::CreateCustomBossGroup(const CustomTab& tab) const {
+BossGroup KpmeProvider::CreateCustomBossGroup(const CustomTab& tab) const {
 	if (tab.id.empty() || tab.displayName.empty()) {
 		return BossGroup {};
 	}
@@ -83,7 +71,7 @@ BossGroup KpmeBossProvider::CreateCustomBossGroup(const CustomTab& tab) const {
 		}
 		for (const auto& kpmeTab : tabs) {
 			auto entries = EntriesFor(kpmeTab);
-			auto it = std::find_if(entries.begin(), entries.end(), [&](const BossEntry& entry) { return GetProofIdentifier(entry) == proof.proofId; });
+			auto it = std::find_if(entries.begin(), entries.end(), [&](const BossEntry& entry) { return entry.proofId == proof.proofId; });
 			if (it != entries.end()) {
 				bosses.push_back(*it);
 				break;

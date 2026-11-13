@@ -1,19 +1,27 @@
 #ifndef KPME_PROVIDER_H
 #define KPME_PROVIDER_H
 
-#include "../common/data_provider.h"
+#include "../common/provider.h"
 #include "kpme_client.h"
 
-class KpmeProvider : public IDataProvider {
+class KpmeProvider : public IProvider {
 public:
+	KpmeProvider();
 
-	void LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) override;
+	const char* Name() const override { return "KPME"; }
 	bool SupportsLinkedAccounts() const override { return true; }
+	bool ShowsProfileId() const override { return true; }
+	void LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) override;
 	PlayerProofData ComputeProofsFromRawData(const PlayerProofData& rawData, bool includeLinkedAccounts) const override;
+
+	const std::vector<BossGroup>& GetBossGroups() const override { return bossGroups_; }
+	std::vector<ProofOption> GetAvailableProofs() const override;
+	BossGroup CreateCustomBossGroup(const CustomTab& tab) const override;
 
 private:
 	Kpme::KpmeClient client_;
-	PlayerProofData ConvertKpmeResponse(const Kpme::KpmeResponse& response);
+	std::vector<BossGroup> bossGroups_;
+	static PlayerProofData ConvertKpmeResponse(const Kpme::KpmeResponse& response);
 };
 
 #endif

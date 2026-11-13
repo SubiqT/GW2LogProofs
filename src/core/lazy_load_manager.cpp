@@ -1,5 +1,4 @@
 #include "lazy_load_manager.h"
-#include "../providers/common/provider_registry.h"
 #include "settings.h"
 #include "shared.h"
 #include <algorithm>

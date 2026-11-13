@@ -4,7 +4,6 @@
 #include "imgui/imgui.h"
 #include "nexus/Nexus.h"
 
-#include "core/boss_registry.h"
 #include "core/event_handlers.h"
 #include "core/player_manager.h"
 #include "core/settings.h"
@@ -26,7 +25,7 @@ AddonDefinition AddonDef = {};
 
 static void LoadPlayerDataWrapper(const std::string& account, const std::string& provider, const std::string& key) {
 	try {
-		auto providerInstance = ProviderRegistry::Instance().CreateProvider(provider);
+		IProvider* providerInstance = ProviderRegistry::Instance().Find(provider);
 		if (!providerInstance) {
 			PlayerManager::lazyLoadManager.OnLoadFailed(key);
 			return;
@@ -76,8 +75,8 @@ void AddonLoad(AddonAPI* addonApi) {
 	if (Settings::ShowQuickAccessShortcut)
 		RegisterQuickAccessShortcut();
 
-	ProviderRegistry::Instance().RegisterProvider("Wingman", []() { return std::make_unique<WingmanProvider>(); });
-	ProviderRegistry::Instance().RegisterProvider("KPME", []() { return std::make_unique<KpmeProvider>(); });
+	ProviderRegistry::Instance().Register(std::make_unique<WingmanProvider>());
+	ProviderRegistry::Instance().Register(std::make_unique<KpmeProvider>());
 
 	trackerManager.RegisterTracker(std::make_unique<RealtimeApiTracker>());
 	trackerManager.RegisterTracker(std::make_unique<UnofficialExtrasTracker>());
@@ -86,7 +85,6 @@ void AddonLoad(AddonAPI* addonApi) {
 	PlayerManager::lazyLoadManager.SetLoadFunction(LoadPlayerDataWrapper);
 
 	HTTPClient::Initialize();
-	InitializeBossRegistry();
 	InitializeTrackerManager();
 
 	APIDefs->Renderer.Register(ERenderType_Render, AddonRender);

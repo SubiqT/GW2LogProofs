@@ -1,18 +1,22 @@
 #ifndef PROVIDER_REGISTRY_H
 #define PROVIDER_REGISTRY_H
 
-#include "data_provider.h"
-#include <unordered_map>
+#include "provider.h"
+#include <memory>
+#include <string_view>
+#include <vector>
 
 class ProviderRegistry {
 public:
 	static ProviderRegistry& Instance();
 
-	void RegisterProvider(const std::string& name, DataProviderFactory factory);
-	std::unique_ptr<IDataProvider> CreateProvider(const std::string& name);
+	void Register(std::unique_ptr<IProvider> provider);
+	IProvider* Find(std::string_view name) const;
+	// In registration order.
+	const std::vector<std::unique_ptr<IProvider>>& All() const { return providers_; }
 
 private:
-	std::unordered_map<std::string, DataProviderFactory> providers_;
+	std::vector<std::unique_ptr<IProvider>> providers_;
 };
 
 #endif

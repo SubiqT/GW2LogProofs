@@ -4,7 +4,7 @@
 #include <thread>
 
 
-#include "../core/boss_registry.h"
+#include "../core/boss_group.h"
 #include "../core/bosses.h"
 #include "../core/textures.h"
 
@@ -25,10 +25,6 @@
 
 static ImGuiWindowFlags windowFlags = (ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_AlwaysAutoResize);
 static ImGuiTableFlags tableFlags = (ImGuiTableFlags_Borders | ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY);
-
-static std::vector<std::string> GetDataSources() {
-	return BossRegistry::Instance().GetAvailableProviders();
-}
 
 namespace {
 	static float bezier_ease(float t) {
@@ -224,10 +220,8 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 	}
 }
 
-static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider* provider, bool showKpmeId, const std::string& providerName) {
-
-	group.InitializeCache(provider);
-
+static void DrawPlayerRow(const Player& p, const BossGroup& group, IProvider* provider, bool showKpmeId) {
+	const std::string providerName = provider->Name();
 
 	auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
 	auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
@@ -235,12 +229,9 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 
 
 	std::unique_ptr<PlayerProofData> computedData;
-	if (rawProofData && rawProofData->rawData.has_value() && providerName == "KPME") {
-		auto dataProvider = ProviderRegistry::Instance().CreateProvider(providerName);
-		if (dataProvider && dataProvider->SupportsLinkedAccounts()) {
-			bool includeLinked = (Settings::LinkedAccountsMode == COMBINE_LINKED);
-			computedData = std::make_unique<PlayerProofData>(dataProvider->ComputeProofsFromRawData(*rawProofData, includeLinked));
-		}
+	if (rawProofData && rawProofData->rawData.has_value()) {
+		bool includeLinked = (Settings::LinkedAccountsMode == COMBINE_LINKED);
+		computedData = std::make_unique<PlayerProofData>(provider->ComputeProofsFromRawData(*rawProofData, includeLinked));
 	}
 	const auto* proofData = computedData ? computedData.get() : rawProofData;
 
@@ -258,11 +249,11 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 
 	bool isDisabled = !proofData || proofData->proofs.empty();
 
-	for (size_t i = 0; i < group.cachedCurrencyIds.size(); ++i) {
+	for (size_t i = 0; i < group.currencies.size(); ++i) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
 		if (proofData) {
-			auto it = proofData->proofs.find(group.cachedCurrencyIds[i]);
+			auto it = proofData->proofs.find(group.currencies[i]);
 			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : (isDisabled ? "" : "0"));
 		} else {
 			if (lazyState == LoadState::LOADING) {
@@ -272,11 +263,11 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 			}
 		}
 	}
-	for (size_t i = 0; i < group.cachedBossIds.size(); ++i) {
+	for (size_t i = 0; i < group.bosses.size(); ++i) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
 		if (proofData) {
-			auto it = proofData->proofs.find(group.cachedBossIds[i]);
+			auto it = proofData->proofs.find(group.bosses[i].proofId);
 			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : (isDisabled ? "" : "0"));
 		} else {
 			if (lazyState == LoadState::LOADING) {
@@ -307,17 +298,17 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 				ImGui::Text("-");
 			}
 
-			for (size_t i = 0; i < group.cachedCurrencyIds.size(); ++i) {
+			for (size_t i = 0; i < group.currencies.size(); ++i) {
 				ImGui::TableNextColumn();
 				HighlightColumnOnHover();
-				auto it = linkedAccount.proofs.find(group.cachedCurrencyIds[i]);
+				auto it = linkedAccount.proofs.find(group.currencies[i]);
 				ImGui::Text(it != linkedAccount.proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
 			}
 
-			for (size_t i = 0; i < group.cachedBossIds.size(); ++i) {
+			for (size_t i = 0; i < group.bosses.size(); ++i) {
 				ImGui::TableNextColumn();
 				HighlightColumnOnHover();
-				auto it = linkedAccount.proofs.find(group.cachedBossIds[i]);
+				auto it = linkedAccount.proofs.find(group.bosses[i].proofId);
 				ImGui::Text(it != linkedAccount.proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
 			}
 
@@ -326,7 +317,9 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IBossProvider
 	}
 }
 
-static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, const std::string& providerName, bool showKpmeId = false) {
+static void DrawGenericTab(const BossGroup& group, IProvider* provider) {
+	const std::string providerName = provider->Name();
+	const bool showKpmeId = provider->ShowsProfileId();
 	if (!ImGui::BeginTabItem(group.name.c_str())) return;
 	int columnCount = static_cast<int>(group.currencies.size() + group.bosses.size()) + (showKpmeId ? 2 : 1);
 	if (ImGui::BeginTable(group.tableName.c_str(), columnCount, tableFlags)) {
@@ -363,7 +356,7 @@ static void DrawGenericTab(const BossGroup& group, IBossProvider* provider, cons
 
 
 		for (const auto* player : visiblePlayers) {
-			DrawPlayerRow(*player, group, provider, showKpmeId, providerName);
+			DrawPlayerRow(*player, group, provider, showKpmeId);
 		}
 		ImGui::EndTable();
 	}
@@ -378,7 +371,8 @@ static void SaveWindowState() {
 
 static void DrawProviderCombo(const std::string& currentProvider) {
 	if (ImGui::BeginCombo("##DataSource", currentProvider.c_str())) {
-		for (const auto& provider : GetDataSources()) {
+		for (const auto& registered : ProviderRegistry::Instance().All()) {
+			const std::string provider = registered->Name();
 			bool is_selected = (provider == currentProvider);
 			if (ImGui::Selectable(provider.c_str(), is_selected)) {
 				Settings::SelectedDataSource = (provider == "Wingman") ? WINGMAN : KPME;
@@ -396,9 +390,9 @@ static void DrawProviderCombo(const std::string& currentProvider) {
 	}
 }
 
-static void DrawControls(const std::string& currentProvider) {
-	DrawProviderCombo(currentProvider);
-	if (currentProvider == "KPME") {
+static void DrawControls(const IProvider& provider) {
+	DrawProviderCombo(provider.Name());
+	if (provider.SupportsLinkedAccounts()) {
 		ImGui::SameLine();
 		const char* modeNames[] = {"Hide linked accounts", "Combine linked accounts", "Split linked accounts"};
 		if (ImGui::BeginCombo("##LinkedMode", modeNames[Settings::LinkedAccountsMode])) {
@@ -445,10 +439,9 @@ void RenderWindowLogProofs() {
 		return;
 	}
 	std::string currentProvider = (Settings::SelectedDataSource == WINGMAN) ? "Wingman" : "KPME";
-	DrawControls(currentProvider);
-	IBossProvider* bossProvider = BossRegistry::Instance().GetProvider(currentProvider);
+	IProvider* bossProvider = ProviderRegistry::Instance().Find(currentProvider);
+	if (bossProvider) DrawControls(*bossProvider);
 	if (bossProvider && ImGui::BeginTabBar(("##" + currentProvider).c_str(), ImGuiTabBarFlags_None)) {
-		bool isKpme = (currentProvider == "KPME");
 
 
 		Settings::EnsureProviderConfigExists(currentProvider);
@@ -462,7 +455,7 @@ void RenderWindowLogProofs() {
 						auto bossGroup = bossProvider->CreateCustomBossGroup(customTab);
 
 						if (!bossGroup.bosses.empty() || !bossGroup.currencies.empty()) {
-							DrawGenericTab(bossGroup, bossProvider, currentProvider, isKpme);
+							DrawGenericTab(bossGroup, bossProvider);
 						}
 					} catch (...) {
 						// Skip invalid tabs silently
@@ -473,7 +466,7 @@ void RenderWindowLogProofs() {
 		} else {
 			// Render default tabs
 			for (const auto& group : bossProvider->GetBossGroups()) {
-				DrawGenericTab(group, bossProvider, currentProvider, isKpme);
+				DrawGenericTab(group, bossProvider);
 			}
 		}
 

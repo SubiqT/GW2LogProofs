@@ -1,6 +1,5 @@
 #include "tab_config.h"
 #include "../providers/common/provider_registry.h"
-#include "boss_registry.h"
 #include "settings.h"
 #include "shared.h"
 
@@ -150,7 +149,7 @@ void TabConfigManager::SetProviderConfig(const std::string& providerId, const Pr
 }
 
 std::vector<ProofOption> TabConfigManager::GetAvailableProofs(const std::string& providerId) const {
-	auto* provider = BossRegistry::Instance().GetProvider(providerId);
+	auto* provider = ProviderRegistry::Instance().Find(providerId);
 	if (provider) {
 		return provider->GetAvailableProofs();
 	}

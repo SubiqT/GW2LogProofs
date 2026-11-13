@@ -1,18 +1,23 @@
 #ifndef WINGMAN_PROVIDER_H
 #define WINGMAN_PROVIDER_H
 
-#include "../common/data_provider.h"
+#include "../common/provider.h"
 #include "wingman_client.h"
 
-class WingmanProvider : public IDataProvider {
+class WingmanProvider : public IProvider {
 public:
+	WingmanProvider();
 
+	const char* Name() const override { return "Wingman"; }
 	void LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) override;
-	bool SupportsLinkedAccounts() const override { return false; }
+
+	const std::vector<BossGroup>& GetBossGroups() const override { return bossGroups_; }
+	std::vector<ProofOption> GetAvailableProofs() const override;
+	BossGroup CreateCustomBossGroup(const CustomTab& tab) const override;
 
 private:
 	Wingman::WingmanClient client_;
-	PlayerProofData ConvertWingmanResponse(const Wingman::WingmanResponse& response);
+	std::vector<BossGroup> bossGroups_;
 };
 
 #endif
