@@ -3,7 +3,24 @@
 #include "../core/tab_config.h"
 #include "../imgui/imgui.h"
 #include <algorithm>
+#include <charconv>
+#include <string_view>
 #include <unordered_map>
+
+constexpr std::string_view CUSTOM_TAB_ID_PREFIX = "custom_tab_";
+
+static int ResizeStringCallback(ImGuiInputTextCallbackData* data) {
+	if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
+		auto* text = static_cast<std::string*>(data->UserData);
+		text->resize(data->BufTextLen);
+		data->Buf = text->data();
+	}
+	return 0;
+}
+
+static bool InputString(const char* label, std::string& text) {
+	return ImGui::InputText(label, text.data(), text.capacity() + 1, ImGuiInputTextFlags_CallbackResize, ResizeStringCallback, &text);
+}
 
 void ToggleShowWindowLogProofs(const char* keybindIdentifier, bool isRelease) {
 	if (isRelease)
@@ -278,11 +295,8 @@ void DrawCustomTabEditor(const std::string& providerId) {
 			ImGui::TableNextRow();
 
 			ImGui::TableNextColumn();
-			char nameBuffer[256];
-			strcpy_s(nameBuffer, tab.displayName.c_str());
 			ImGui::SetNextItemWidth(-1);
-			if (ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer))) {
-				tab.displayName = nameBuffer;
+			if (InputString("##Name", tab.displayName)) {
 				TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
 			}
 
@@ -332,14 +346,17 @@ void DrawCustomTabEditor(const std::string& providerId) {
 		if (tabCounter == -1) {
 			tabCounter = 0;
 			for (const auto& tab : config.tabs) {
-				if (tab.id.substr(0, 11) == "custom_tab_") {
-					int num = std::stoi(tab.id.substr(11));
-					tabCounter = (tabCounter > num) ? tabCounter : num;
+				std::string_view id = tab.id;
+				if (!id.starts_with(CUSTOM_TAB_ID_PREFIX)) continue;
+				id.remove_prefix(CUSTOM_TAB_ID_PREFIX.size());
+				int num = 0;
+				if (std::from_chars(id.data(), id.data() + id.size(), num).ec == std::errc()) {
+					tabCounter = (std::max)(tabCounter, num);
 				}
 			}
 		}
 		CustomTab newTab;
-		newTab.id = "custom_tab_" + std::to_string(++tabCounter);
+		newTab.id = std::string(CUSTOM_TAB_ID_PREFIX) + std::to_string(++tabCounter);
 		newTab.displayName = "New Tab";
 		newTab.visible = true;
 		newTab.order = static_cast<int>(config.tabs.size());
