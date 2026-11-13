@@ -1,13 +1,9 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include <mutex>
+#include <filesystem>
 
 #include "../imgui/imgui.h"
-#include "tab_config.h"
-
-#include "../nlohmann/json.hpp"
-using json = nlohmann::json;
 
 enum DataSource {
 	WINGMAN,
@@ -20,42 +16,25 @@ enum LinkedAccountMode {
 	SPLIT_LINKED
 };
 
-extern const char* SHOW_QUICK_ACCESS_SHORTCUT;
-extern const char* WINDOW_LOG_PROOFS_KEY;
-extern const char* SHOW_WINDOW_LOG_PROOFS;
-
-extern const char* MIN_WINDOW_WIDTH;
-extern const char* MIN_WINDOW_HEIGHT;
-extern const char* MAX_WINDOW_WIDTH;
-extern const char* MAX_WINDOW_HEIGHT;
-extern const char* WINDOW_AUTO_RESIZE;
-extern const char* WINDOW_RESTRICT_SIZE;
-
-
-extern const char* COLUMN_ACCOUNT_SIZE;
-extern const char* COLUMN_BOSSES_SIZE;
-extern const char* COLUMN_KPME_ID_SIZE;
-extern const char* BOSS_ICON_SCALE;
-
-extern const char* SELECTED_DATA_SOURCE;
-extern const char* LINKED_ACCOUNTS_MODE;
-extern const char* INCLUDE_MISSING_ACCOUNTS;
-
-extern const char* HOVER_ENABLED;
-extern const char* HOVER_COLOUR;
-
-
-
-extern const char* CACHE_TIMEOUT_MINUTES;
-extern const char* MAX_RETRY_ATTEMPTS;
-
 namespace Settings {
-	extern std::mutex Mutex;
-	extern json Settings;
+	struct Range {
+		float min;
+		float max;
+	};
+	inline constexpr Range WINDOW_SIZE_RANGE {100.0f, 1500.0f};
+	inline constexpr Range ACCOUNT_COLUMN_RANGE {40.0f, 400.0f};
+	inline constexpr Range PROOF_COLUMN_RANGE {8.0f, 128.0f};
+	struct IntRange {
+		int min;
+		int max;
+	};
+	inline constexpr IntRange CACHE_TIMEOUT_MINUTES_RANGE {1, 30};
+	inline constexpr IntRange RETRY_ATTEMPTS_RANGE {1, 10};
 
-	void Load(std::filesystem::path filePath);
-	void Save(std::filesystem::path filePath);
-	void SaveInternal(std::filesystem::path filePath);
+	// Missing, mistyped or out-of-range values keep their defaults.
+	void Load(const std::filesystem::path& filePath);
+	// Writes every setting to the file passed to Load, preserving keys this version does not know.
+	void Save();
 
 	extern bool ShowQuickAccessShortcut;
 	extern bool ShowWindowLogProofs;
@@ -80,13 +59,8 @@ namespace Settings {
 	extern ImU32 hoverColour;
 	extern ImVec4 hoverColourBuffer;
 
-
-	// Cache settings
 	extern int CacheTimeoutMinutes;
 	extern int MaxRetryAttempts;
-
-	void ResetToDefaultTabs(const std::string& providerId);
-	void EnsureProviderConfigExists(const std::string& providerId);
 } // namespace Settings
 
 #endif

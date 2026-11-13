@@ -2,151 +2,72 @@
 #include "shared.h"
 #include "tab_config.h"
 
-#include <filesystem>
+#include <algorithm>
 #include <format>
 #include <fstream>
 
-#include "../imgui/imgui.h"
+#include "../nlohmann/json.hpp"
 
-const char* SHOW_QUICK_ACCESS_SHORTCUT = "ShowQuickAccessShortcut";
-const char* WINDOW_LOG_PROOFS_KEY = "WindowLogProofs";
-const char* SHOW_WINDOW_LOG_PROOFS = "ShowWindow";
+using json = nlohmann::json;
 
-const char* MIN_WINDOW_WIDTH = "MinWindowWidth";
-const char* MIN_WINDOW_HEIGHT = "MinWindowHeight";
-const char* MAX_WINDOW_WIDTH = "MaxWindowWidth";
-const char* MAX_WINDOW_HEIGHT = "MaxWindowHeight";
-const char* WINDOW_AUTO_RESIZE = "WindowAutoResize";
-const char* WINDOW_RESTRICT_SIZE = "WindowRestrictSize";
+namespace {
+	constexpr const char* SHOW_QUICK_ACCESS_SHORTCUT = "ShowQuickAccessShortcut";
+	constexpr const char* WINDOW_LOG_PROOFS_KEY = "WindowLogProofs";
+	constexpr const char* SHOW_WINDOW_LOG_PROOFS = "ShowWindow";
+	constexpr const char* MIN_WINDOW_WIDTH = "MinWindowWidth";
+	constexpr const char* MIN_WINDOW_HEIGHT = "MinWindowHeight";
+	constexpr const char* MAX_WINDOW_WIDTH = "MaxWindowWidth";
+	constexpr const char* MAX_WINDOW_HEIGHT = "MaxWindowHeight";
+	constexpr const char* WINDOW_AUTO_RESIZE = "WindowAutoResize";
+	constexpr const char* WINDOW_RESTRICT_SIZE = "WindowRestrictSize";
+	constexpr const char* COLUMN_ACCOUNT_SIZE = "ColumnAccountSize";
+	constexpr const char* COLUMN_BOSSES_SIZE = "ColumnBossesSize";
+	constexpr const char* COLUMN_KPME_ID_SIZE = "ColumnKpmeIdSize";
+	constexpr const char* BOSS_ICON_SCALE = "BossIconScale";
+	constexpr const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
+	constexpr const char* LINKED_ACCOUNTS_MODE = "LinkedAccountsMode";
+	constexpr const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
+	constexpr const char* HOVER_ENABLED = "HoverEnabled";
+	constexpr const char* HOVER_COLOUR = "HoverColour";
+	constexpr const char* CACHE_TIMEOUT_MINUTES = "CacheTimeoutMinutes";
+	constexpr const char* MAX_RETRY_ATTEMPTS = "MaxRetryAttempts";
+	constexpr const char* PROVIDER_CONFIGS = "ProviderConfigs";
 
-const char* COLUMN_ACCOUNT_SIZE = "ColumnAccountSize";
-const char* COLUMN_BOSSES_SIZE = "ColumnBossesSize";
-const char* COLUMN_KPME_ID_SIZE = "ColumnKpmeIdSize";
-const char* BOSS_ICON_SCALE = "BossIconScale";
+	std::filesystem::path settingsPath;
+	json document = json::object();
 
-const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
-const char* LINKED_ACCOUNTS_MODE = "LinkedAccountsMode";
-const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
+	template <typename T>
+	void Read(const json& object, const char* key, T& value) {
+		auto it = object.find(key);
+		if (it == object.end()) return;
+		try {
+			value = it->get<T>();
+		} catch (const json::exception& e) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Ignoring invalid setting {}: {}", key, e.what()).c_str());
+		}
+	}
 
-const char* HOVER_ENABLED = "HoverEnabled";
-const char* HOVER_COLOUR = "HoverColour";
+	template <typename T, typename Range>
+	void ReadClamped(const json& object, const char* key, T& value, Range range) {
+		Read(object, key, value);
+		value = std::clamp(value, range.min, range.max);
+	}
 
+	template <typename Enum>
+	void ReadEnum(const json& object, const char* key, Enum& value, Enum last) {
+		int raw = value;
+		Read(object, key, raw);
+		if (raw >= 0 && raw <= last) value = static_cast<Enum>(raw);
+	}
 
-const char* CACHE_TIMEOUT_MINUTES = "CacheTimeoutMinutes";
-const char* MAX_RETRY_ATTEMPTS = "MaxRetryAttempts";
+	json& WindowSettings() {
+		json& window = document[WINDOW_LOG_PROOFS_KEY];
+		if (!window.is_object()) window = json::object();
+		return window;
+	}
+} // namespace
 
 namespace Settings {
-	std::mutex Mutex;
-	json Settings = json::object();
-
-	void Load(std::filesystem::path filePath) {
-		if (!std::filesystem::exists(filePath))
-			return;
-
-		try {
-			std::scoped_lock lck(Mutex);
-			std::ifstream file(filePath);
-			Settings = json::parse(file);
-			file.close();
-		} catch (json::parse_error& ex) {
-			APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, std::format("failed to parse settings.json file. exception details: {}", ex.what()).c_str());
-		}
-
-		if (!Settings[SHOW_QUICK_ACCESS_SHORTCUT].is_null()) {
-			Settings[SHOW_QUICK_ACCESS_SHORTCUT].get_to<bool>(ShowQuickAccessShortcut);
-		}
-
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS].get_to<bool>(ShowWindowLogProofs);
-		}
-
-		/* Window Sizing */
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH].get_to<float>(MinWindowWidth);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT].get_to<float>(MinWindowHeight);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH].get_to<float>(MaxWindowWidth);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT].get_to<float>(MaxWindowHeight);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_AUTO_RESIZE].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_AUTO_RESIZE].get_to<bool>(WindowAutoResize);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_RESTRICT_SIZE].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_RESTRICT_SIZE].get_to<bool>(WindowRestrictSize);
-		}
-
-		/* Column Sizing */
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE].get_to<float>(ColumnSizeAccount);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE].get_to<float>(ColumnSizeBosses);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE].get_to<float>(ColumnSizeKpmeId);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][BOSS_ICON_SCALE].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][BOSS_ICON_SCALE].get_to<float>(BossIconScale);
-		}
-
-		/* Data settings */
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE].get_to<DataSource>(SelectedDataSource);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE].get_to<LinkedAccountMode>(LinkedAccountsMode);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS].get_to<bool>(IncludeMissingAccounts);
-		}
-
-		/* Hover settings */
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED].get_to<bool>(hoverEnabled);
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR].is_null()) {
-			Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR].get_to<ImU32>(hoverColour);
-			hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
-		}
-
-		/* Custom tabs settings */
-
-
-		/* Cache settings */
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].is_number_integer()) {
-			int value = Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES].get<int>();
-			if (value >= 1 && value <= 30) {
-				CacheTimeoutMinutes = value;
-			}
-		}
-		if (!Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].is_null() && Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].is_number_integer()) {
-			int value = Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS].get<int>();
-			if (value >= 1 && value <= 10) {
-				MaxRetryAttempts = value;
-			}
-		}
-
-
-		TabConfigManager::Instance().LoadFromSettings();
-	}
-
-	void Save(std::filesystem::path filePath) {
-		std::scoped_lock lck(Mutex);
-		SaveInternal(filePath);
-	}
-
-	void SaveInternal(std::filesystem::path filePath) {
-
-		std::ofstream file(filePath);
-		file << Settings.dump(4, ' ') << std::endl;
-		file.close();
-	}
-
 	bool ShowQuickAccessShortcut = true;
 	bool ShowWindowLogProofs = false;
 
@@ -170,24 +91,80 @@ namespace Settings {
 	ImU32 hoverColour = 4285558896;
 	ImVec4 hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
 
-
 	int CacheTimeoutMinutes = 10;
 	int MaxRetryAttempts = 3;
 
-	void ResetToDefaultTabs(const std::string& providerId) {
-		ProviderTabConfig config;
-		config.providerId = providerId;
-		config.useCustomTabs = false;
-		config.tabs.clear();
-		TabConfigManager::Instance().SetProviderConfig(providerId, config);
-		TabConfigManager::Instance().SaveAndPersist();
-	}
+	void Load(const std::filesystem::path& filePath) {
+		settingsPath = filePath;
+		if (std::filesystem::exists(filePath)) {
+			std::ifstream file(filePath);
+			document = json::parse(file, nullptr, false);
+			if (!document.is_object()) {
+				APIDefs->Log(ELogLevel_CRITICAL, ADDON_NAME, "settings.json is not a valid JSON object; using default settings.");
+				document = json::object();
+			}
+		}
 
-	void EnsureProviderConfigExists(const std::string& providerId) {
-		auto& tabManager = TabConfigManager::Instance();
-		auto config = tabManager.GetProviderConfig(providerId);
-		if (config.providerId.empty()) {
-			ResetToDefaultTabs(providerId);
+		Read(document, SHOW_QUICK_ACCESS_SHORTCUT, ShowQuickAccessShortcut);
+
+		const json& window = WindowSettings();
+		Read(window, SHOW_WINDOW_LOG_PROOFS, ShowWindowLogProofs);
+		ReadClamped(window, MIN_WINDOW_WIDTH, MinWindowWidth, WINDOW_SIZE_RANGE);
+		ReadClamped(window, MIN_WINDOW_HEIGHT, MinWindowHeight, WINDOW_SIZE_RANGE);
+		ReadClamped(window, MAX_WINDOW_WIDTH, MaxWindowWidth, WINDOW_SIZE_RANGE);
+		ReadClamped(window, MAX_WINDOW_HEIGHT, MaxWindowHeight, WINDOW_SIZE_RANGE);
+		MaxWindowWidth = (std::max)(MaxWindowWidth, MinWindowWidth);
+		MaxWindowHeight = (std::max)(MaxWindowHeight, MinWindowHeight);
+		Read(window, WINDOW_AUTO_RESIZE, WindowAutoResize);
+		Read(window, WINDOW_RESTRICT_SIZE, WindowRestrictSize);
+
+		ReadClamped(window, COLUMN_ACCOUNT_SIZE, ColumnSizeAccount, ACCOUNT_COLUMN_RANGE);
+		ReadClamped(window, COLUMN_BOSSES_SIZE, ColumnSizeBosses, PROOF_COLUMN_RANGE);
+		ReadClamped(window, COLUMN_KPME_ID_SIZE, ColumnSizeKpmeId, PROOF_COLUMN_RANGE);
+		ReadClamped(window, BOSS_ICON_SCALE, BossIconScale, PROOF_COLUMN_RANGE);
+
+		ReadEnum(window, SELECTED_DATA_SOURCE, SelectedDataSource, KPME);
+		ReadEnum(window, LINKED_ACCOUNTS_MODE, LinkedAccountsMode, SPLIT_LINKED);
+		Read(window, INCLUDE_MISSING_ACCOUNTS, IncludeMissingAccounts);
+
+		Read(window, HOVER_ENABLED, hoverEnabled);
+		Read(window, HOVER_COLOUR, hoverColour);
+		hoverColourBuffer = ImGui::ColorConvertU32ToFloat4(hoverColour);
+
+		ReadClamped(window, CACHE_TIMEOUT_MINUTES, CacheTimeoutMinutes, CACHE_TIMEOUT_MINUTES_RANGE);
+		ReadClamped(window, MAX_RETRY_ATTEMPTS, MaxRetryAttempts, RETRY_ATTEMPTS_RANGE);
+
+		if (auto configs = window.find(PROVIDER_CONFIGS); configs != window.end()) {
+			TabConfigManager::Instance().Load(*configs);
 		}
 	}
+
+	void Save() {
+		document[SHOW_QUICK_ACCESS_SHORTCUT] = ShowQuickAccessShortcut;
+
+		json& window = WindowSettings();
+		window[SHOW_WINDOW_LOG_PROOFS] = ShowWindowLogProofs;
+		window[MIN_WINDOW_WIDTH] = MinWindowWidth;
+		window[MIN_WINDOW_HEIGHT] = MinWindowHeight;
+		window[MAX_WINDOW_WIDTH] = MaxWindowWidth;
+		window[MAX_WINDOW_HEIGHT] = MaxWindowHeight;
+		window[WINDOW_AUTO_RESIZE] = WindowAutoResize;
+		window[WINDOW_RESTRICT_SIZE] = WindowRestrictSize;
+		window[COLUMN_ACCOUNT_SIZE] = ColumnSizeAccount;
+		window[COLUMN_BOSSES_SIZE] = ColumnSizeBosses;
+		window[COLUMN_KPME_ID_SIZE] = ColumnSizeKpmeId;
+		window[BOSS_ICON_SCALE] = BossIconScale;
+		window[SELECTED_DATA_SOURCE] = SelectedDataSource;
+		window[LINKED_ACCOUNTS_MODE] = LinkedAccountsMode;
+		window[INCLUDE_MISSING_ACCOUNTS] = IncludeMissingAccounts;
+		window[HOVER_ENABLED] = hoverEnabled;
+		window[HOVER_COLOUR] = hoverColour;
+		window[CACHE_TIMEOUT_MINUTES] = CacheTimeoutMinutes;
+		window[MAX_RETRY_ATTEMPTS] = MaxRetryAttempts;
+		window[PROVIDER_CONFIGS] = TabConfigManager::Instance().ToJson();
+
+		std::ofstream file(settingsPath);
+		file << document.dump(4, ' ') << std::endl;
+	}
+
 } // namespace Settings

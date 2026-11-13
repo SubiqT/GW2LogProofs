@@ -2,6 +2,7 @@
 #include "../providers/common/provider_registry.h"
 #include "settings.h"
 #include "shared.h"
+#include <format>
 
 using json = nlohmann::json;
 
@@ -47,7 +48,15 @@ void to_json(json& j, const ProviderTabConfig& config) {
 void from_json(const json& j, ProviderTabConfig& config) {
 	j.at("ProviderId").get_to(config.providerId);
 	j.at("UseCustomTabs").get_to(config.useCustomTabs);
-	j.at("CustomTabs").get_to(config.tabs);
+	config.tabs.clear();
+	for (const auto& tabJson : j.at("CustomTabs")) {
+		try {
+			auto tab = tabJson.get<CustomTab>();
+			if (!tab.id.empty() && !tab.displayName.empty()) config.tabs.push_back(std::move(tab));
+		} catch (const json::exception& e) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Skipping invalid custom tab: {}", e.what()).c_str());
+		}
+	}
 }
 
 TabConfigManager& TabConfigManager::Instance() {
@@ -144,8 +153,7 @@ ProviderTabConfig TabConfigManager::GetProviderConfig(const std::string& provide
 
 void TabConfigManager::SetProviderConfig(const std::string& providerId, const ProviderTabConfig& config) {
 	providerConfigs_[providerId] = config;
-	providerConfigs_[providerId].providerId = providerId; // Ensure provider ID is set
-														  // Don't save immediately - let the caller handle saving to avoid mutex deadlock
+	providerConfigs_[providerId].providerId = providerId;
 }
 
 std::vector<ProofOption> TabConfigManager::GetAvailableProofs(const std::string& providerId) const {
@@ -156,30 +164,25 @@ std::vector<ProofOption> TabConfigManager::GetAvailableProofs(const std::string&
 	return {};
 }
 
-void TabConfigManager::LoadFromSettings() {
-	// Note: Called from Settings::Load() which already holds mutex
-	if (Settings::Settings.contains("WindowLogProofs") && Settings::Settings["WindowLogProofs"].contains("ProviderConfigs")) {
-
-		auto providerConfigs = Settings::Settings["WindowLogProofs"]["ProviderConfigs"];
-		for (auto& [providerId, configJson] : providerConfigs.items()) {
-			ProviderTabConfig config;
-			from_json(configJson, config);
-			providerConfigs_[providerId] = config;
+void TabConfigManager::Load(const json& providerConfigs) {
+	if (!providerConfigs.is_object()) return;
+	for (const auto& [providerId, configJson] : providerConfigs.items()) {
+		try {
+			providerConfigs_[providerId] = configJson.get<ProviderTabConfig>();
+		} catch (const json::exception& e) {
+			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Ignoring invalid tab configuration for {}: {}", providerId, e.what()).c_str());
 		}
 	}
 }
 
-void TabConfigManager::SaveToSettings() {
-	std::scoped_lock lck(Settings::Mutex);
-	json providerConfigsJson;
+json TabConfigManager::ToJson() const {
+	json providerConfigs = json::object();
 	for (const auto& [providerId, config] : providerConfigs_) {
-		to_json(providerConfigsJson[providerId], config);
+		providerConfigs[providerId] = config;
 	}
-
-	Settings::Settings["WindowLogProofs"]["ProviderConfigs"] = providerConfigsJson;
+	return providerConfigs;
 }
 
 void TabConfigManager::SaveAndPersist() {
-	SaveToSettings();
-	Settings::Save(SettingsPath);
+	Settings::Save();
 }

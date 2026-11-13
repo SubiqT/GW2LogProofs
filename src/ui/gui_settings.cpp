@@ -9,8 +9,7 @@ void ToggleShowWindowLogProofs(const char* keybindIdentifier, bool isRelease) {
 	if (isRelease)
 		return;
 	Settings::ShowWindowLogProofs = !Settings::ShowWindowLogProofs;
-	Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
-	Settings::Save(SettingsPath);
+	Settings::Save();
 }
 
 void RegisterQuickAccessShortcut() {
@@ -33,8 +32,7 @@ static void DrawWindowSizingOptions() {
 		ImGui::Text("Auto Resize");
 		ImGui::TableNextColumn();
 		if (ImGui::Checkbox("##AutoResize", &Settings::WindowAutoResize)) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_AUTO_RESIZE] = Settings::WindowAutoResize;
-			Settings::Save(SettingsPath);
+			Settings::Save();
 		}
 
 		ImGui::TableNextRow();
@@ -42,8 +40,7 @@ static void DrawWindowSizingOptions() {
 		ImGui::Text("Restrict Size");
 		ImGui::TableNextColumn();
 		if (ImGui::Checkbox("##RestrictSize", &Settings::WindowRestrictSize)) {
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][WINDOW_RESTRICT_SIZE] = Settings::WindowRestrictSize;
-			Settings::Save(SettingsPath);
+			Settings::Save();
 		}
 
 		ImGui::EndTable();
@@ -60,48 +57,40 @@ static void DrawWindowSizingOptions() {
 			ImGui::TableNextColumn();
 			ImGui::Text("Width");
 			ImGui::TableNextColumn();
-			if (ImGui::SliderFloat("##MinWidth", &Settings::MinWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
-				Settings::MinWindowWidth = std::clamp(Settings::MinWindowWidth, 100.0f, 1500.0f);
+			if (ImGui::SliderFloat("##MinWidth", &Settings::MinWindowWidth, Settings::WINDOW_SIZE_RANGE.min, Settings::WINDOW_SIZE_RANGE.max, "%.0f px")) {
+				Settings::MinWindowWidth = std::clamp(Settings::MinWindowWidth, Settings::WINDOW_SIZE_RANGE.min, Settings::WINDOW_SIZE_RANGE.max);
 				if (Settings::MinWindowWidth > Settings::MaxWindowWidth) {
 					Settings::MaxWindowWidth = Settings::MinWindowWidth;
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH] = Settings::MaxWindowWidth;
 				}
-				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
-				Settings::Save(SettingsPath);
+				Settings::Save();
 			}
 			ImGui::TableNextColumn();
-			if (ImGui::SliderFloat("##MaxWidth", &Settings::MaxWindowWidth, 100.0f, 1500.0f, "%.0f px")) {
-				Settings::MaxWindowWidth = std::clamp(Settings::MaxWindowWidth, 100.0f, 1500.0f);
+			if (ImGui::SliderFloat("##MaxWidth", &Settings::MaxWindowWidth, Settings::WINDOW_SIZE_RANGE.min, Settings::WINDOW_SIZE_RANGE.max, "%.0f px")) {
+				Settings::MaxWindowWidth = std::clamp(Settings::MaxWindowWidth, Settings::WINDOW_SIZE_RANGE.min, Settings::WINDOW_SIZE_RANGE.max);
 				if (Settings::MaxWindowWidth < Settings::MinWindowWidth) {
 					Settings::MinWindowWidth = Settings::MaxWindowWidth;
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_WIDTH] = Settings::MinWindowWidth;
 				}
-				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_WIDTH] = Settings::MaxWindowWidth;
-				Settings::Save(SettingsPath);
+				Settings::Save();
 			}
 
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
 			ImGui::Text("Height");
 			ImGui::TableNextColumn();
-			if (ImGui::SliderFloat("##MinHeight", &Settings::MinWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
-				Settings::MinWindowHeight = std::clamp(Settings::MinWindowHeight, 100.0f, 1500.0f);
+			if (ImGui::SliderFloat("##MinHeight", &Settings::MinWindowHeight, Settings::WINDOW_SIZE_RANGE.min, Settings::WINDOW_SIZE_RANGE.max, "%.0f px")) {
+				Settings::MinWindowHeight = std::clamp(Settings::MinWindowHeight, Settings::WINDOW_SIZE_RANGE.min, Settings::WINDOW_SIZE_RANGE.max);
 				if (Settings::MinWindowHeight > Settings::MaxWindowHeight) {
 					Settings::MaxWindowHeight = Settings::MinWindowHeight;
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT] = Settings::MaxWindowHeight;
 				}
-				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT] = Settings::MinWindowHeight;
-				Settings::Save(SettingsPath);
+				Settings::Save();
 			}
 			ImGui::TableNextColumn();
-			if (ImGui::SliderFloat("##MaxHeight", &Settings::MaxWindowHeight, 100.0f, 1500.0f, "%.0f px")) {
-				Settings::MaxWindowHeight = std::clamp(Settings::MaxWindowHeight, 100.0f, 1500.0f);
+			if (ImGui::SliderFloat("##MaxHeight", &Settings::MaxWindowHeight, Settings::WINDOW_SIZE_RANGE.min, Settings::WINDOW_SIZE_RANGE.max, "%.0f px")) {
+				Settings::MaxWindowHeight = std::clamp(Settings::MaxWindowHeight, Settings::WINDOW_SIZE_RANGE.min, Settings::WINDOW_SIZE_RANGE.max);
 				if (Settings::MaxWindowHeight < Settings::MinWindowHeight) {
 					Settings::MinWindowHeight = Settings::MaxWindowHeight;
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][MIN_WINDOW_HEIGHT] = Settings::MinWindowHeight;
 				}
-				Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_WINDOW_HEIGHT] = Settings::MaxWindowHeight;
-				Settings::Save(SettingsPath);
+				Settings::Save();
 			}
 
 			ImGui::EndTable();
@@ -118,40 +107,36 @@ static void DrawColumnOptions() {
 		ImGui::TableNextColumn();
 		ImGui::Text("Account Width");
 		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##AccountSize", &Settings::ColumnSizeAccount, 40.0f, 400.0f, "%.0f px")) {
-			Settings::ColumnSizeAccount = std::clamp(Settings::ColumnSizeAccount, 40.0f, 400.0f);
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_ACCOUNT_SIZE] = Settings::ColumnSizeAccount;
-			Settings::Save(SettingsPath);
+		if (ImGui::SliderFloat("##AccountSize", &Settings::ColumnSizeAccount, Settings::ACCOUNT_COLUMN_RANGE.min, Settings::ACCOUNT_COLUMN_RANGE.max, "%.0f px")) {
+			Settings::ColumnSizeAccount = std::clamp(Settings::ColumnSizeAccount, Settings::ACCOUNT_COLUMN_RANGE.min, Settings::ACCOUNT_COLUMN_RANGE.max);
+			Settings::Save();
 		}
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
 		ImGui::Text("Id Width");
 		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##KpmeIdSize", &Settings::ColumnSizeKpmeId, 8.0f, 128.0f, "%.0f px")) {
-			Settings::ColumnSizeKpmeId = std::clamp(Settings::ColumnSizeKpmeId, 8.0f, 128.0f);
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_KPME_ID_SIZE] = Settings::ColumnSizeKpmeId;
-			Settings::Save(SettingsPath);
+		if (ImGui::SliderFloat("##KpmeIdSize", &Settings::ColumnSizeKpmeId, Settings::PROOF_COLUMN_RANGE.min, Settings::PROOF_COLUMN_RANGE.max, "%.0f px")) {
+			Settings::ColumnSizeKpmeId = std::clamp(Settings::ColumnSizeKpmeId, Settings::PROOF_COLUMN_RANGE.min, Settings::PROOF_COLUMN_RANGE.max);
+			Settings::Save();
 		}
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
 		ImGui::Text("Proof Width");
 		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##BossesSize", &Settings::ColumnSizeBosses, 8.0f, 128.0f, "%.0f px")) {
-			Settings::ColumnSizeBosses = std::clamp(Settings::ColumnSizeBosses, 8.0f, 128.0f);
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][COLUMN_BOSSES_SIZE] = Settings::ColumnSizeBosses;
-			Settings::Save(SettingsPath);
+		if (ImGui::SliderFloat("##BossesSize", &Settings::ColumnSizeBosses, Settings::PROOF_COLUMN_RANGE.min, Settings::PROOF_COLUMN_RANGE.max, "%.0f px")) {
+			Settings::ColumnSizeBosses = std::clamp(Settings::ColumnSizeBosses, Settings::PROOF_COLUMN_RANGE.min, Settings::PROOF_COLUMN_RANGE.max);
+			Settings::Save();
 		}
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
 		ImGui::Text("Proof Icon Size");
 		ImGui::TableNextColumn();
-		if (ImGui::SliderFloat("##BossIconScale", &Settings::BossIconScale, 8.0f, 128.0f, "%.0f px")) {
-			Settings::BossIconScale = std::clamp(Settings::BossIconScale, 8.0f, 128.0f);
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][BOSS_ICON_SCALE] = Settings::BossIconScale;
-			Settings::Save(SettingsPath);
+		if (ImGui::SliderFloat("##BossIconScale", &Settings::BossIconScale, Settings::PROOF_COLUMN_RANGE.min, Settings::PROOF_COLUMN_RANGE.max, "%.0f px")) {
+			Settings::BossIconScale = std::clamp(Settings::BossIconScale, Settings::PROOF_COLUMN_RANGE.min, Settings::PROOF_COLUMN_RANGE.max);
+			Settings::Save();
 		}
 
 		ImGui::EndTable();
@@ -162,8 +147,7 @@ static void DrawHoverOptions() {
 	static bool showColourModal = false;
 
 	if (ImGui::Checkbox("Hover Enabled", &Settings::hoverEnabled)) {
-		Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_ENABLED] = Settings::hoverEnabled;
-		Settings::Save(SettingsPath);
+		Settings::Save();
 	}
 
 	if (Settings::hoverEnabled) {
@@ -182,8 +166,7 @@ static void DrawHoverOptions() {
 	if (ImGui::BeginPopupModal("Select Hover Colour", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 		if (ImGui::ColorPicker4("##HoverColourPicker", (float*) &Settings::hoverColourBuffer)) {
 			Settings::hoverColour = ImGui::ColorConvertFloat4ToU32(Settings::hoverColourBuffer);
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][HOVER_COLOUR] = Settings::hoverColour;
-			Settings::Save(SettingsPath);
+			Settings::Save();
 		}
 		if (ImGui::Button("Close")) {
 			ImGui::CloseCurrentPopup();
@@ -403,8 +386,7 @@ static void DrawGeneralSettings() {
 		ImGui::Text("Show Quick Access Shortcut");
 		ImGui::TableNextColumn();
 		if (ImGui::Checkbox("##ShowQuickAccess", &Settings::ShowQuickAccessShortcut)) {
-			Settings::Settings[SHOW_QUICK_ACCESS_SHORTCUT] = Settings::ShowQuickAccessShortcut;
-			Settings::Save(SettingsPath);
+			Settings::Save();
 			if (Settings::ShowQuickAccessShortcut)
 				RegisterQuickAccessShortcut();
 			else
@@ -422,8 +404,7 @@ static void DrawGeneralSettings() {
 				bool is_selected = (currentMode == i);
 				if (ImGui::Selectable(visibilityModes[i], is_selected)) {
 					Settings::IncludeMissingAccounts = (i == 0);
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][INCLUDE_MISSING_ACCOUNTS] = Settings::IncludeMissingAccounts;
-					Settings::Save(SettingsPath);
+					Settings::Save();
 				}
 				if (is_selected) ImGui::SetItemDefaultFocus();
 			}
@@ -440,8 +421,7 @@ static void DrawGeneralSettings() {
 				bool is_selected = (Settings::LinkedAccountsMode == i);
 				if (ImGui::Selectable(modeNames[i], is_selected)) {
 					Settings::LinkedAccountsMode = static_cast<LinkedAccountMode>(i);
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE] = Settings::LinkedAccountsMode;
-					Settings::Save(SettingsPath);
+					Settings::Save();
 				}
 				if (is_selected) ImGui::SetItemDefaultFocus();
 			}
@@ -461,20 +441,18 @@ static void DrawNetworkSettings() {
 		ImGui::TableNextColumn();
 		ImGui::Text("Cache Timeout (minutes)");
 		ImGui::TableNextColumn();
-		if (ImGui::SliderInt("##CacheTimeout", &Settings::CacheTimeoutMinutes, 1, 30)) {
-			Settings::CacheTimeoutMinutes = std::clamp(Settings::CacheTimeoutMinutes, 1, 30);
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][CACHE_TIMEOUT_MINUTES] = Settings::CacheTimeoutMinutes;
-			Settings::Save(SettingsPath);
+		if (ImGui::SliderInt("##CacheTimeout", &Settings::CacheTimeoutMinutes, Settings::CACHE_TIMEOUT_MINUTES_RANGE.min, Settings::CACHE_TIMEOUT_MINUTES_RANGE.max)) {
+			Settings::CacheTimeoutMinutes = std::clamp(Settings::CacheTimeoutMinutes, Settings::CACHE_TIMEOUT_MINUTES_RANGE.min, Settings::CACHE_TIMEOUT_MINUTES_RANGE.max);
+			Settings::Save();
 		}
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
 		ImGui::Text("Max Retry Attempts");
 		ImGui::TableNextColumn();
-		if (ImGui::SliderInt("##MaxRetries", &Settings::MaxRetryAttempts, 1, 10)) {
-			Settings::MaxRetryAttempts = std::clamp(Settings::MaxRetryAttempts, 1, 10);
-			Settings::Settings[WINDOW_LOG_PROOFS_KEY][MAX_RETRY_ATTEMPTS] = Settings::MaxRetryAttempts;
-			Settings::Save(SettingsPath);
+		if (ImGui::SliderInt("##MaxRetries", &Settings::MaxRetryAttempts, Settings::RETRY_ATTEMPTS_RANGE.min, Settings::RETRY_ATTEMPTS_RANGE.max)) {
+			Settings::MaxRetryAttempts = std::clamp(Settings::MaxRetryAttempts, Settings::RETRY_ATTEMPTS_RANGE.min, Settings::RETRY_ATTEMPTS_RANGE.max);
+			Settings::Save();
 		}
 
 

@@ -8,7 +8,6 @@
 extern const char* ADDON_NAME;
 
 extern std::filesystem::path AddonPath;
-extern std::filesystem::path SettingsPath;
 
 extern AddonAPI* APIDefs;
 extern HMODULE hSelf;

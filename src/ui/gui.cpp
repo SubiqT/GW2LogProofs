@@ -319,11 +319,6 @@ static void DrawGenericTab(const BossGroup& group, IProvider* provider) {
 }
 
 
-static void SaveWindowState() {
-	Settings::Settings[WINDOW_LOG_PROOFS_KEY][SHOW_WINDOW_LOG_PROOFS] = Settings::ShowWindowLogProofs;
-	Settings::Save(SettingsPath);
-}
-
 static void DrawProviderCombo(const std::string& currentProvider) {
 	if (ImGui::BeginCombo("##DataSource", currentProvider.c_str())) {
 		for (const auto& registered : ProviderRegistry::Instance().All()) {
@@ -331,8 +326,7 @@ static void DrawProviderCombo(const std::string& currentProvider) {
 			bool is_selected = (provider == currentProvider);
 			if (ImGui::Selectable(provider.c_str(), is_selected)) {
 				Settings::SelectedDataSource = (provider == "Wingman") ? WINGMAN : KPME;
-				Settings::Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE] = Settings::SelectedDataSource;
-				Settings::Save(SettingsPath);
+				Settings::Save();
 			}
 			if (is_selected) ImGui::SetItemDefaultFocus();
 		}
@@ -350,8 +344,7 @@ static void DrawControls(const IProvider& provider) {
 				bool is_selected = (Settings::LinkedAccountsMode == i);
 				if (ImGui::Selectable(modeNames[i], is_selected)) {
 					Settings::LinkedAccountsMode = static_cast<LinkedAccountMode>(i);
-					Settings::Settings[WINDOW_LOG_PROOFS_KEY][LINKED_ACCOUNTS_MODE] = Settings::LinkedAccountsMode;
-					Settings::Save(SettingsPath);
+					Settings::Save();
 				}
 				if (is_selected) ImGui::SetItemDefaultFocus();
 			}
@@ -366,7 +359,7 @@ void RenderWindowLogProofs() {
 
 
 	if (isWindowOpen != wasWindowOpen) {
-		if (!isWindowOpen) SaveWindowState();
+		if (!isWindowOpen) Settings::Save();
 		wasWindowOpen = isWindowOpen;
 	}
 
@@ -393,7 +386,6 @@ void RenderWindowLogProofs() {
 	if (bossProvider && ImGui::BeginTabBar(("##" + currentProvider).c_str(), ImGuiTabBarFlags_None)) {
 
 
-		Settings::EnsureProviderConfigExists(currentProvider);
 		auto config = TabConfigManager::Instance().GetProviderConfig(currentProvider);
 
 		if (config.useCustomTabs) {
@@ -422,5 +414,5 @@ void RenderWindowLogProofs() {
 		ImGui::EndTabBar();
 	}
 	ImGui::End();
-	if (!Settings::ShowWindowLogProofs) SaveWindowState();
+	if (!Settings::ShowWindowLogProofs) Settings::Save();
 }

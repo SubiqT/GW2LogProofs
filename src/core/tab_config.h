@@ -53,8 +53,8 @@ public:
 
 	std::vector<ProofOption> GetAvailableProofs(const std::string& providerId) const;
 
-	void LoadFromSettings();
-	void SaveToSettings();
+	void Load(const nlohmann::json& providerConfigs);
+	nlohmann::json ToJson() const;
 	void SaveAndPersist();
 
 	std::unordered_map<std::string, ProviderTabConfig> providerConfigs_;

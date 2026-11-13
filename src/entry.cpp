@@ -44,9 +44,8 @@ void AddonLoad(AddonAPI* addonApi) {
 	ImGui::SetAllocatorFunctions((void* (*) (size_t, void*) ) APIDefs->ImguiMalloc, (void (*)(void*, void*)) APIDefs->ImguiFree);
 
 	AddonPath = APIDefs->Paths.GetAddonDirectory("log_proofs");
-	SettingsPath = APIDefs->Paths.GetAddonDirectory("log_proofs/settings.json");
 	std::filesystem::create_directory(AddonPath);
-	Settings::Load(SettingsPath);
+	Settings::Load(APIDefs->Paths.GetAddonDirectory("log_proofs/settings.json"));
 
 	APIDefs->Textures.GetOrCreateFromResource("TEX_LOG_NORMAL", IDB_LOG_NORMAL, hSelf);
 	APIDefs->Textures.GetOrCreateFromResource("TEX_LOG_HOVER", IDB_LOG_HOVER, hSelf);

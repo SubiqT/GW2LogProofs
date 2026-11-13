@@ -5,7 +5,6 @@
 const char* ADDON_NAME = "Log Proofs";
 
 std::filesystem::path AddonPath;
-std::filesystem::path SettingsPath;
 
 AddonAPI* APIDefs = nullptr;
 HMODULE hSelf = nullptr;
