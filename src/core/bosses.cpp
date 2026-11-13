@@ -82,13 +82,13 @@ std::vector<Boss> sortedKpmeStrikeBosses {
 		CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate,
 		OldLionsCourt,
 		Dagda, Cerus,
-		Kela
+		Kela, Vloxx
 };
 std::vector<Boss> sortedKpmeStrikeCMBosses {
 		CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM,
 		OldLionsCourtCM,
 		DagdaCM, CerusCM,
-		KelaCM
+		KelaCM, VloxxCM
 };
 
 std::string GetBossName(Boss boss) {
