@@ -21,7 +21,7 @@ namespace {
 			{.id = 17172, .name = "Mursaat Overseer", .texture = {"TEX_MURSAAT_OVERSEER", IDB_MURSAAT_OVERSEER}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Recreation Room Floor Fragment", .kpmeCoffer = "Mursaat Overseer's Coffer"},
 			{.id = 17188, .name = "Samarog", .texture = {"TEX_SAMAROG", IDB_SAMAROG}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Impaled Prisoner Token", .kpmeCoffer = "Samarog's Coffer"},
 			{.id = 17154, .name = "Deimos", .texture = {"TEX_DEIMOS", IDB_DEIMOS}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Fragment of Saul's Burden", .kpmeCoffer = "Deimos's Coffer"},
-			{.id = 19767, .name = "Soulles Horror", .texture = {"TEX_SOULLESS_HORROR", IDB_SOULLESS_HORROR}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Desmina's Token", .kpmeCoffer = "Desmina's Coffer"},
+			{.id = 19767, .name = "Soulless Horror", .texture = {"TEX_SOULLESS_HORROR", IDB_SOULLESS_HORROR}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Desmina's Token", .kpmeCoffer = "Desmina's Coffer"},
 			{.id = 19828, .name = "River of Souls", .texture = {"TEX_RIVER_OF_SOULS", IDB_RIVER_OF_SOULS}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "River of Souls Token", .kpmeCoffer = "River of Souls Coffer"},
 			{.id = 19691, .name = "Broken King", .texture = {"TEX_BROKEN_KING", IDB_BROKEN_KING}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Statue Token", .kpmeCoffer = "Statue of Grenth Coffer"},
 			{.id = 19536, .name = "Eater of Souls", .texture = {"TEX_EATER_OF_SOULS", IDB_EATER_OF_SOULS}, .content = Content::RAID, .wingmanModes = NORMAL},
