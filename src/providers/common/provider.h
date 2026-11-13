@@ -10,7 +10,15 @@
 #include "../../core/boss_group.h"
 #include "../../core/tab_config.h"
 
-using ProofCounts = std::unordered_map<std::string, int>;
+struct ProofAmount {
+	int items = 0;
+	// Boss coffers that each stand in for several of the boss's tokens.
+	int coffers = 0;
+
+	int Total(int itemsPerCoffer) const { return items + coffers * itemsPerCoffer; }
+};
+
+using ProofCounts = std::unordered_map<std::string, ProofAmount>;
 
 struct LinkedAccountProofs {
 	std::string accountName;

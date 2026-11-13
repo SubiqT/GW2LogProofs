@@ -8,7 +8,9 @@ namespace {
 		auto proofs = std::make_shared<PlayerProofs>();
 		proofs->profileId = response.account;
 		proofs->profileUrl = "https://gw2wingman.nevermindcreations.de/kp/" + HTTPClient::EncodeUrlComponent(response.account);
-		proofs->own = {response.kp.begin(), response.kp.end()};
+		for (const auto& [id, total] : response.kp) {
+			proofs->own[id] = {total};
+		}
 		proofs->combined = proofs->own;
 		return proofs;
 	}

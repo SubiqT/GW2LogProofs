@@ -4,16 +4,14 @@
 #include "../../core/bosses.h"
 
 namespace {
-	constexpr int TOKENS_PER_RAID_COFFER = 3;
-
 	void AddMissing(ProofCounts& counts, const std::map<std::string, int>& source) {
 		for (const auto& [name, amount] : source) {
-			counts.try_emplace(name, amount);
+			counts.try_emplace(name, ProofAmount {amount});
 		}
 	}
 
-	// Counts as shown in the tables: Legendary Divination counts towards Legendary Insight and each
-	// raid coffer counts as three of that boss's tokens.
+	// Counts as shown in the tables: Legendary Divination counts towards Legendary Insight and raid coffers are
+	// attributed to that boss's token, so the table can convert them with the configured tokens per coffer.
 	ProofCounts ToDisplayCounts(const Kpme::KpSummary& summary) {
 		ProofCounts counts;
 		AddMissing(counts, summary.killproofs);
@@ -21,12 +19,12 @@ namespace {
 		AddMissing(counts, summary.coffers);
 
 		if (auto divination = summary.killproofs.find("Legendary Divination"); divination != summary.killproofs.end()) {
-			counts["Legendary Insight"] += divination->second;
+			counts["Legendary Insight"].items += divination->second;
 		}
 		for (const auto& boss : AllBosses()) {
 			if (boss.content != Content::RAID || !boss.kpmeToken || !boss.kpmeCoffer) continue;
 			if (auto coffers = summary.coffers.find(boss.kpmeCoffer); coffers != summary.coffers.end()) {
-				counts[boss.kpmeToken] += coffers->second * TOKENS_PER_RAID_COFFER;
+				counts[boss.kpmeToken].coffers += coffers->second;
 			}
 		}
 		return counts;

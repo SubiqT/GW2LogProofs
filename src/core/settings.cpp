@@ -27,6 +27,7 @@ namespace {
 	constexpr const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
 	constexpr const char* LINKED_ACCOUNTS_MODE = "LinkedAccountsMode";
 	constexpr const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
+	constexpr const char* TOKENS_PER_COFFER = "TokensPerCoffer";
 	constexpr const char* HOVER_ENABLED = "HoverEnabled";
 	constexpr const char* HOVER_COLOUR = "HoverColour";
 	constexpr const char* CACHE_TIMEOUT_MINUTES = "CacheTimeoutMinutes";
@@ -86,6 +87,7 @@ namespace Settings {
 	DataSource SelectedDataSource = WINGMAN;
 	LinkedAccountMode LinkedAccountsMode = HIDE_LINKED;
 	bool IncludeMissingAccounts = true;
+	int TokensPerCoffer = 3;
 
 	bool hoverEnabled = true;
 	ImU32 hoverColour = 4285558896;
@@ -126,6 +128,7 @@ namespace Settings {
 		ReadEnum(window, SELECTED_DATA_SOURCE, SelectedDataSource, KPME);
 		ReadEnum(window, LINKED_ACCOUNTS_MODE, LinkedAccountsMode, SPLIT_LINKED);
 		Read(window, INCLUDE_MISSING_ACCOUNTS, IncludeMissingAccounts);
+		ReadClamped(window, TOKENS_PER_COFFER, TokensPerCoffer, TOKENS_PER_COFFER_RANGE);
 
 		Read(window, HOVER_ENABLED, hoverEnabled);
 		Read(window, HOVER_COLOUR, hoverColour);
@@ -157,6 +160,7 @@ namespace Settings {
 		window[SELECTED_DATA_SOURCE] = SelectedDataSource;
 		window[LINKED_ACCOUNTS_MODE] = LinkedAccountsMode;
 		window[INCLUDE_MISSING_ACCOUNTS] = IncludeMissingAccounts;
+		window[TOKENS_PER_COFFER] = TokensPerCoffer;
 		window[HOVER_ENABLED] = hoverEnabled;
 		window[HOVER_COLOUR] = hoverColour;
 		window[CACHE_TIMEOUT_MINUTES] = CacheTimeoutMinutes;

@@ -238,7 +238,15 @@ static void DrawProfileId(const PlayerProofs* proofs) {
 static void DrawCount(const ProofCounts* counts, const std::string& proofId, LoadState state, const char* missingText) {
 	if (counts) {
 		auto it = counts->find(proofId);
-		ImGui::TextUnformatted(it != counts->end() ? std::to_string(it->second).c_str() : missingText);
+		if (it == counts->end()) {
+			ImGui::TextUnformatted(missingText);
+			return;
+		}
+		const ProofAmount& amount = it->second;
+		ImGui::TextUnformatted(std::to_string(amount.Total(Settings::TokensPerCoffer)).c_str());
+		if (amount.coffers > 0 && ImGui::IsItemHovered()) {
+			ImGui::SetTooltip("Tokens: %d\nCoffers: %d (%d tokens each)", amount.items, amount.coffers, Settings::TokensPerCoffer);
+		}
 	} else if (state == LoadState::LOADING) {
 		DrawSpinner();
 	} else {
@@ -309,7 +317,7 @@ static std::variant<std::string, int> SortKey(const PlayerRow& row, const Column
 			if (!row.load.proofs) return -1;
 			const auto& counts = CountsForSelectedMode(*row.load.proofs);
 			auto it = counts.find(column.proofId);
-			return it != counts.end() ? it->second : 0;
+			return it != counts.end() ? it->second.Total(Settings::TokensPerCoffer) : 0;
 		}
 	}
 	return 0;

@@ -30,6 +30,7 @@ namespace Settings {
 	};
 	inline constexpr IntRange CACHE_TIMEOUT_MINUTES_RANGE {1, 30};
 	inline constexpr IntRange RETRY_ATTEMPTS_RANGE {1, 10};
+	inline constexpr IntRange TOKENS_PER_COFFER_RANGE {0, 5};
 
 	// Missing, mistyped or out-of-range values keep their defaults.
 	void Load(const std::filesystem::path& filePath);
@@ -54,6 +55,8 @@ namespace Settings {
 	extern DataSource SelectedDataSource;
 	extern LinkedAccountMode LinkedAccountsMode;
 	extern bool IncludeMissingAccounts;
+	// Raid tokens each unopened boss coffer counts as. A coffer drops 1-5 tokens, so the default is the average.
+	extern int TokensPerCoffer;
 
 	extern bool hoverEnabled;
 	extern ImU32 hoverColour;

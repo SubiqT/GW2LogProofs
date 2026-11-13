@@ -418,6 +418,16 @@ static void DrawGeneralSettings() {
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
+		ImGui::Text("Tokens per KPME Coffer");
+		ImGui::TableNextColumn();
+		if (ImGui::SliderInt("##TokensPerCoffer", &Settings::TokensPerCoffer, Settings::TOKENS_PER_COFFER_RANGE.min, Settings::TOKENS_PER_COFFER_RANGE.max)) {
+			Settings::TokensPerCoffer = std::clamp(Settings::TokensPerCoffer, Settings::TOKENS_PER_COFFER_RANGE.min, Settings::TOKENS_PER_COFFER_RANGE.max);
+			Settings::Save();
+		}
+		if (ImGui::IsItemHovered()) ImGui::SetTooltip("Raid boss coffers drop 1 to 5 tokens, so 3 is the average. Set to 0 to count only tokens already looted.");
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
 		ImGui::Text("Linked Accounts Mode");
 		ImGui::TableNextColumn();
 		const char* modeNames[] = {"Hide linked accounts", "Combine linked accounts", "Split linked accounts"};
