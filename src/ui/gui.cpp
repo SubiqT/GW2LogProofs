@@ -88,26 +88,6 @@ static void DrawSpinner() {
 	window->DrawList->PathStroke(color, false, (float) thickness);
 }
 
-static void DrawPlayerAccountName(const std::string& account, const PlayerProofs* proofData) {
-	if (proofData && !proofData->profileUrl.empty()) {
-		if (ImGui::TextURL(account.c_str())) {
-			ShellExecuteA(0, 0, proofData->profileUrl.c_str(), 0, 0, SW_SHOW);
-		}
-	} else {
-		ImGui::TextUnformatted(account.c_str());
-	}
-}
-
-static void DrawKpmeId(const PlayerProofs* proofData) {
-	if (proofData && !proofData->profileId.empty()) {
-		if (ImGui::TextURL(proofData->profileId.c_str())) {
-			ImGui::SetClipboardText(proofData->profileId.c_str());
-		}
-	} else {
-		ImGui::Text("0");
-	}
-}
-
 static void HighlightColumnOnHover() {
 	if (!Settings::hoverEnabled)
 		return;
@@ -134,37 +114,6 @@ static void HighlightRowOnHover(ImGuiTable* table) {
 	}
 }
 
-static void SetupTableColumns(const BossGroup& group, bool showKpmeId) {
-	static std::vector<std::pair<std::string, float>> columnSpecs;
-	columnSpecs.clear();
-
-	columnSpecs.emplace_back("Account", Settings::ColumnSizeAccount);
-	if (showKpmeId) {
-		columnSpecs.emplace_back("Id", Settings::ColumnSizeKpmeId);
-	}
-	for (const auto& currency : group.currencies) {
-		columnSpecs.emplace_back(currency, Settings::ColumnSizeBosses);
-	}
-	for (const auto& bossEntry : group.bosses) {
-		static std::unordered_map<std::string, std::string> bossNameCache;
-		std::string key = std::to_string(bossEntry.boss->id) + "_" + std::to_string(int(bossEntry.type));
-		auto it = bossNameCache.find(key);
-		if (it == bossNameCache.end()) {
-			it = bossNameCache.emplace(key, GetBossName(*bossEntry.boss, bossEntry.type)).first;
-		}
-		columnSpecs.emplace_back(it->second, Settings::ColumnSizeBosses);
-	}
-
-
-	for (size_t i = 0; i < columnSpecs.size(); ++i) {
-		ImGuiTableColumnFlags flags = ImGuiTableColumnFlags_WidthFixed;
-		if (i == 0) flags |= ImGuiTableColumnFlags_NoHide; // Account column
-		else if (i > (showKpmeId ? 1 : 0))
-			flags |= ImGuiTableColumnFlags_NoResize; // Boss/currency columns
-		ImGui::TableSetupColumn(columnSpecs[i].first.c_str(), flags, columnSpecs[i].second);
-	}
-}
-
 // TableHeader provides click-to-sort and the column context menu; the icon is drawn over its empty label.
 static void DrawHeaderCell(const char* id, const std::string& name, Texture* texture) {
 	ImGui::TableNextColumn();
@@ -181,20 +130,77 @@ static void DrawHeaderCell(const char* id, const std::string& name, Texture* tex
 	}
 }
 
-static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
+static const ImVec4 COMMANDER_COLOUR {0.35f, 0.65f, 1.0f, 1.0f};
+constexpr float LINKED_ACCOUNT_INDENT = 20.0f;
+
+enum class ColumnKind {
+	ACCOUNT,
+	CHARACTER,
+	SUBGROUP,
+	PROFILE_ID,
+	PROOF
+};
+
+struct Column {
+	ColumnKind kind;
+	std::string name;
+	std::string proofId; // Only for PROOF columns.
+	Texture* texture = nullptr;
+};
+
+struct PlayerRow {
+	SquadMember member;
+	PlayerLoad load;
+};
+
+static std::vector<Column> BuildColumns(const BossGroup& group, bool showProfileId) {
+	std::vector<Column> columns {
+			{ColumnKind::ACCOUNT,   "Account"  },
+			{ColumnKind::CHARACTER, "Character"},
+			{ColumnKind::SUBGROUP,  "Group"    },
+	};
+	if (showProfileId) columns.push_back({ColumnKind::PROFILE_ID, "Id"});
+	for (const auto& currency : group.currencies) {
+		columns.push_back({ColumnKind::PROOF, currency, currency, GetCurrencyTexture(currency)});
+	}
+	for (const auto& boss : group.bosses) {
+		columns.push_back({ColumnKind::PROOF, GetBossName(*boss.boss, boss.type), boss.proofId, GetBossTexture(*boss.boss)});
+	}
+	return columns;
+}
+
+static void SetupTableColumns(const std::vector<Column>& columns) {
+	for (const auto& column : columns) {
+		switch (column.kind) {
+			case ColumnKind::ACCOUNT:
+				ImGui::TableSetupColumn(column.name.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
+				break;
+			case ColumnKind::CHARACTER:
+				ImGui::TableSetupColumn(column.name.c_str(), ImGuiTableColumnFlags_WidthFixed, Settings::ColumnSizeAccount);
+				break;
+			case ColumnKind::SUBGROUP:
+				ImGui::TableSetupColumn(column.name.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_DefaultHide);
+				break;
+			case ColumnKind::PROFILE_ID:
+				ImGui::TableSetupColumn(column.name.c_str(), ImGuiTableColumnFlags_WidthFixed, Settings::ColumnSizeKpmeId);
+				break;
+			case ColumnKind::PROOF:
+				ImGui::TableSetupColumn(column.name.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, Settings::ColumnSizeBosses);
+				break;
+		}
+	}
+}
+
+static void DrawTableHeaders(const std::vector<Column>& columns) {
 	ImGui::TableSetupScrollFreeze(1, 1);
 	ImGui::TableNextRow(ImGuiTableRowFlags_Headers, Settings::BossIconScale + ImGui::GetStyle().CellPadding.y * 2.0f);
-	ImGui::TableNextColumn();
-	ImGui::TableHeader("Account");
-	if (showKpmeId) {
-		ImGui::TableNextColumn();
-		ImGui::TableHeader("Id");
-	}
-	for (const auto& currency : group.currencies) {
-		DrawHeaderCell(("##" + currency).c_str(), currency, GetCurrencyTexture(currency));
-	}
-	for (const auto& bossEntry : group.bosses) {
-		DrawHeaderCell(("##" + bossEntry.proofId).c_str(), GetBossName(*bossEntry.boss, bossEntry.type), GetBossTexture(*bossEntry.boss));
+	for (const auto& column : columns) {
+		if (column.kind == ColumnKind::PROOF) {
+			DrawHeaderCell(("##" + column.proofId).c_str(), column.name, column.texture);
+		} else {
+			ImGui::TableNextColumn();
+			ImGui::TableHeader(column.name.c_str());
+		}
 	}
 }
 
@@ -202,9 +208,30 @@ static const ProofCounts& CountsForSelectedMode(const PlayerProofs& proofs) {
 	return Settings::LinkedAccountsMode == COMBINE_LINKED ? proofs.combined : proofs.own;
 }
 
-static void DrawCountCell(const ProofCounts* counts, const std::string& proofId, LoadState state, const char* missingText) {
-	ImGui::TableNextColumn();
-	HighlightColumnOnHover();
+static void DrawAccountName(const SquadMember& member, const PlayerProofs* proofs) {
+	if (member.commander) ImGui::PushStyleColor(ImGuiCol_Text, COMMANDER_COLOUR);
+	if (proofs && !proofs->profileUrl.empty()) {
+		if (ImGui::TextURL(member.account.c_str())) {
+			ShellExecuteA(0, 0, proofs->profileUrl.c_str(), 0, 0, SW_SHOW);
+		}
+	} else {
+		ImGui::TextUnformatted(member.account.c_str());
+	}
+	if (member.commander) {
+		ImGui::PopStyleColor();
+		if (ImGui::IsItemHovered()) ImGui::SetTooltip("Commander");
+	}
+}
+
+static void DrawProfileId(const PlayerProofs* proofs) {
+	if (!proofs || proofs->profileId.empty()) return;
+	if (ImGui::TextURL(proofs->profileId.c_str())) {
+		ImGui::SetClipboardText(proofs->profileId.c_str());
+	}
+	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Click to copy");
+}
+
+static void DrawCount(const ProofCounts* counts, const std::string& proofId, LoadState state, const char* missingText) {
 	if (counts) {
 		auto it = counts->find(proofId);
 		ImGui::TextUnformatted(it != counts->end() ? std::to_string(it->second).c_str() : missingText);
@@ -215,116 +242,110 @@ static void DrawCountCell(const ProofCounts* counts, const std::string& proofId,
 	}
 }
 
-struct PlayerRow {
-	std::string account;
-	PlayerLoad load;
-};
-
-static void DrawPlayerRow(const PlayerRow& row, const BossGroup& group, bool showKpmeId) {
-	const std::string& account = row.account;
+static void DrawPlayerRow(const PlayerRow& row, const std::vector<Column>& columns) {
 	const auto& [state, proofs] = row.load;
 	const ProofCounts* counts = proofs ? &CountsForSelectedMode(*proofs) : nullptr;
 	const bool hasProofs = counts && !counts->empty();
 	const char* missingText = hasProofs ? "0" : "";
 
-	if (!hasProofs) {
-		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
-	}
-
-	ImGui::TableNextColumn();
-	DrawPlayerAccountName(account, proofs.get());
-	if (showKpmeId) {
+	if (!hasProofs) ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+	for (const auto& column : columns) {
 		ImGui::TableNextColumn();
-		HighlightColumnOnHover();
-		DrawKpmeId(proofs.get());
+		switch (column.kind) {
+			case ColumnKind::ACCOUNT:
+				DrawAccountName(row.member, proofs.get());
+				break;
+			case ColumnKind::CHARACTER:
+				ImGui::TextUnformatted(row.member.character.c_str());
+				break;
+			case ColumnKind::SUBGROUP:
+				if (row.member.subgroup) ImGui::TextUnformatted(std::to_string(row.member.subgroup).c_str());
+				break;
+			case ColumnKind::PROFILE_ID:
+				HighlightColumnOnHover();
+				DrawProfileId(proofs.get());
+				break;
+			case ColumnKind::PROOF:
+				HighlightColumnOnHover();
+				DrawCount(counts, column.proofId, state, missingText);
+				break;
+		}
 	}
-	for (const auto& currency : group.currencies) {
-		DrawCountCell(counts, currency, state, missingText);
-	}
-	for (const auto& boss : group.bosses) {
-		DrawCountCell(counts, boss.proofId, state, missingText);
-	}
-
-	if (!hasProofs) {
-		ImGui::PopStyleColor();
-	}
-
+	if (!hasProofs) ImGui::PopStyleColor();
 	HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 
 	if (Settings::LinkedAccountsMode != SPLIT_LINKED || !proofs) return;
 	for (const auto& linkedAccount : proofs->linkedAccounts) {
-		ImGui::TableNextColumn();
-		ImGui::Indent(20.0f);
-		ImGui::TextUnformatted(linkedAccount.accountName.c_str());
-		ImGui::Unindent(20.0f);
-
-		if (showKpmeId) {
+		for (const auto& column : columns) {
 			ImGui::TableNextColumn();
-			HighlightColumnOnHover();
-			ImGui::Text("-");
+			if (column.kind == ColumnKind::ACCOUNT) {
+				ImGui::Indent(LINKED_ACCOUNT_INDENT);
+				ImGui::TextUnformatted(linkedAccount.accountName.c_str());
+				ImGui::Unindent(LINKED_ACCOUNT_INDENT);
+			} else if (column.kind == ColumnKind::PROOF) {
+				HighlightColumnOnHover();
+				DrawCount(&linkedAccount.proofs, column.proofId, LoadState::READY, "0");
+			}
 		}
-		for (const auto& currency : group.currencies) {
-			DrawCountCell(&linkedAccount.proofs, currency, LoadState::READY, "0");
-		}
-		for (const auto& boss : group.bosses) {
-			DrawCountCell(&linkedAccount.proofs, boss.proofId, LoadState::READY, "0");
-		}
-
 		HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 	}
 }
 
-static int ProofCount(const PlayerRow& row, const std::string& proofId) {
-	if (!row.load.proofs) return -1;
-	const auto& counts = CountsForSelectedMode(*row.load.proofs);
-	auto it = counts.find(proofId);
-	return it != counts.end() ? it->second : 0;
+static std::variant<std::string, int> SortKey(const PlayerRow& row, const Column& column) {
+	switch (column.kind) {
+		case ColumnKind::ACCOUNT:
+			return row.member.account;
+		case ColumnKind::CHARACTER:
+			return row.member.character;
+		case ColumnKind::SUBGROUP:
+			return row.member.subgroup;
+		case ColumnKind::PROFILE_ID:
+			return row.load.proofs ? row.load.proofs->profileId : std::string();
+		case ColumnKind::PROOF: {
+			if (!row.load.proofs) return -1;
+			const auto& counts = CountsForSelectedMode(*row.load.proofs);
+			auto it = counts.find(column.proofId);
+			return it != counts.end() ? it->second : 0;
+		}
+	}
+	return 0;
 }
 
 // Sorts by the clicked column; rows keep squad join order while no column is sorted.
-static void SortRows(std::vector<PlayerRow>& rows, const BossGroup& group, bool showKpmeId) {
+static void SortRows(std::vector<PlayerRow>& rows, const std::vector<Column>& columns) {
 	const ImGuiTableSortSpecs* specs = ImGui::TableGetSortSpecs();
 	if (!specs || specs->SpecsCount == 0) return;
 	const ImGuiTableColumnSortSpecs& spec = specs->Specs[0];
+	if (spec.ColumnIndex < 0 || spec.ColumnIndex >= static_cast<int>(columns.size())) return;
+	const Column& column = columns[spec.ColumnIndex];
 	const bool descending = spec.SortDirection == ImGuiSortDirection_Descending;
-	const int firstProofColumn = showKpmeId ? 2 : 1;
-
-	auto key = [&](const PlayerRow& row) -> std::variant<std::string, int> {
-		if (spec.ColumnIndex == 0) return row.account;
-		if (spec.ColumnIndex < firstProofColumn) return row.load.proofs ? row.load.proofs->profileId : std::string();
-		size_t proofIndex = spec.ColumnIndex - firstProofColumn;
-		if (proofIndex < group.currencies.size()) return ProofCount(row, group.currencies[proofIndex]);
-		proofIndex -= group.currencies.size();
-		return proofIndex < group.bosses.size() ? ProofCount(row, group.bosses[proofIndex].proofId) : 0;
-	};
 	std::stable_sort(rows.begin(), rows.end(), [&](const PlayerRow& a, const PlayerRow& b) {
-		return descending ? key(b) < key(a) : key(a) < key(b);
+		return descending ? SortKey(b, column) < SortKey(a, column) : SortKey(a, column) < SortKey(b, column);
 	});
 }
 
 static void DrawGenericTab(const BossGroup& group, IProvider* provider) {
-	const std::string providerName = provider->Name();
-	const bool showKpmeId = provider->ShowsProfileId();
 	if (!ImGui::BeginTabItem(group.name.c_str())) return;
-	int columnCount = static_cast<int>(group.currencies.size() + group.bosses.size()) + (showKpmeId ? 2 : 1);
-	if (ImGui::BeginTable(group.tableName.c_str(), columnCount, tableFlags)) {
-		SetupTableColumns(group, showKpmeId);
-		DrawTableHeaders(group, showKpmeId);
+	const std::string providerName = provider->Name();
+	const auto columns = BuildColumns(group, provider->ShowsProfileId());
+	if (ImGui::BeginTable(group.tableName.c_str(), static_cast<int>(columns.size()), tableFlags)) {
+		SetupTableColumns(columns);
+		DrawTableHeaders(columns);
 
 		std::vector<PlayerRow> rows;
-		for (auto& account : PlayerManager::Accounts()) {
-			PlayerManager::lazyLoadManager.RequestPlayerData(account, providerName);
-			PlayerLoad load = PlayerManager::lazyLoadManager.GetPlayerLoad(account, providerName);
+		for (auto& member : PlayerManager::Members()) {
+			PlayerManager::lazyLoadManager.RequestPlayerData(member.account, providerName);
+			PlayerLoad load = PlayerManager::lazyLoadManager.GetPlayerLoad(member.account, providerName);
 			if (!Settings::IncludeMissingAccounts && load.state == LoadState::READY && (!load.proofs || CountsForSelectedMode(*load.proofs).empty())) continue;
-			rows.push_back({std::move(account), std::move(load)});
+			rows.push_back({std::move(member), std::move(load)});
 		}
 		if (rows.empty()) {
 			ImGui::TableNextColumn();
 			ImGui::TextUnformatted("No players found... ");
 		}
-		SortRows(rows, group, showKpmeId);
+		SortRows(rows, columns);
 		for (const auto& row : rows) {
-			DrawPlayerRow(row, group, showKpmeId);
+			DrawPlayerRow(row, columns);
 		}
 		ImGui::EndTable();
 	}

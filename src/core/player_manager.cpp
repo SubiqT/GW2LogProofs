@@ -9,8 +9,20 @@
 namespace PlayerManager {
 	namespace {
 		std::mutex mutex;
-		std::vector<std::string> accounts;
+		std::vector<SquadMember> members;
 		std::string selfAccount;
+
+		void UpdateLocked(const SquadMemberUpdate& update) {
+			auto it = std::find_if(members.begin(), members.end(), [&](const SquadMember& m) { return m.account == update.account; });
+			if (it == members.end()) {
+				members.push_back({update.account});
+				it = std::prev(members.end());
+				APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player added to tracking: {}", update.account).c_str());
+			}
+			if (update.character && !update.character->empty()) it->character = *update.character;
+			if (update.subgroup) it->subgroup = *update.subgroup;
+			if (update.commander) it->commander = *update.commander;
+		}
 	} // namespace
 
 	LazyLoadManager lazyLoadManager(
@@ -25,27 +37,24 @@ namespace PlayerManager {
 			[] { return LoadPolicy {std::chrono::minutes(Settings::CacheTimeoutMinutes), Settings::MaxRetryAttempts}; }
 	);
 
-	void AddPlayer(const std::string& account) {
-		if (account.empty()) return;
+	void UpdatePlayer(const SquadMemberUpdate& update) {
+		if (update.account.empty()) return;
 		std::scoped_lock lock(mutex);
-		if (std::find(accounts.begin(), accounts.end(), account) != accounts.end()) return;
-		accounts.push_back(account);
-		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player added to tracking: {}", account).c_str());
+		UpdateLocked(update);
 	}
 
 	void RemovePlayer(const std::string& account) {
 		std::scoped_lock lock(mutex);
-		if (std::erase(accounts, account)) {
+		if (std::erase_if(members, [&](const SquadMember& m) { return m.account == account; })) {
 			APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player removed from tracking: {}", account).c_str());
 		}
 	}
 
-	void SetSelf(const std::string& account) {
-		{
-			std::scoped_lock lock(mutex);
-			selfAccount = account;
-		}
-		AddPlayer(account);
+	void SetSelf(const SquadMemberUpdate& update) {
+		if (update.account.empty()) return;
+		std::scoped_lock lock(mutex);
+		selfAccount = update.account;
+		UpdateLocked(update);
 	}
 
 	bool IsSelf(const std::string& account) {
@@ -55,11 +64,15 @@ namespace PlayerManager {
 
 	void ClearPlayers() {
 		std::scoped_lock lock(mutex);
-		std::erase_if(accounts, [](const std::string& account) { return account != selfAccount; });
+		std::erase_if(members, [](const SquadMember& m) { return m.account != selfAccount; });
+		for (auto& self : members) {
+			self.subgroup = 0;
+			self.commander = false;
+		}
 	}
 
-	std::vector<std::string> Accounts() {
+	std::vector<SquadMember> Members() {
 		std::scoped_lock lock(mutex);
-		return accounts;
+		return members;
 	}
 } // namespace PlayerManager
