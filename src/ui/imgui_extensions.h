@@ -15,7 +15,7 @@ namespace ImGui {
 		bool clicked = false;
 
 		if (true == SameLineBefore_) { ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x); }
-		ImGui::Text(name_);
+		ImGui::TextUnformatted(name_);
 		if (ImGui::IsItemHovered()) {
 			if (ImGui::IsMouseClicked(0)) {
 				clicked = true;

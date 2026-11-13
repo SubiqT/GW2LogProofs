@@ -93,7 +93,7 @@ static void DrawPlayerAccountName(const std::string& account, const PlayerProofs
 			ShellExecuteA(0, 0, proofData->profileUrl.c_str(), 0, 0, SW_SHOW);
 		}
 	} else {
-		ImGui::Text(account.c_str());
+		ImGui::TextUnformatted(account.c_str());
 	}
 }
 
@@ -184,11 +184,11 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 			if (padding > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding);
 			ImGui::Image((void*) texture->Resource, ImVec2(iconSize, iconSize));
 		} else {
-			ImGui::Text(currency.c_str());
+			ImGui::TextUnformatted(currency.c_str());
 		}
 		if (ImGui::IsItemHovered()) {
 			ImGui::BeginTooltip();
-			ImGui::Text(currency.c_str());
+			ImGui::TextUnformatted(currency.c_str());
 			ImGui::EndTooltip();
 		}
 	}
@@ -210,11 +210,11 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 			if (padding > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding);
 			ImGui::Image((void*) texture->Resource, ImVec2(iconSize, iconSize));
 		} else {
-			ImGui::Text(bossName.c_str());
+			ImGui::TextUnformatted(bossName.c_str());
 		}
 		if (ImGui::IsItemHovered()) {
 			ImGui::BeginTooltip();
-			ImGui::Text(bossName.c_str());
+			ImGui::TextUnformatted(bossName.c_str());
 			ImGui::EndTooltip();
 		}
 	}
@@ -229,11 +229,11 @@ static void DrawCountCell(const ProofCounts* counts, const std::string& proofId,
 	HighlightColumnOnHover();
 	if (counts) {
 		auto it = counts->find(proofId);
-		ImGui::Text(it != counts->end() ? std::to_string(it->second).c_str() : missingText);
+		ImGui::TextUnformatted(it != counts->end() ? std::to_string(it->second).c_str() : missingText);
 	} else if (state == LoadState::LOADING) {
 		DrawSpinner();
 	} else {
-		ImGui::Text(missingText);
+		ImGui::TextUnformatted(missingText);
 	}
 }
 
@@ -273,7 +273,7 @@ static void DrawPlayerRow(const std::string& account, const BossGroup& group, IP
 	for (const auto& linkedAccount : proofs->linkedAccounts) {
 		ImGui::TableNextColumn();
 		ImGui::Indent(20.0f);
-		ImGui::Text(linkedAccount.accountName.c_str());
+		ImGui::TextUnformatted(linkedAccount.accountName.c_str());
 		ImGui::Unindent(20.0f);
 
 		if (showKpmeId) {
