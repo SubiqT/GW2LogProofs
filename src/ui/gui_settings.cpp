@@ -2,25 +2,13 @@
 #include "../core/shared.h"
 #include "../core/tab_config.h"
 #include "../imgui/imgui.h"
+#include "imgui_extensions.h"
 #include <algorithm>
 #include <charconv>
 #include <string_view>
 #include <unordered_map>
 
 constexpr std::string_view CUSTOM_TAB_ID_PREFIX = "custom_tab_";
-
-static int ResizeStringCallback(ImGuiInputTextCallbackData* data) {
-	if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
-		auto* text = static_cast<std::string*>(data->UserData);
-		text->resize(data->BufTextLen);
-		data->Buf = text->data();
-	}
-	return 0;
-}
-
-static bool InputString(const char* label, std::string& text) {
-	return ImGui::InputText(label, text.data(), text.capacity() + 1, ImGuiInputTextFlags_CallbackResize, ResizeStringCallback, &text);
-}
 
 void ToggleShowWindowLogProofs(const char* keybindIdentifier, bool isRelease) {
 	if (isRelease)
@@ -296,7 +284,7 @@ void DrawCustomTabEditor(const std::string& providerId) {
 
 			ImGui::TableNextColumn();
 			ImGui::SetNextItemWidth(-1);
-			if (InputString("##Name", tab.displayName)) {
+			if (ImGui::InputString("##Name", tab.displayName)) {
 				TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
 			}
 

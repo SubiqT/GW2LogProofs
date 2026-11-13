@@ -132,6 +132,7 @@ static void DrawHeaderCell(const char* id, const std::string& name, Texture* tex
 
 static const ImVec4 COMMANDER_COLOUR {0.35f, 0.65f, 1.0f, 1.0f};
 constexpr float LINKED_ACCOUNT_INDENT = 20.0f;
+constexpr float LOOKUP_INPUT_WIDTH = 200.0f;
 
 enum class ColumnKind {
 	ACCOUNT,
@@ -217,9 +218,12 @@ static void DrawAccountName(const SquadMember& member, const PlayerProofs* proof
 	} else {
 		ImGui::TextUnformatted(member.account.c_str());
 	}
-	if (member.commander) {
-		ImGui::PopStyleColor();
-		if (ImGui::IsItemHovered()) ImGui::SetTooltip("Commander");
+	if (member.commander) ImGui::PopStyleColor();
+	if (ImGui::IsItemHovered() && (member.commander || member.addedManually)) {
+		ImGui::BeginTooltip();
+		if (member.commander) ImGui::TextUnformatted("Commander");
+		if (member.addedManually) ImGui::TextUnformatted(member.inSquad ? "Looked up manually" : "Looked up manually, not in your squad");
+		ImGui::EndTooltip();
 	}
 }
 
@@ -368,6 +372,22 @@ static void DrawProviderCombo(const std::string& currentProvider) {
 	}
 }
 
+static void DrawPlayerLookup() {
+	static std::string lookup;
+	ImGui::SetNextItemWidth(LOOKUP_INPUT_WIDTH);
+	bool submitted = ImGui::InputString("##Lookup", lookup, ImGuiInputTextFlags_EnterReturnsTrue, "Account name or KP ID");
+	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Look up a player who is not in your squad");
+	ImGui::SameLine();
+	submitted |= ImGui::Button("Add");
+	if (submitted && PlayerManager::AddManualPlayer(lookup)) {
+		lookup.clear();
+	}
+	if (PlayerManager::HasManualPlayers()) {
+		ImGui::SameLine();
+		if (ImGui::Button("Clear added")) PlayerManager::ClearManualPlayers();
+	}
+}
+
 static void DrawControls(const IProvider& provider) {
 	DrawProviderCombo(provider.Name());
 	if (provider.SupportsLinkedAccounts()) {
@@ -385,6 +405,7 @@ static void DrawControls(const IProvider& provider) {
 			ImGui::EndCombo();
 		}
 	}
+	DrawPlayerLookup();
 }
 
 void RenderWindowLogProofs() {

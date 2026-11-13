@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 struct SquadMember {
@@ -12,6 +13,9 @@ struct SquadMember {
 	std::string character;
 	uint8_t subgroup = 0; // 1-based; 0 when unknown or not in a squad.
 	bool commander = false;
+	bool inSquad = false;
+	// Added through the lookup box; kept when they leave the squad until the lookups are cleared.
+	bool addedManually = false;
 };
 
 // Fields left empty keep the member's current value, so sources that lack a field do not erase it.
@@ -30,8 +34,12 @@ namespace PlayerManager {
 	void RemovePlayer(const std::string& account);
 	void SetSelf(const SquadMemberUpdate& update);
 	bool IsSelf(const std::string& account);
-	// Removes everyone except the local player.
+	// Removes everyone except the local player and manual lookups.
 	void ClearPlayers();
+	// Accepts an account name or KP ID typed by the user; returns false if the text is not a plausible id.
+	bool AddManualPlayer(std::string_view id);
+	void ClearManualPlayers();
+	bool HasManualPlayers();
 	std::vector<SquadMember> Members();
 } // namespace PlayerManager
 
