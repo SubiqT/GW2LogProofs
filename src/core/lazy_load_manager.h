@@ -33,6 +33,7 @@ class LazyLoadManager {
 public:
 	using Clock = std::chrono::steady_clock;
 	using Fetcher = std::function<void(const std::string& account, const std::string& provider, FetchCallback callback)>;
+	// Called on the thread that requests data; fetch completions use the policy captured with their request.
 	using PolicySource = std::function<LoadPolicy()>;
 
 	LazyLoadManager(Fetcher fetch, PolicySource policy, std::function<Clock::time_point()> now = Clock::now);
@@ -55,7 +56,7 @@ private:
 		Clock::time_point retryAt;
 	};
 
-	void OnFetched(const Key& key, const FetchResult& result);
+	void OnFetched(const Key& key, const FetchResult& result, const LoadPolicy& policy);
 
 	Fetcher fetch_;
 	PolicySource policy_;

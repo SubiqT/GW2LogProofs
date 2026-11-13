@@ -14,19 +14,20 @@ LazyLoadManager::LazyLoadManager(Fetcher fetch, PolicySource policy, std::functi
 
 void LazyLoadManager::RequestPlayerData(const std::string& account, const std::string& provider) {
 	Key key {account, provider};
+	LoadPolicy policy = policy_();
 	{
 		std::scoped_lock lock(mutex_);
 		auto now = now_();
 		auto& entry = entries_[key];
 		if (entry.inFlight || entry.retryAt > now) return;
-		if (entry.loaded && now - entry.loadedAt < policy_().cacheTimeout) return;
+		if (entry.loaded && now - entry.loadedAt < policy.cacheTimeout) return;
 		entry.inFlight = true;
 	}
 	// Fetch callbacks can run synchronously, so the lock must not be held here.
-	fetch_(account, provider, [this, key](const FetchResult& result) { OnFetched(key, result); });
+	fetch_(account, provider, [this, key, policy](const FetchResult& result) { OnFetched(key, result, policy); });
 }
 
-void LazyLoadManager::OnFetched(const Key& key, const FetchResult& result) {
+void LazyLoadManager::OnFetched(const Key& key, const FetchResult& result, const LoadPolicy& policy) {
 	std::scoped_lock lock(mutex_);
 	auto& entry = entries_[key];
 	auto now = now_();
@@ -41,7 +42,6 @@ void LazyLoadManager::OnFetched(const Key& key, const FetchResult& result) {
 		return;
 	}
 
-	LoadPolicy policy = policy_();
 	if (++entry.failures >= policy.maxAttempts) {
 		entry.failures = 0;
 		entry.retryAt = now + policy.cacheTimeout;
