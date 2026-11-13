@@ -2,6 +2,7 @@
 #include <format>
 #include <functional>
 #include <thread>
+#include <variant>
 
 
 #include "../core/boss_group.h"
@@ -24,7 +25,7 @@
 
 
 static ImGuiWindowFlags windowFlags = (ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_AlwaysAutoResize);
-static ImGuiTableFlags tableFlags = (ImGuiTableFlags_Borders | ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY);
+static ImGuiTableFlags tableFlags = (ImGuiTableFlags_Borders | ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortTristate | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY);
 
 namespace {
 	static float bezier_ease(float t) {
@@ -164,59 +165,36 @@ static void SetupTableColumns(const BossGroup& group, bool showKpmeId) {
 	}
 }
 
+// TableHeader provides click-to-sort and the column context menu; the icon is drawn over its empty label.
+static void DrawHeaderCell(const char* id, const std::string& name, Texture* texture) {
+	ImGui::TableNextColumn();
+	ImVec2 start = ImGui::GetCursorPos();
+	ImGui::TableHeader(texture ? id : name.c_str());
+	if (texture) {
+		ImGui::SetCursorPos(start);
+		float padding = (Settings::ColumnSizeBosses - Settings::BossIconScale) * 0.5f;
+		if (padding > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding);
+		ImGui::Image((void*) texture->Resource, ImVec2(Settings::BossIconScale, Settings::BossIconScale));
+	}
+	if (ImGui::IsItemHovered()) {
+		ImGui::SetTooltip("%s", name.c_str());
+	}
+}
+
 static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 	ImGui::TableSetupScrollFreeze(1, 1);
-	ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+	ImGui::TableNextRow(ImGuiTableRowFlags_Headers, Settings::BossIconScale + ImGui::GetStyle().CellPadding.y * 2.0f);
 	ImGui::TableNextColumn();
-	ImGui::Text("Account");
+	ImGui::TableHeader("Account");
 	if (showKpmeId) {
 		ImGui::TableNextColumn();
-		ImGui::Text("Id");
+		ImGui::TableHeader("Id");
 	}
 	for (const auto& currency : group.currencies) {
-		ImGui::TableNextColumn();
-		HighlightColumnOnHover();
-		Texture* texture = GetCurrencyTexture(currency);
-		if (texture) {
-			float columnWidth = Settings::ColumnSizeBosses;
-			float iconSize = Settings::BossIconScale;
-			float padding = (columnWidth - iconSize) * 0.5f;
-			if (padding > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding);
-			ImGui::Image((void*) texture->Resource, ImVec2(iconSize, iconSize));
-		} else {
-			ImGui::TextUnformatted(currency.c_str());
-		}
-		if (ImGui::IsItemHovered()) {
-			ImGui::BeginTooltip();
-			ImGui::TextUnformatted(currency.c_str());
-			ImGui::EndTooltip();
-		}
+		DrawHeaderCell(("##" + currency).c_str(), currency, GetCurrencyTexture(currency));
 	}
 	for (const auto& bossEntry : group.bosses) {
-		ImGui::TableNextColumn();
-		HighlightColumnOnHover();
-		Texture* texture = GetBossTexture(*bossEntry.boss);
-		static std::unordered_map<std::string, std::string> bossNameCache;
-		std::string key = std::to_string(bossEntry.boss->id) + "_" + std::to_string(int(bossEntry.type));
-		auto it = bossNameCache.find(key);
-		if (it == bossNameCache.end()) {
-			it = bossNameCache.emplace(key, GetBossName(*bossEntry.boss, bossEntry.type)).first;
-		}
-		const std::string& bossName = it->second;
-		if (texture) {
-			float columnWidth = Settings::ColumnSizeBosses;
-			float iconSize = Settings::BossIconScale;
-			float padding = (columnWidth - iconSize) * 0.5f;
-			if (padding > 0) ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding);
-			ImGui::Image((void*) texture->Resource, ImVec2(iconSize, iconSize));
-		} else {
-			ImGui::TextUnformatted(bossName.c_str());
-		}
-		if (ImGui::IsItemHovered()) {
-			ImGui::BeginTooltip();
-			ImGui::TextUnformatted(bossName.c_str());
-			ImGui::EndTooltip();
-		}
+		DrawHeaderCell(("##" + bossEntry.proofId).c_str(), GetBossName(*bossEntry.boss, bossEntry.type), GetBossTexture(*bossEntry.boss));
 	}
 }
 
@@ -237,10 +215,14 @@ static void DrawCountCell(const ProofCounts* counts, const std::string& proofId,
 	}
 }
 
-static void DrawPlayerRow(const std::string& account, const BossGroup& group, IProvider* provider, bool showKpmeId) {
-	const std::string providerName = provider->Name();
-	PlayerManager::lazyLoadManager.RequestPlayerData(account, providerName);
-	auto [state, proofs] = PlayerManager::lazyLoadManager.GetPlayerLoad(account, providerName);
+struct PlayerRow {
+	std::string account;
+	PlayerLoad load;
+};
+
+static void DrawPlayerRow(const PlayerRow& row, const BossGroup& group, bool showKpmeId) {
+	const std::string& account = row.account;
+	const auto& [state, proofs] = row.load;
 	const ProofCounts* counts = proofs ? &CountsForSelectedMode(*proofs) : nullptr;
 	const bool hasProofs = counts && !counts->empty();
 	const char* missingText = hasProofs ? "0" : "";
@@ -292,6 +274,34 @@ static void DrawPlayerRow(const std::string& account, const BossGroup& group, IP
 	}
 }
 
+static int ProofCount(const PlayerRow& row, const std::string& proofId) {
+	if (!row.load.proofs) return -1;
+	const auto& counts = CountsForSelectedMode(*row.load.proofs);
+	auto it = counts.find(proofId);
+	return it != counts.end() ? it->second : 0;
+}
+
+// Sorts by the clicked column; rows keep squad join order while no column is sorted.
+static void SortRows(std::vector<PlayerRow>& rows, const BossGroup& group, bool showKpmeId) {
+	const ImGuiTableSortSpecs* specs = ImGui::TableGetSortSpecs();
+	if (!specs || specs->SpecsCount == 0) return;
+	const ImGuiTableColumnSortSpecs& spec = specs->Specs[0];
+	const bool descending = spec.SortDirection == ImGuiSortDirection_Descending;
+	const int firstProofColumn = showKpmeId ? 2 : 1;
+
+	auto key = [&](const PlayerRow& row) -> std::variant<std::string, int> {
+		if (spec.ColumnIndex == 0) return row.account;
+		if (spec.ColumnIndex < firstProofColumn) return row.load.proofs ? row.load.proofs->profileId : std::string();
+		size_t proofIndex = spec.ColumnIndex - firstProofColumn;
+		if (proofIndex < group.currencies.size()) return ProofCount(row, group.currencies[proofIndex]);
+		proofIndex -= group.currencies.size();
+		return proofIndex < group.bosses.size() ? ProofCount(row, group.bosses[proofIndex].proofId) : 0;
+	};
+	std::stable_sort(rows.begin(), rows.end(), [&](const PlayerRow& a, const PlayerRow& b) {
+		return descending ? key(b) < key(a) : key(a) < key(b);
+	});
+}
+
 static void DrawGenericTab(const BossGroup& group, IProvider* provider) {
 	const std::string providerName = provider->Name();
 	const bool showKpmeId = provider->ShowsProfileId();
@@ -301,17 +311,20 @@ static void DrawGenericTab(const BossGroup& group, IProvider* provider) {
 		SetupTableColumns(group, showKpmeId);
 		DrawTableHeaders(group, showKpmeId);
 
-		auto accounts = PlayerManager::Accounts();
-		if (accounts.empty()) {
-			ImGui::TableNextColumn();
-			ImGui::Text("No players found... ");
+		std::vector<PlayerRow> rows;
+		for (auto& account : PlayerManager::Accounts()) {
+			PlayerManager::lazyLoadManager.RequestPlayerData(account, providerName);
+			PlayerLoad load = PlayerManager::lazyLoadManager.GetPlayerLoad(account, providerName);
+			if (!Settings::IncludeMissingAccounts && load.state == LoadState::READY && (!load.proofs || CountsForSelectedMode(*load.proofs).empty())) continue;
+			rows.push_back({std::move(account), std::move(load)});
 		}
-		for (const auto& account : accounts) {
-			if (!Settings::IncludeMissingAccounts) {
-				auto [state, proofs] = PlayerManager::lazyLoadManager.GetPlayerLoad(account, providerName);
-				if (state == LoadState::READY && (!proofs || CountsForSelectedMode(*proofs).empty())) continue;
-			}
-			DrawPlayerRow(account, group, provider, showKpmeId);
+		if (rows.empty()) {
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted("No players found... ");
+		}
+		SortRows(rows, group, showKpmeId);
+		for (const auto& row : rows) {
+			DrawPlayerRow(row, group, showKpmeId);
 		}
 		ImGui::EndTable();
 	}
