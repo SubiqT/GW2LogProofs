@@ -8,6 +8,7 @@ public:
 	WingmanProvider();
 
 	const char* Name() const override { return "Wingman"; }
+	const char* MissingDataDescription() const override { return "No logs uploaded to Wingman for this account"; }
 	void FetchAsync(const std::string& account, FetchCallback callback) override;
 
 	const std::vector<BossGroup>& GetBossGroups() const override { return bossGroups_; }

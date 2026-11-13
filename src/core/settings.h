@@ -2,6 +2,7 @@
 #define SETTINGS_H
 
 #include <filesystem>
+#include <string>
 
 #include "../imgui/imgui.h"
 
@@ -57,6 +58,9 @@ namespace Settings {
 	extern bool IncludeMissingAccounts;
 	// Raid tokens each unopened boss coffer counts as. A coffer drops 1-5 tokens, so the default is the average.
 	extern int TokensPerCoffer;
+	// Shown in proof cells for accounts the provider has no data for.
+	extern std::string UnavailableText;
+	inline constexpr size_t MAX_UNAVAILABLE_TEXT_LENGTH = 16;
 
 	extern bool hoverEnabled;
 	extern ImU32 hoverColour;

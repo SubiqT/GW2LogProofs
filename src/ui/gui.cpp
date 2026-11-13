@@ -133,6 +133,7 @@ static void DrawHeaderCell(const char* id, const std::string& name, Texture* tex
 static const ImVec4 COMMANDER_COLOUR {0.35f, 0.65f, 1.0f, 1.0f};
 constexpr float LINKED_ACCOUNT_INDENT = 20.0f;
 constexpr float LOOKUP_INPUT_WIDTH = 200.0f;
+constexpr const char* FAILED_TEXT = "?";
 
 enum class ColumnKind {
 	ACCOUNT,
@@ -209,7 +210,15 @@ static const ProofCounts& CountsForSelectedMode(const PlayerProofs& proofs) {
 	return Settings::LinkedAccountsMode == COMBINE_LINKED ? proofs.combined : proofs.own;
 }
 
-static void DrawAccountName(const SquadMember& member, const PlayerProofs* proofs) {
+// Explains a row without proof counts; null when the row has data or is still loading.
+static const char* MissingDataReason(const PlayerLoad& load, const IProvider& provider) {
+	if (load.state == LoadState::FAILED) return "Could not reach the service; retrying";
+	if (load.state != LoadState::READY) return nullptr;
+	if (load.proofs && !CountsForSelectedMode(*load.proofs).empty()) return nullptr;
+	return provider.MissingDataDescription();
+}
+
+static void DrawAccountName(const SquadMember& member, const PlayerProofs* proofs, const char* missingReason) {
 	if (member.commander) ImGui::PushStyleColor(ImGuiCol_Text, COMMANDER_COLOUR);
 	if (proofs && !proofs->profileUrl.empty()) {
 		if (ImGui::TextURL(member.account.c_str())) {
@@ -219,8 +228,9 @@ static void DrawAccountName(const SquadMember& member, const PlayerProofs* proof
 		ImGui::TextUnformatted(member.account.c_str());
 	}
 	if (member.commander) ImGui::PopStyleColor();
-	if (ImGui::IsItemHovered() && (member.commander || member.addedManually)) {
+	if (ImGui::IsItemHovered() && (member.commander || member.addedManually || missingReason)) {
 		ImGui::BeginTooltip();
+		if (missingReason) ImGui::TextUnformatted(missingReason);
 		if (member.commander) ImGui::TextUnformatted("Commander");
 		if (member.addedManually) ImGui::TextUnformatted(member.inSquad ? "Looked up manually" : "Looked up manually, not in your squad");
 		ImGui::EndTooltip();
@@ -254,18 +264,19 @@ static void DrawCount(const ProofCounts* counts, const std::string& proofId, Loa
 	}
 }
 
-static void DrawPlayerRow(const PlayerRow& row, const std::vector<Column>& columns) {
+static void DrawPlayerRow(const PlayerRow& row, const std::vector<Column>& columns, const IProvider& provider) {
 	const auto& [state, proofs] = row.load;
 	const ProofCounts* counts = proofs ? &CountsForSelectedMode(*proofs) : nullptr;
 	const bool hasProofs = counts && !counts->empty();
-	const char* missingText = hasProofs ? "0" : "";
+	const char* missingReason = MissingDataReason(row.load, provider);
+	const char* missingText = hasProofs ? "0" : state == LoadState::FAILED ? FAILED_TEXT : Settings::UnavailableText.c_str();
 
 	if (!hasProofs) ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
 	for (const auto& column : columns) {
 		ImGui::TableNextColumn();
 		switch (column.kind) {
 			case ColumnKind::ACCOUNT:
-				DrawAccountName(row.member, proofs.get());
+				DrawAccountName(row.member, proofs.get(), missingReason);
 				break;
 			case ColumnKind::CHARACTER:
 				ImGui::TextUnformatted(row.member.character.c_str());
@@ -357,7 +368,7 @@ static void DrawGenericTab(const BossGroup& group, IProvider* provider) {
 		}
 		SortRows(rows, columns);
 		for (const auto& row : rows) {
-			DrawPlayerRow(row, columns);
+			DrawPlayerRow(row, columns, *provider);
 		}
 		ImGui::EndTable();
 	}

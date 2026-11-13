@@ -8,6 +8,7 @@ public:
 	KpmeProvider();
 
 	const char* Name() const override { return "KPME"; }
+	const char* MissingDataDescription() const override { return "No killproof.me profile, or the profile is private"; }
 	bool SupportsLinkedAccounts() const override { return true; }
 	bool ShowsProfileId() const override { return true; }
 	void FetchAsync(const std::string& account, FetchCallback callback) override;

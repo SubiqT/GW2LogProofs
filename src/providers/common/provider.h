@@ -55,6 +55,8 @@ public:
 	virtual const char* Name() const = 0;
 	virtual bool SupportsLinkedAccounts() const { return false; }
 	virtual bool ShowsProfileId() const { return false; }
+	// Shown when the service has no proofs for an account.
+	virtual const char* MissingDataDescription() const = 0;
 
 	virtual void FetchAsync(const std::string& account, FetchCallback callback) = 0;
 

@@ -418,6 +418,16 @@ static void DrawGeneralSettings() {
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
+		ImGui::Text("Text for Missing Data");
+		ImGui::TableNextColumn();
+		if (ImGui::InputString("##UnavailableText", Settings::UnavailableText)) {
+			Settings::UnavailableText.resize((std::min)(Settings::UnavailableText.size(), Settings::MAX_UNAVAILABLE_TEXT_LENGTH));
+			Settings::Save();
+		}
+		if (ImGui::IsItemHovered()) ImGui::SetTooltip("Shown in place of counts for accounts without a profile, or with a private one");
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
 		ImGui::Text("Tokens per KPME Coffer");
 		ImGui::TableNextColumn();
 		if (ImGui::SliderInt("##TokensPerCoffer", &Settings::TokensPerCoffer, Settings::TOKENS_PER_COFFER_RANGE.min, Settings::TOKENS_PER_COFFER_RANGE.max)) {
