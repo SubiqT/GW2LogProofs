@@ -27,7 +27,7 @@ std::string WingmanBossProvider::GetProofIdentifier(const std::string& currency)
 std::vector<ProofOption> WingmanBossProvider::GetAvailableProofs() const {
 	static const std::vector<Boss> raidNormal = {ValeGuardian, Gorseval, Sabetha, Slothasor, BanditTrio, Matthias, Escort, KeepConstruct, TwistedCastle, Xera, Cairn, MursaatOverseer, Samarog, Deimos, SoullessHorror, RiverOfSouls, BrokenKing, EaterOfSouls, Eyes, Dhuum, ConjuredAmalgamate, TwinLargos, Qadim, Adina, Sabir, QadimThePeerless, Greer, Decima, Ura};
 	static const std::vector<Boss> raidCM = {KeepConstructCM, CairnCM, MursaatOverseerCM, SamarogCM, DeimosCM, SoullessHorrorCM, DhuumCM, ConjuredAmalgamateCM, TwinLargosCM, QadimCM, AdinaCM, SabirCM, QadimThePeerlessCM, GreerCM, DecimaCM, UraCM};
-	static const std::vector<Boss> fractalCM = {MAMACM, SiaxTheCorruptedCM, EnsolyssOfTheEndlessTormentCM, SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM, ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM, KanaxaiScytheOfHouseAurkusCM, EparchCM};
+	static const std::vector<Boss> fractalCM = {MAMACM, SiaxTheCorruptedCM, EnsolyssOfTheEndlessTormentCM, SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM, ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM, KanaxaiScytheOfHouseAurkusCM, EparchCM, KinfallCM};
 	static const std::vector<Boss> strikeNormal = {IcebroodConstruct, TheVoiceAndTheClaw, FraenirOfJormag, Boneskinner, WhisperOfJormag, Freezie, CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate, OldLionsCourt, Dagda, Cerus, Kela, Vloxx};
 	static const std::vector<Boss> strikeCM = {CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM, OldLionsCourtCM, DagdaCM, CerusCM, KelaCM, VloxxCM};
 

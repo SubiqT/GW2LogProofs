@@ -35,7 +35,7 @@ std::vector<Boss> sortedFractalCMBosses {
 		ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM,
 		KanaxaiScytheOfHouseAurkusCM,
 		// CerusAndDeimosCM, // Not tracked anymore by arc or wingman
-		EparchCM
+		EparchCM, KinfallCM
 };
 std::vector<Boss> sortedStrikeBosses {
 		IcebroodConstruct, TheVoiceAndTheClaw, FraenirOfJormag, Boneskinner, WhisperOfJormag,
