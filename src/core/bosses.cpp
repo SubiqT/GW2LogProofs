@@ -43,16 +43,16 @@ std::vector<Boss> sortedStrikeBosses {
 		CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate,
 		OldLionsCourt,
 		Dagda, Cerus,
-		Kela
+		Kela, Vloxx
 };
 std::vector<Boss> sortedStrikeCMBosses {
 		CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM,
 		OldLionsCourtCM,
 		DagdaCM, CerusCM,
-		KelaCM
+		KelaCM, VloxxCM
 };
 std::vector<Boss> sortedStrikeLMBosses {
-		CerusCM
+		CerusCM, VloxxCM
 };
 
 std::vector<std::string> sortedKpmeSummary {
@@ -211,6 +211,8 @@ std::string GetBossName(Boss boss) {
 			return "Kela";
 		case KelaToken:
 			return "Kela";
+		case Vloxx:
+			return "Vloxx";
 		default:
 			return "Unknown";
 	}
@@ -360,6 +362,8 @@ Texture* GetBossTexture(Boss boss) {
 			return APIDefs->Textures.GetOrCreateFromResource("TEX_KELA", IDB_KELA, hSelf);
 		case KelaToken:
 			return APIDefs->Textures.GetOrCreateFromResource("TEX_KELA", IDB_KELA, hSelf);
+		case Vloxx:
+			return APIDefs->Textures.GetOrCreateFromResource("TEX_VLOXX", IDB_VLOXX, hSelf);
 		default:
 			return APIDefs->Textures.GetOrCreateFromResource("TEX_UNDER_CONSTRUCTION", IDB_UNDER_CONSTRUCTION, hSelf);
 	}

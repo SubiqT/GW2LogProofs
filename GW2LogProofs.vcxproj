@@ -220,6 +220,7 @@
     <Image Include="src\resources\Unstable_Fractal_Essence.png" />
     <Image Include="src\resources\Ura.png" />
     <Image Include="src\resources\Vale_Guardian.png" />
+    <Image Include="src\resources\Vloxx.png" />
     <Image Include="src\resources\Watchknight_Mark_II.png" />
     <Image Include="src\resources\Whisper_of_Jormag.png" />
     <Image Include="src\resources\Xera.png" />

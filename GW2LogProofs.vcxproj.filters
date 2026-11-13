@@ -538,6 +538,9 @@
     <Image Include="src\resources\Kinfall.png">
       <Filter>resources</Filter>
     </Image>
+    <Image Include="src\resources\Vloxx.png">
+      <Filter>resources</Filter>
+    </Image>
     <Image Include="src\resources\Greer.png">
       <Filter>resources</Filter>
     </Image>
