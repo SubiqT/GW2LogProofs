@@ -45,7 +45,6 @@ extern const char* HOVER_ENABLED;
 extern const char* HOVER_COLOUR;
 
 
-extern const char* PROVIDER_CONFIGS;
 
 extern const char* CACHE_TIMEOUT_MINUTES;
 extern const char* MAX_RETRY_ATTEMPTS;

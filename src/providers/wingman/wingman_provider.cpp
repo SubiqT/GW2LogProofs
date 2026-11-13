@@ -7,10 +7,6 @@ void WingmanProvider::LoadPlayerDataAsync(const std::string& account, std::funct
 	});
 }
 
-std::vector<std::string> WingmanProvider::GetSupportedProofTypes() const {
-	return {"KILL_PROOF"};
-}
-
 PlayerProofData WingmanProvider::ConvertWingmanResponse(const Wingman::WingmanResponse& response) {
 	PlayerProofData data;
 	data.accountName = response.account;

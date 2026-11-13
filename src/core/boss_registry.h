@@ -51,7 +51,6 @@ public:
 	// Custom tab support
 	virtual std::vector<ProofOption> GetAvailableProofs() const = 0;
 	virtual BossGroup CreateCustomBossGroup(const CustomTab& tab) const = 0;
-	virtual bool SupportsCustomTabs() const { return true; }
 };
 
 class BossRegistry {

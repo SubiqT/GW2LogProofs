@@ -122,19 +122,7 @@ enum Boss {
 	VloxxCM = -28106,
 };
 
-extern std::vector<Boss> sortedRaidBosses;
-extern std::vector<Boss> sortedRaidCmBosses;
-extern std::vector<Boss> sortedRaidLMBosses;
-extern std::vector<Boss> sortedFractalCMBosses;
-extern std::vector<Boss> sortedStrikeBosses;
-extern std::vector<Boss> sortedStrikeCMBosses;
-extern std::vector<Boss> sortedStrikeLMBosses;
 
-extern std::vector<std::string> sortedKpmeSummary;
-extern std::vector<Boss> sortedKpmeRaidBosses;
-extern std::vector<Boss> sortedKpmeRaidCMBosses;
-extern std::vector<Boss> sortedKpmeStrikeBosses;
-extern std::vector<Boss> sortedKpmeStrikeCMBosses;
 
 std::string GetBossName(Boss boss);
 std::string GetBossName(Boss boss, BossType type);

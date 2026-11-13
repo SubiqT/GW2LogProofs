@@ -48,7 +48,6 @@ public:
 	void CreateTab(const std::string& providerId, const CustomTab& tab);
 	void UpdateTab(const std::string& providerId, const std::string& tabId, const CustomTab& tab);
 	void DeleteTab(const std::string& providerId, const std::string& tabId);
-	void ReorderTabs(const std::string& providerId, const std::vector<std::string>& tabOrder);
 
 	ProviderTabConfig GetProviderConfig(const std::string& providerId) const;
 	void SetProviderConfig(const std::string& providerId, const ProviderTabConfig& config);
@@ -58,12 +57,9 @@ public:
 	void LoadFromSettings();
 	void SaveToSettings();
 	void SaveAndPersist();
-	void ValidateAndCleanupConfigs();
 
 	std::unordered_map<std::string, ProviderTabConfig> providerConfigs_;
 
-private:
-	void ValidateTabConfig(ProviderTabConfig& config) const;
 };
 
 // JSON serialization

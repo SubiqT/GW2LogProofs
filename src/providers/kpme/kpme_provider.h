@@ -6,11 +6,9 @@
 
 class KpmeProvider : public IDataProvider {
 public:
-	std::string GetProviderName() const override { return "KPME"; }
 
 	void LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) override;
 	bool SupportsLinkedAccounts() const override { return true; }
-	std::vector<std::string> GetSupportedProofTypes() const override;
 	PlayerProofData ComputeProofsFromRawData(const PlayerProofData& rawData, bool includeLinkedAccounts) const override;
 
 private:

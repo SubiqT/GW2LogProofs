@@ -100,19 +100,6 @@ static void DrawPlayerAccountName(const Player& player, const auto* proofData) {
 	}
 }
 
-static void DrawPlayerProofValue(const Player& player, const std::string& proofId, const std::string& providerName) {
-	if (player.state == LoadState::READY && player.proofData) {
-		auto it = player.proofData->proofs.find(proofId);
-		ImGui::Text(it != player.proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
-	} else {
-		if (player.state == LoadState::LOADING) {
-			DrawSpinner();
-		} else {
-			ImGui::Text("0");
-		}
-	}
-}
-
 static void DrawKpmeId(const Player& aPlayer, const auto* proofData) {
 	if (proofData && !proofData->profileId.empty()) {
 		if (ImGui::TextURL(proofData->profileId.c_str())) {

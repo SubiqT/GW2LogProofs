@@ -281,55 +281,6 @@ void DrawProofSelector(const std::string& providerId, std::vector<ProofSelection
 	}
 }
 
-void DrawTabEditor(const std::string& providerId, CustomTab& tab) {
-	ImGui::PushID(tab.id.c_str());
-
-	if (ImGui::BeginTable(("TabEditor_" + tab.id).c_str(), 2, ImGuiTableFlags_SizingStretchProp)) {
-		ImGui::TableSetupColumn("Setting", ImGuiTableColumnFlags_WidthFixed, 120.0f);
-		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Name");
-		ImGui::TableNextColumn();
-		char nameBuffer[256];
-		strcpy_s(nameBuffer, tab.displayName.c_str());
-		if (ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer))) {
-			tab.displayName = nameBuffer;
-			TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
-		}
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Visible");
-		ImGui::TableNextColumn();
-		if (ImGui::Checkbox("##Visible", &tab.visible)) {
-			TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
-		}
-
-		ImGui::TableNextRow();
-		ImGui::TableNextColumn();
-		ImGui::Text("Actions");
-		ImGui::TableNextColumn();
-		if (ImGui::Button("Delete Tab")) {
-			TabConfigManager::Instance().DeleteTab(providerId, tab.id);
-		}
-
-		ImGui::EndTable();
-	}
-
-	if (ImGui::CollapsingHeader("Proof Selection")) {
-		auto oldProofs = tab.proofs;
-		DrawProofSelector(providerId, tab.proofs);
-		if (oldProofs != tab.proofs) {
-			TabConfigManager::Instance().UpdateTab(providerId, tab.id, tab);
-		}
-	}
-
-	ImGui::PopID();
-	ImGui::Separator();
-}
-
 void DrawCustomTabEditor(const std::string& providerId) {
 	auto config = TabConfigManager::Instance().GetProviderConfig(providerId);
 

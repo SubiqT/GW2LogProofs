@@ -15,10 +15,6 @@ void KpmeProvider::LoadPlayerDataAsync(const std::string& account, std::function
 	});
 }
 
-std::vector<std::string> KpmeProvider::GetSupportedProofTypes() const {
-	return {"KILL_PROOF", "TOKEN", "COFFER", "TITLE"};
-}
-
 PlayerProofData KpmeProvider::ConvertKpmeResponse(const Kpme::KpmeResponse& response) {
 	PlayerProofData data;
 	data.accountName = response.id;
@@ -122,14 +118,6 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 					proof.displayName = kp.first;
 					proof.url = "";
 					data.proofs[kp.first] = proof;
-				}
-			}
-		} else {
-
-			for (const auto& kp : response.self.killproofs) {
-				if (kp.first == "Legendary Divination" && !data.proofs.count(kp.first)) {
-
-					continue;
 				}
 			}
 		}

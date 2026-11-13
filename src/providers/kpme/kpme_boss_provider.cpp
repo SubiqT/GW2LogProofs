@@ -169,7 +169,6 @@ BossGroup KpmeBossProvider::CreateCustomBossGroup(const CustomTab& tab) const {
 			currencies.push_back(proof.proofId);
 		} else {
 			// Find boss by proof identifier
-			bool found = false;
 			BossType type = BossTypeFromString(proof.bossType);
 
 			for (const auto& boss : {

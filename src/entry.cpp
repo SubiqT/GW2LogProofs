@@ -65,8 +65,6 @@ void AddonLoad(AddonAPI* addonApi) {
 	ImGui::SetCurrentContext((ImGuiContext*) APIDefs->ImguiContext);
 	ImGui::SetAllocatorFunctions((void* (*) (size_t, void*) ) APIDefs->ImguiMalloc, (void (*)(void*, void*)) APIDefs->ImguiFree);
 
-	NexusLink = (NexusLinkData*) APIDefs->DataLink.Get("DL_NEXUS_LINK");
-
 	AddonPath = APIDefs->Paths.GetAddonDirectory("log_proofs");
 	SettingsPath = APIDefs->Paths.GetAddonDirectory("log_proofs/settings.json");
 	std::filesystem::create_directory(AddonPath);
@@ -84,7 +82,6 @@ void AddonLoad(AddonAPI* addonApi) {
 	trackerManager.RegisterTracker(std::make_unique<RealtimeApiTracker>());
 	trackerManager.RegisterTracker(std::make_unique<UnofficialExtrasTracker>());
 	trackerManager.RegisterTracker(std::make_unique<ArcdpsTracker>());
-	auto activeTracker = trackerManager.GetActiveTracker();
 
 	PlayerManager::lazyLoadManager.SetLoadFunction(LoadPlayerDataWrapper);
 

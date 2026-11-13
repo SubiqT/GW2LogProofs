@@ -73,15 +73,6 @@ namespace HTTPClient {
 		}
 	}
 
-	std::future<std::string> GetRequestAsync(const std::wstring& wUrl) {
-		auto promise = std::make_shared<std::promise<std::string>>();
-		auto future = promise->get_future();
-		GetRequestAsync(wUrl, [promise](const std::string& result) {
-			promise->set_value(result);
-		});
-		return future;
-	}
-
 	void GetRequestAsync(const std::wstring& wUrl, std::function<void(const std::string&)> callback) {
 		Initialize();
 		if (!hSession) {

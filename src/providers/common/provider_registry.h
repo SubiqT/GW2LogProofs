@@ -10,7 +10,6 @@ public:
 
 	void RegisterProvider(const std::string& name, DataProviderFactory factory);
 	std::unique_ptr<IDataProvider> CreateProvider(const std::string& name);
-	std::vector<std::string> GetAvailableProviders() const;
 
 private:
 	std::unordered_map<std::string, DataProviderFactory> providers_;

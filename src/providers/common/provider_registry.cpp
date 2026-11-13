@@ -17,10 +17,3 @@ std::unique_ptr<IDataProvider> ProviderRegistry::CreateProvider(const std::strin
 	return nullptr;
 }
 
-std::vector<std::string> ProviderRegistry::GetAvailableProviders() const {
-	std::vector<std::string> names;
-	for (const auto& pair : providers_) {
-		names.push_back(pair.first);
-	}
-	return names;
-}

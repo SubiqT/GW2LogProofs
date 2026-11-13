@@ -32,8 +32,6 @@ const char* HOVER_ENABLED = "HoverEnabled";
 const char* HOVER_COLOUR = "HoverColour";
 
 
-const char* PROVIDER_CONFIGS = "ProviderConfigs";
-
 const char* CACHE_TIMEOUT_MINUTES = "CacheTimeoutMinutes";
 const char* MAX_RETRY_ATTEMPTS = "MaxRetryAttempts";
 

@@ -3,7 +3,6 @@
 #include "boss_registry.h"
 #include "settings.h"
 #include "shared.h"
-#include <unordered_set>
 
 using json = nlohmann::json;
 
@@ -131,20 +130,6 @@ void TabConfigManager::DeleteTab(const std::string& providerId, const std::strin
 	}
 }
 
-void TabConfigManager::ReorderTabs(const std::string& providerId, const std::vector<std::string>& tabOrder) {
-	auto& config = providerConfigs_[providerId];
-	for (size_t i = 0; i < tabOrder.size(); ++i) {
-		for (auto& tab : config.tabs) {
-			if (tab.id == tabOrder[i]) {
-				tab.order = static_cast<int>(i);
-				break;
-			}
-		}
-	}
-	std::sort(config.tabs.begin(), config.tabs.end(), [](const CustomTab& a, const CustomTab& b) { return a.order < b.order; });
-	SaveAndPersist();
-}
-
 ProviderTabConfig TabConfigManager::GetProviderConfig(const std::string& providerId) const {
 	auto it = providerConfigs_.find(providerId);
 	if (it != providerConfigs_.end()) {
@@ -198,36 +183,4 @@ void TabConfigManager::SaveToSettings() {
 void TabConfigManager::SaveAndPersist() {
 	SaveToSettings();
 	Settings::Save(SettingsPath);
-}
-
-void TabConfigManager::ValidateAndCleanupConfigs() {
-	for (auto& [providerId, config] : providerConfigs_) {
-		ValidateTabConfig(config);
-	}
-}
-
-void TabConfigManager::ValidateTabConfig(ProviderTabConfig& config) const {
-	// Remove tabs with empty IDs or display names
-	config.tabs.erase(
-			std::remove_if(config.tabs.begin(), config.tabs.end(), [](const CustomTab& tab) {
-				return tab.id.empty() || tab.displayName.empty();
-			}),
-			config.tabs.end()
-	);
-
-	// Remove duplicate tab IDs
-	std::unordered_set<std::string> seenIds;
-	config.tabs.erase(
-			std::remove_if(config.tabs.begin(), config.tabs.end(), [&seenIds](const CustomTab& tab) {
-				if (seenIds.count(tab.id)) {
-					return true; // Duplicate
-				}
-				seenIds.insert(tab.id);
-				return false;
-			}),
-			config.tabs.end()
-	);
-
-	// Skip proof ID validation during load - providers may not be ready yet
-	// Validation will happen when tabs are actually used
 }
