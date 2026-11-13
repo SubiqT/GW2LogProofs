@@ -22,6 +22,20 @@ Alternatively, you can install manually:
 2. Place it in your addons folder (e.g. `C:\Program Files\Guild Wars 2\addons`).
 3. Log Proofs should be automatically detected and loaded by Nexus.
 
+## Building on macOS
+
+The Makefile cross-compiles the Windows DLL with `clang-cl` and the MSVC CRT and Windows SDK downloaded by [xwin](https://github.com/Jake-Shadle/xwin). Running `xwin` requires accepting the Microsoft licence terms.
+
+```sh
+brew install llvm lld
+cargo install xwin
+xwin --accept-license splat --output ~/Library/Caches/cargo-xwin/xwin
+git submodule update --init
+make
+```
+
+The DLL is written to `x64/Release/nexus_log_proofs.dll`. Set `XWIN` or `LLVM` to override the SDK or toolchain location.
+
 ## Issues
 
 Join the [Raidcore discord](https://discord.gg/Mvk7W7gjE4) to report issues in the [#log-proofs](https://discord.com/channels/410828272679518241/1245405030207721532) channel. For best results, describe the steps necessary to reproduce the problem and upload the Nexus log from `<GW2>/addons/Nexus/Nexus.log`.
