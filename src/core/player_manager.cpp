@@ -1,4 +1,5 @@
 #include "player_manager.h"
+#include "../providers/common/provider_registry.h"
 #include "settings.h"
 #include "shared.h"
 #include <format>
@@ -7,15 +8,22 @@ namespace PlayerManager {
 	std::vector<Player> players;
 	std::string selfAccountName;
 	std::mutex playerMutex;
-	LazyLoadManager lazyLoadManager;
+	LazyLoadManager lazyLoadManager(
+			[](const std::string& account, const std::string& provider, FetchCallback callback) {
+				IProvider* source = ProviderRegistry::Instance().Find(provider);
+				if (!source) {
+					callback({FetchStatus::FAILED});
+					return;
+				}
+				source->FetchAsync(account, std::move(callback));
+			},
+			[] { return LoadPolicy {std::chrono::minutes(Settings::CacheTimeoutMinutes), Settings::MaxRetryAttempts}; }
+	);
+
 	static long long GetPlayerIndex(const std::string& account) {
 		for (Player& p : players)
 			if (p.account == account) return std::addressof(p) - std::addressof(players.at(0));
 		return -1;
-	}
-
-	static std::string GetCurrentProviderName() {
-		return (Settings::SelectedDataSource == WINGMAN) ? "Wingman" : "KPME";
 	}
 
 	void AddPlayer(const PlayerInfo& playerInfo) {
@@ -26,10 +34,6 @@ namespace PlayerManager {
 		players.push_back({playerInfo.account});
 
 		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player added to tracking: {}", playerInfo.account).c_str());
-
-		if (Settings::ShowWindowLogProofs) {
-			lazyLoadManager.RequestPlayerData(playerInfo.account, GetCurrentProviderName());
-		}
 	}
 
 	void RemovePlayer(const PlayerInfo& playerInfo) {
@@ -58,15 +62,4 @@ namespace PlayerManager {
 		}
 	}
 
-
-	void OnWindowStateChanged(bool isOpen) {
-		lazyLoadManager.OnWindowStateChanged(isOpen);
-		if (isOpen) {
-			std::string providerName = GetCurrentProviderName();
-			std::scoped_lock lck(playerMutex);
-			for (const auto& player : players) {
-				lazyLoadManager.RequestPlayerData(player.account, providerName);
-			}
-		}
-	}
 } // namespace PlayerManager

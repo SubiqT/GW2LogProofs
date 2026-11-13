@@ -18,7 +18,6 @@ namespace PlayerManager {
 	void RemovePlayer(const PlayerInfo& playerInfo);
 	void SetSelf(const PlayerInfo& playerInfo);
 	void ClearPlayers();
-	void OnWindowStateChanged(bool isOpen);
 } // namespace PlayerManager
 
 #endif

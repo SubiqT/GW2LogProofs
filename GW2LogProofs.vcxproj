@@ -31,6 +31,7 @@
     <ClCompile Include="src\unofficial_extras\KeyBindHelper.cpp" />
     <ClCompile Include="src\unofficial_extras\KeyBindsTranslation.cpp" />
     <ClCompile Include="src\providers\common\provider_registry.cpp" />
+    <ClCompile Include="src\providers\common\json_fetch.cpp" />
     <ClCompile Include="src\utils\httpclient.cpp" />
     <ClCompile Include="src\ui\gui_settings.cpp" />
     <ClCompile Include="src\providers\wingman\wingman_provider.cpp" />
@@ -72,6 +73,7 @@
     <ClInclude Include="src\version.h" />
     <ClInclude Include="src\providers\common\provider.h" />
     <ClInclude Include="src\providers\common\provider_registry.h" />
+    <ClInclude Include="src\providers\common\json_fetch.h" />
     <ClInclude Include="src\core\player_data.h" />
     <ClInclude Include="src\providers\wingman\wingman_provider.h" />
     <ClInclude Include="src\providers\wingman\wingman_client.h" />

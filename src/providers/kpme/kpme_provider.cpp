@@ -1,4 +1,6 @@
 #include "kpme_provider.h"
+#include "../common/json_fetch.h"
+#include "kpme_client.h"
 #include "../../core/bosses.h"
 
 namespace {
@@ -51,8 +53,6 @@ namespace {
 	}
 } // namespace
 
-void KpmeProvider::LoadPlayerDataAsync(const std::string& account, PlayerProofsCallback callback) {
-	client_.GetKpAsync(account, [callback](const Kpme::KpmeResponse& response) {
-		callback(Convert(response));
-	});
+void KpmeProvider::FetchAsync(const std::string& account, FetchCallback callback) {
+	FetchJson(Kpme::KillProofUrl(account), [](const nlohmann::json& j) { return Convert(Kpme::ParseResponse(j)); }, std::move(callback));
 }

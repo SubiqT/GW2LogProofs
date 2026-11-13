@@ -3,70 +3,60 @@
 
 #include <chrono>
 #include <functional>
+#include <map>
 #include <memory>
 #include <mutex>
-#include <set>
 #include <string>
-#include <unordered_map>
-#include <vector>
+#include <utility>
 
 #include "../providers/common/provider.h"
 #include "player_data.h"
 
-
-class ProofCache {
-private:
-	struct CacheEntry {
-		std::shared_ptr<const PlayerProofs> data;
-		std::chrono::steady_clock::time_point loadTime;
-		int retryCount = 0;
-		std::chrono::steady_clock::time_point nextRetryTime;
-		bool permanentFailure = false;
-	};
-
-	std::unordered_map<std::string, CacheEntry> cache;
-	std::mutex cacheMutex;
-	std::chrono::steady_clock::time_point windowLastClosed;
-	bool windowCurrentlyOpen = false;
-
-	std::chrono::minutes GetCacheTimeout() const;
-	int GetMaxRetries() const;
-
-public:
-	bool HasValidEntry(const std::string& key);
-	std::shared_ptr<const PlayerProofs> GetEntry(const std::string& key);
-	void SetEntry(const std::string& key, std::shared_ptr<const PlayerProofs> data);
-	void MarkFailure(const std::string& key);
-	bool ShouldRetry(const std::string& key);
-	std::vector<std::string> CleanExpiredEntries();
-	void OnWindowOpened();
-	void OnWindowClosed();
-
-private:
-	bool IsExpired(const CacheEntry& entry);
-	std::chrono::seconds GetRetryDelay(int retryCount);
+struct LoadPolicy {
+	std::chrono::seconds cacheTimeout;
+	int maxAttempts;
 };
 
+struct PlayerLoad {
+	LoadState state;
+	std::shared_ptr<const PlayerProofs> proofs; // Kept while a refresh is in flight; null if not found.
+};
+
+// Caches proofs per account and provider. Callers request data whenever they display it; a fetch only starts once the
+// cached entry is older than the cache timeout, and failed fetches are retried with exponential backoff.
 class LazyLoadManager {
-private:
-	ProofCache cache;
-	std::set<std::string> pendingLoads;
-	std::mutex pendingMutex;
-	bool windowOpen = false;
-	void (*loadFunction)(const std::string&, const std::string&, const std::string&) = nullptr;
-
 public:
-	void OnWindowStateChanged(bool isOpen);
+	using Clock = std::chrono::steady_clock;
+	using Fetcher = std::function<void(const std::string& account, const std::string& provider, FetchCallback callback)>;
+	using PolicySource = std::function<LoadPolicy()>;
+
+	LazyLoadManager(Fetcher fetch, PolicySource policy, std::function<Clock::time_point()> now = Clock::now);
+
+	// Starts a fetch unless the cached entry is fresh, a fetch is in flight, or a retry is not yet due.
 	void RequestPlayerData(const std::string& account, const std::string& provider);
-	LoadState GetPlayerState(const std::string& account, const std::string& provider);
-	std::shared_ptr<const PlayerProofs> GetPlayerData(const std::string& account, const std::string& provider);
-	void CleanupExpiredEntries();
-	void SetLoadFunction(void (*func)(const std::string&, const std::string&, const std::string&));
-	void OnLoadComplete(const std::string& key, std::shared_ptr<const PlayerProofs> data);
-	void OnLoadFailed(const std::string& key);
+	PlayerLoad GetPlayerLoad(const std::string& account, const std::string& provider);
+	// Drops entries older than the cache timeout, such as those of players who have left.
+	void PruneExpired();
 
 private:
-	std::string MakeKey(const std::string& account, const std::string& provider);
+	using Key = std::pair<std::string, std::string>;
+
+	struct Entry {
+		std::shared_ptr<const PlayerProofs> proofs;
+		bool loaded = false; // Also true for accounts the provider reported as not found.
+		bool inFlight = false;
+		Clock::time_point loadedAt;
+		int failures = 0;
+		Clock::time_point retryAt;
+	};
+
+	void OnFetched(const Key& key, const FetchResult& result);
+
+	Fetcher fetch_;
+	PolicySource policy_;
+	std::function<Clock::time_point()> now_;
+	std::mutex mutex_;
+	std::map<Key, Entry> entries_;
 };
 
 #endif

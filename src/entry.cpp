@@ -23,36 +23,18 @@
 
 AddonDefinition AddonDef = {};
 
-static void LoadPlayerDataWrapper(const std::string& account, const std::string& provider, const std::string& key) {
-	try {
-		IProvider* providerInstance = ProviderRegistry::Instance().Find(provider);
-		if (!providerInstance) {
-			PlayerManager::lazyLoadManager.OnLoadFailed(key);
-			return;
-		}
-
-		providerInstance->LoadPlayerDataAsync(account, [key](std::shared_ptr<const PlayerProofs> proofs) {
-			PlayerManager::lazyLoadManager.OnLoadComplete(key, std::move(proofs));
-		});
-	} catch (const std::exception& e) {
-		APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to load {} data for {}: {}", provider, account, e.what()).c_str());
-		PlayerManager::lazyLoadManager.OnLoadFailed(key);
-	}
-}
+constexpr auto CACHE_PRUNE_INTERVAL = std::chrono::minutes(1);
 
 void AddonOptions() {
 	RenderWindowSettings();
 }
 
 void AddonRender() {
-	// Periodic cleanup of expired cache entries
-	if (Settings::ShowWindowLogProofs) {
-		static auto lastCleanup = std::chrono::steady_clock::now();
-		auto now = std::chrono::steady_clock::now();
-		if (now - lastCleanup > std::chrono::seconds(1)) {
-			PlayerManager::lazyLoadManager.CleanupExpiredEntries();
-			lastCleanup = now;
-		}
+	static auto lastPrune = std::chrono::steady_clock::now();
+	auto now = std::chrono::steady_clock::now();
+	if (now - lastPrune > CACHE_PRUNE_INTERVAL) {
+		PlayerManager::lazyLoadManager.PruneExpired();
+		lastPrune = now;
 	}
 
 	RenderWindowLogProofs();
@@ -81,8 +63,6 @@ void AddonLoad(AddonAPI* addonApi) {
 	trackerManager.RegisterTracker(std::make_unique<RealtimeApiTracker>());
 	trackerManager.RegisterTracker(std::make_unique<UnofficialExtrasTracker>());
 	trackerManager.RegisterTracker(std::make_unique<ArcdpsTracker>());
-
-	PlayerManager::lazyLoadManager.SetLoadFunction(LoadPlayerDataWrapper);
 
 	HTTPClient::Initialize();
 	InitializeTrackerManager();

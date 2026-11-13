@@ -1,173 +1,53 @@
 #include "kpme_client.h"
-#include "../../core/shared.h"
-#include "../../nlohmann/json.hpp"
 #include "../../utils/httpclient.h"
-#include <format>
-
 
 using json = nlohmann::json;
 
 namespace Kpme {
-	void from_json(const json& j, KpmeResponse& r) {
-		try {
-			if (j.contains("kpid")) {
-				if (j.at("kpid").is_string()) {
-					j.at("kpid").get_to(r.id);
-				}
-			}
-
-		if (j.contains("killproofs")) {
-			if (j.at("killproofs").is_array()) {
-				for (const auto& item : j.at("killproofs")) {
-					if (item.is_object()) {
-						if (item.contains("name") && item.contains("amount")) {
-							if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
-								r.self.killproofs[item.at("name")] += item.at("amount").get<int>();
-							}
-						}
-					}
-				}
+	namespace {
+		// Sums repeated entries: the API can list the same item name more than once under different item ids.
+		void ReadCounts(const json& parent, const char* key, std::map<std::string, int>& counts) {
+			auto list = parent.find(key);
+			if (list == parent.end() || !list->is_array()) return;
+			for (const auto& item : *list) {
+				if (!item.is_object()) continue;
+				auto name = item.find("name");
+				auto amount = item.find("amount");
+				if (name == item.end() || amount == item.end() || !name->is_string() || !amount->is_number_integer()) continue;
+				counts[name->get<std::string>()] += amount->get<int>();
 			}
 		}
 
-		if (j.contains("tokens")) {
-			if (j.at("tokens").is_array()) {
-				for (const auto& item : j.at("tokens")) {
-					if (item.is_object()) {
-						if (item.contains("name") && item.contains("amount")) {
-							if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
-								r.self.tokens[item.at("name")] += item.at("amount").get<int>();
-							}
-						}
-					}
-				}
-			}
+		KpSummary ReadSummary(const json& j) {
+			KpSummary summary;
+			ReadCounts(j, "killproofs", summary.killproofs);
+			ReadCounts(j, "tokens", summary.tokens);
+			ReadCounts(j, "coffers", summary.coffers);
+			return summary;
 		}
+	} // namespace
 
-		if (j.contains("coffers")) {
-			if (j.at("coffers").is_array()) {
-				for (const auto& item : j.at("coffers")) {
-					if (item.is_object()) {
-						if (item.contains("name") && item.contains("amount")) {
-							if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
-								r.self.coffers[item.at("name")] += item.at("amount").get<int>();
-							}
-						}
-					}
-				}
-			}
-		}
-
-		if (j.contains("linked_totals")) {
-			if (j.at("linked_totals").is_object()) {
-				if (j.at("linked_totals").contains("killproofs")) {
-					if (j.at("linked_totals").at("killproofs").is_array()) {
-						for (const auto& item : j.at("linked_totals").at("killproofs")) {
-							if (item.is_object()) {
-								if (item.contains("name") && item.contains("amount")) {
-									if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
-										r.shared.killproofs[item.at("name")] += item.at("amount").get<int>();
-									}
-								}
-							}
-						}
-					}
-				}
-
-				if (j.at("linked_totals").contains("tokens")) {
-					if (j.at("linked_totals").at("tokens").is_array()) {
-						for (const auto& item : j.at("linked_totals").at("tokens")) {
-							if (item.is_object()) {
-								if (item.contains("name") && item.contains("amount")) {
-									if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
-										r.shared.tokens[item.at("name")] += item.at("amount").get<int>();
-									}
-								}
-							}
-						}
-					}
-				}
-
-				if (j.at("linked_totals").contains("coffers")) {
-					if (j.at("linked_totals").at("coffers").is_array()) {
-						for (const auto& item : j.at("linked_totals").at("coffers")) {
-							if (item.is_object()) {
-								if (item.contains("name") && item.contains("amount")) {
-									if (item.at("name").is_string() && item.at("amount").is_number_integer()) {
-										r.shared.coffers[item.at("name")] += item.at("amount").get<int>();
-									}
-								}
-							}
-						}
-					}
-				}
-
-				}
-			}
-
-			if (j.contains("linked") && j.at("linked").is_array()) {
-				for (const auto& account : j.at("linked")) {
-					if (account.is_object() && account.contains("account_name")) {
-						LinkedAccount linkedAccount;
-						linkedAccount.name = account.at("account_name").get<std::string>();
-
-					// Parse killproofs
-					if (account.contains("killproofs") && account.at("killproofs").is_array()) {
-						for (const auto& kp : account.at("killproofs")) {
-							if (kp.contains("name") && kp.contains("amount")) {
-								linkedAccount.data.killproofs[kp.at("name")] += kp.at("amount").get<int>();
-							}
-						}
-					}
-
-					// Parse tokens
-					if (account.contains("tokens") && account.at("tokens").is_array()) {
-						for (const auto& token : account.at("tokens")) {
-							if (token.contains("name") && token.contains("amount")) {
-								linkedAccount.data.tokens[token.at("name")] += token.at("amount").get<int>();
-							}
-						}
-					}
-
-					// Parse coffers
-					if (account.contains("coffers") && account.at("coffers").is_array()) {
-						for (const auto& coffer : account.at("coffers")) {
-							if (coffer.contains("name") && coffer.contains("amount")) {
-								linkedAccount.data.coffers[coffer.at("name")] += coffer.at("amount").get<int>();
-							}
-						}
-					}
-
-						r.linked_accounts.push_back(linkedAccount);
-					}
-				}
-			}
-		} catch (const json::parse_error& ex) {
-			APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME JSON response: {}", ex.what()).c_str());
-			r = {"", {}, {}, {}};
-			return;
-		}
+	std::string KillProofUrl(const std::string& account) {
+		return "https://killproof.me/api/kp/" + HTTPClient::EncodeUrlComponent(account) + "?lang=en";
 	}
 
-	void KpmeClient::GetKpAsync(const std::string& account, std::function<void(const KpmeResponse&)> callback) {
-		std::string url = std::format("https://killproof.me/api/kp/{}?lang=en", account);
-		const char* cUrl = url.c_str();
-		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Requesting KPME data (async): {}", cUrl).c_str());
-		std::wstring wUrl(cUrl, cUrl + strlen(cUrl));
-
-		HTTPClient::GetRequestAsync(wUrl, [account, callback](const std::string& kpmeResponse) {
-			if (kpmeResponse.empty()) {
-				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Empty response from KPME API for account: {}", account).c_str());
-				callback(KpmeResponse {"", {}, {}, {}});
-				return;
+	KpmeResponse ParseResponse(const json& j) {
+		KpmeResponse r;
+		if (auto id = j.find("kpid"); id != j.end() && id->is_string()) {
+			r.id = id->get<std::string>();
+		}
+		r.self = ReadSummary(j);
+		if (auto totals = j.find("linked_totals"); totals != j.end() && totals->is_object()) {
+			r.shared = ReadSummary(*totals);
+		}
+		if (auto linked = j.find("linked"); linked != j.end() && linked->is_array()) {
+			for (const auto& account : *linked) {
+				if (!account.is_object()) continue;
+				auto name = account.find("account_name");
+				if (name == account.end() || !name->is_string()) continue;
+				r.linked_accounts.push_back({name->get<std::string>(), ReadSummary(account)});
 			}
-			try {
-				json j = json::parse(kpmeResponse);
-				callback(j.template get<KpmeResponse>());
-			} catch (const json::parse_error& e) {
-				APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to parse KPME response for {}: {}", account, e.what()).c_str());
-				callback(KpmeResponse {"", {}, {}, {}});
-			}
-		});
+		}
+		return r;
 	}
 } // namespace Kpme

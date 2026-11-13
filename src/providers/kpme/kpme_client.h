@@ -1,15 +1,13 @@
 #ifndef KPME_CLIENT_H
 #define KPME_CLIENT_H
 
+#include "../../nlohmann/json.hpp"
 #include "kpme_types.h"
-#include <functional>
+#include <string>
 
 namespace Kpme {
-	class KpmeClient {
-	public:
-
-		void GetKpAsync(const std::string& account, std::function<void(const KpmeResponse&)> callback);
-	};
+	std::string KillProofUrl(const std::string& account);
+	KpmeResponse ParseResponse(const nlohmann::json& j);
 } // namespace Kpme
 
 #endif

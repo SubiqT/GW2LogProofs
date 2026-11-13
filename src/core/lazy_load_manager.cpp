@@ -1,201 +1,72 @@
 #include "lazy_load_manager.h"
-#include "settings.h"
-#include "shared.h"
 #include <algorithm>
 
+namespace {
+	constexpr int MAX_BACKOFF_EXPONENT = 4;
 
-bool ProofCache::HasValidEntry(const std::string& key) {
-	std::scoped_lock lock(cacheMutex);
-	auto it = cache.find(key);
-	return it != cache.end() && !IsExpired(it->second) && !it->second.permanentFailure;
-}
-
-std::shared_ptr<const PlayerProofs> ProofCache::GetEntry(const std::string& key) {
-	std::scoped_lock lock(cacheMutex);
-	auto it = cache.find(key);
-	if (it != cache.end() && !IsExpired(it->second) && it->second.data) {
-		return it->second.data;
+	std::chrono::seconds RetryDelay(int failures) {
+		return std::chrono::seconds(1 << std::min(failures - 1, MAX_BACKOFF_EXPONENT));
 	}
-	return nullptr;
-}
+} // namespace
 
-void ProofCache::SetEntry(const std::string& key, std::shared_ptr<const PlayerProofs> data) {
-	std::scoped_lock lock(cacheMutex);
-	auto& entry = cache[key];
-	entry.data = std::move(data);
-	entry.loadTime = std::chrono::steady_clock::now();
-	entry.retryCount = 0;
-	entry.permanentFailure = false;
-}
-
-void ProofCache::MarkFailure(const std::string& key) {
-	std::scoped_lock lock(cacheMutex);
-	auto& entry = cache[key];
-	entry.retryCount++;
-	entry.nextRetryTime = std::chrono::steady_clock::now() + GetRetryDelay(entry.retryCount);
-
-	if (entry.retryCount >= GetMaxRetries()) {
-		entry.permanentFailure = true;
-	}
-}
-
-bool ProofCache::ShouldRetry(const std::string& key) {
-	std::scoped_lock lock(cacheMutex);
-	auto it = cache.find(key);
-	if (it == cache.end()) return true;
-
-	const auto& entry = it->second;
-	if (entry.permanentFailure) return false;
-	if (entry.retryCount >= GetMaxRetries()) return false;
-
-	return std::chrono::steady_clock::now() >= entry.nextRetryTime;
-}
-
-std::vector<std::string> ProofCache::CleanExpiredEntries() {
-	std::vector<std::string> expiredKeys;
-	std::scoped_lock lock(cacheMutex);
-	auto it = cache.begin();
-	while (it != cache.end()) {
-		if (IsExpired(it->second)) {
-			if (windowCurrentlyOpen) {
-				expiredKeys.push_back(it->first);
-			}
-			it = cache.erase(it);
-		} else {
-			++it;
-		}
-	}
-	return expiredKeys;
-}
-
-void ProofCache::OnWindowOpened() {
-	std::scoped_lock lock(cacheMutex);
-	windowCurrentlyOpen = true;
-}
-
-void ProofCache::OnWindowClosed() {
-	std::scoped_lock lock(cacheMutex);
-	windowCurrentlyOpen = false;
-	windowLastClosed = std::chrono::steady_clock::now();
-}
-
-bool ProofCache::IsExpired(const CacheEntry& entry) {
-	auto now = std::chrono::steady_clock::now();
-	auto cacheAge = now - entry.loadTime;
-
-	auto timeout = GetCacheTimeout();
-	if (windowCurrentlyOpen) {
-		return cacheAge > timeout;
-	} else {
-		auto timeSinceWindowClosed = now - windowLastClosed;
-		return cacheAge > timeout && timeSinceWindowClosed > timeout;
-	}
-}
-
-std::chrono::minutes ProofCache::GetCacheTimeout() const {
-	return std::chrono::minutes(Settings::CacheTimeoutMinutes);
-}
-
-int ProofCache::GetMaxRetries() const {
-	return Settings::MaxRetryAttempts;
-}
-
-std::chrono::seconds ProofCache::GetRetryDelay(int retryCount) {
-	return std::chrono::seconds(1 << (std::min) (retryCount - 1, 4));
-}
-
-std::string LazyLoadManager::MakeKey(const std::string& account, const std::string& provider) {
-	return account + "|" + provider;
-}
-
-void LazyLoadManager::OnWindowStateChanged(bool isOpen) {
-	windowOpen = isOpen;
-	if (isOpen) {
-		cache.OnWindowOpened();
-	} else {
-		cache.OnWindowClosed();
-	}
-}
+LazyLoadManager::LazyLoadManager(Fetcher fetch, PolicySource policy, std::function<Clock::time_point()> now)
+	: fetch_(std::move(fetch)), policy_(std::move(policy)), now_(std::move(now)) {}
 
 void LazyLoadManager::RequestPlayerData(const std::string& account, const std::string& provider) {
-	if (!windowOpen) return;
-
-	std::string key = MakeKey(account, provider);
-
-	if (cache.HasValidEntry(key)) return;
-	if (!cache.ShouldRetry(key)) return;
-
+	Key key {account, provider};
 	{
-		std::scoped_lock lock(pendingMutex);
-		if (pendingLoads.count(key)) return;
-		pendingLoads.insert(key);
+		std::scoped_lock lock(mutex_);
+		auto now = now_();
+		auto& entry = entries_[key];
+		if (entry.inFlight || entry.retryAt > now) return;
+		if (entry.loaded && now - entry.loadedAt < policy_().cacheTimeout) return;
+		entry.inFlight = true;
 	}
-
-
-	if (loadFunction) {
-		loadFunction(account, provider, key);
-	}
+	// Fetch callbacks can run synchronously, so the lock must not be held here.
+	fetch_(account, provider, [this, key](const FetchResult& result) { OnFetched(key, result); });
 }
 
-LoadState LazyLoadManager::GetPlayerState(const std::string& account, const std::string& provider) {
-	std::string key = MakeKey(account, provider);
+void LazyLoadManager::OnFetched(const Key& key, const FetchResult& result) {
+	std::scoped_lock lock(mutex_);
+	auto& entry = entries_[key];
+	auto now = now_();
+	entry.inFlight = false;
 
-	if (cache.HasValidEntry(key)) {
-		return LoadState::READY;
+	if (result.status != FetchStatus::FAILED) {
+		entry.proofs = result.proofs;
+		entry.loaded = true;
+		entry.loadedAt = now;
+		entry.failures = 0;
+		entry.retryAt = {};
+		return;
 	}
 
-	{
-		std::scoped_lock lock(pendingMutex);
-		if (pendingLoads.count(key)) {
-			return LoadState::LOADING;
-		}
-	}
-
-	return LoadState::FAILED;
-}
-
-std::shared_ptr<const PlayerProofs> LazyLoadManager::GetPlayerData(const std::string& account, const std::string& provider) {
-	std::string key = MakeKey(account, provider);
-	return cache.GetEntry(key);
-}
-
-void LazyLoadManager::CleanupExpiredEntries() {
-	auto expiredKeys = cache.CleanExpiredEntries();
-
-
-	for (const auto& key : expiredKeys) {
-		size_t pos = key.find('|');
-		if (pos != std::string::npos) {
-			std::string account = key.substr(0, pos);
-			std::string provider = key.substr(pos + 1);
-			RequestPlayerData(account, provider);
-		}
-	}
-
-	std::scoped_lock lock(pendingMutex);
-
-	auto it = pendingLoads.begin();
-	while (it != pendingLoads.end()) {
-		if (!cache.HasValidEntry(*it) && !cache.ShouldRetry(*it)) {
-			it = pendingLoads.erase(it);
-		} else {
-			++it;
-		}
+	LoadPolicy policy = policy_();
+	if (++entry.failures >= policy.maxAttempts) {
+		entry.failures = 0;
+		entry.retryAt = now + policy.cacheTimeout;
+	} else {
+		entry.retryAt = now + RetryDelay(entry.failures);
 	}
 }
 
-void LazyLoadManager::SetLoadFunction(void (*func)(const std::string&, const std::string&, const std::string&)) {
-	loadFunction = func;
+PlayerLoad LazyLoadManager::GetPlayerLoad(const std::string& account, const std::string& provider) {
+	std::scoped_lock lock(mutex_);
+	auto it = entries_.find({account, provider});
+	if (it == entries_.end()) return {LoadState::LOADING, nullptr};
+	const auto& entry = it->second;
+	if (entry.loaded) return {LoadState::READY, entry.proofs};
+	return {entry.inFlight ? LoadState::LOADING : LoadState::FAILED, nullptr};
 }
 
-void LazyLoadManager::OnLoadComplete(const std::string& key, std::shared_ptr<const PlayerProofs> data) {
-	cache.SetEntry(key, std::move(data));
-	std::scoped_lock lock(pendingMutex);
-	pendingLoads.erase(key);
-}
-
-void LazyLoadManager::OnLoadFailed(const std::string& key) {
-	cache.MarkFailure(key);
-	std::scoped_lock lock(pendingMutex);
-	pendingLoads.erase(key);
+void LazyLoadManager::PruneExpired() {
+	std::scoped_lock lock(mutex_);
+	auto now = now_();
+	auto timeout = policy_().cacheTimeout;
+	std::erase_if(entries_, [&](const auto& item) {
+		const auto& entry = item.second;
+		if (entry.inFlight) return false;
+		auto lastActivity = std::max(entry.loadedAt, entry.retryAt);
+		return now - lastActivity > timeout;
+	});
 }

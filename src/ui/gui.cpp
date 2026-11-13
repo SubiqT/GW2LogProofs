@@ -239,8 +239,8 @@ static void DrawCountCell(const ProofCounts* counts, const std::string& proofId,
 
 static void DrawPlayerRow(const Player& p, const BossGroup& group, IProvider* provider, bool showKpmeId) {
 	const std::string providerName = provider->Name();
-	auto state = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
-	auto proofs = state == LoadState::READY ? PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName) : nullptr;
+	PlayerManager::lazyLoadManager.RequestPlayerData(p.account, providerName);
+	auto [state, proofs] = PlayerManager::lazyLoadManager.GetPlayerLoad(p.account, providerName);
 	const ProofCounts* counts = proofs ? &CountsForSelectedMode(*proofs) : nullptr;
 	const bool hasProofs = counts && !counts->empty();
 	const char* missingText = hasProofs ? "0" : "";
@@ -317,12 +317,9 @@ static void DrawGenericTab(const BossGroup& group, IProvider* provider) {
 
 			for (const auto& p : PlayerManager::players) {
 				if (!Settings::IncludeMissingAccounts) {
-					auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
-					if (lazyState == LoadState::READY) {
-						auto proofs = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
-						if (!proofs || CountsForSelectedMode(*proofs).empty()) {
-							continue;
-						}
+					auto [state, proofs] = PlayerManager::lazyLoadManager.GetPlayerLoad(p.account, providerName);
+					if (state == LoadState::READY && (!proofs || CountsForSelectedMode(*proofs).empty())) {
+						continue;
 					}
 				}
 				visiblePlayers.push_back(&p);
@@ -353,11 +350,6 @@ static void DrawProviderCombo(const std::string& currentProvider) {
 				Settings::SelectedDataSource = (provider == "Wingman") ? WINGMAN : KPME;
 				Settings::Settings[WINDOW_LOG_PROOFS_KEY][SELECTED_DATA_SOURCE] = Settings::SelectedDataSource;
 				Settings::Save(SettingsPath);
-
-				std::scoped_lock lck(PlayerManager::playerMutex);
-				for (const auto& player : PlayerManager::players) {
-					PlayerManager::lazyLoadManager.RequestPlayerData(player.account, provider);
-				}
 			}
 			if (is_selected) ImGui::SetItemDefaultFocus();
 		}
@@ -391,7 +383,6 @@ void RenderWindowLogProofs() {
 
 
 	if (isWindowOpen != wasWindowOpen) {
-		PlayerManager::OnWindowStateChanged(isWindowOpen);
 		if (!isWindowOpen) SaveWindowState();
 		wasWindowOpen = isWindowOpen;
 	}

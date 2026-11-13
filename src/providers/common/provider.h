@@ -26,7 +26,20 @@ struct PlayerProofs {
 	std::vector<LinkedAccountProofs> linkedAccounts;
 };
 
-using PlayerProofsCallback = std::function<void(std::shared_ptr<const PlayerProofs>)>;
+enum class FetchStatus {
+	FOUND,
+	// The service has no data for the account; retried only after the cache timeout.
+	NOT_FOUND,
+	// Network, server or response errors; retried with backoff.
+	FAILED
+};
+
+struct FetchResult {
+	FetchStatus status;
+	std::shared_ptr<const PlayerProofs> proofs; // Set only when status is FOUND.
+};
+
+using FetchCallback = std::function<void(const FetchResult&)>;
 
 class IProvider {
 public:
@@ -35,7 +48,7 @@ public:
 	virtual bool SupportsLinkedAccounts() const { return false; }
 	virtual bool ShowsProfileId() const { return false; }
 
-	virtual void LoadPlayerDataAsync(const std::string& account, PlayerProofsCallback callback) = 0;
+	virtual void FetchAsync(const std::string& account, FetchCallback callback) = 0;
 
 	virtual const std::vector<BossGroup>& GetBossGroups() const = 0;
 	virtual std::vector<ProofOption> GetAvailableProofs() const = 0;
