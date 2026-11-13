@@ -1,23 +1,67 @@
 #include "wingman_boss_provider.h"
 #include "../../core/bosses.h"
-#include <format>
+#include <charconv>
+#include <cstdlib>
+
+namespace {
+	struct WingmanTab {
+		const char* name;
+		const char* tableName;
+		const char* category;
+		Content content;
+		BossType type;
+	};
+
+	constexpr WingmanTab tabs[] = {
+			{"Raids",       "normalRaidsTable",   "Raid",    Content::RAID,    BossType::NORMAL},
+			{"Raid CMs",    "cmRaidsTable",       "Raid",    Content::RAID,    BossType::CM    },
+			{"Raid LMs",    "lmRaidsTable",       "Raid",    Content::RAID,    BossType::LCM   },
+			{"Fractal CMs", "cmFractalsTable",    "Fractal", Content::FRACTAL, BossType::CM    },
+			{"Strikes",     "normalStrikesTable", "Strike",  Content::STRIKE,  BossType::NORMAL},
+			{"Strike CMs",  "cmStrikesTable",     "Strike",  Content::STRIKE,  BossType::CM    },
+			{"Strike LMs",  "lmStrikesTable",     "Strike",  Content::STRIKE,  BossType::LCM   },
+	};
+
+	const char* BossTypeName(BossType type) {
+		switch (type) {
+			case BossType::CM:
+				return "CM";
+			case BossType::LCM:
+				return "LCM";
+			default:
+				return "Normal";
+		}
+	}
+
+	// Saved custom tabs store CMs as the negated boss id and everything else as the plain id.
+	std::string CustomTabProofId(const BossInfo& boss, BossType type) {
+		return std::to_string(type == BossType::CM ? -boss.id : boss.id);
+	}
+} // namespace
 
 std::vector<BossGroup> WingmanBossProvider::GetBossGroups() const {
-	return {
-			{"Raids",       "normalRaidsTable",   BossCategory::RAID_NORMAL,   {{ValeGuardian, BossType::NORMAL}, {Gorseval, BossType::NORMAL}, {Sabetha, BossType::NORMAL}, {Slothasor, BossType::NORMAL}, {BanditTrio, BossType::NORMAL}, {Matthias, BossType::NORMAL}, {Escort, BossType::NORMAL}, {KeepConstruct, BossType::NORMAL}, {TwistedCastle, BossType::NORMAL}, {Xera, BossType::NORMAL}, {Cairn, BossType::NORMAL}, {MursaatOverseer, BossType::NORMAL}, {Samarog, BossType::NORMAL}, {Deimos, BossType::NORMAL}, {SoullessHorror, BossType::NORMAL}, {RiverOfSouls, BossType::NORMAL}, {BrokenKing, BossType::NORMAL}, {EaterOfSouls, BossType::NORMAL}, {Eyes, BossType::NORMAL}, {Dhuum, BossType::NORMAL}, {ConjuredAmalgamate, BossType::NORMAL}, {TwinLargos, BossType::NORMAL}, {Qadim, BossType::NORMAL}, {Adina, BossType::NORMAL}, {Sabir, BossType::NORMAL}, {QadimThePeerless, BossType::NORMAL}, {Greer, BossType::NORMAL}, {Decima, BossType::NORMAL}, {Ura, BossType::NORMAL}}},
-			{"Raid CMs",    "cmRaidsTable",       BossCategory::RAID_CM,       {{KeepConstructCM, BossType::CM}, {CairnCM, BossType::CM}, {MursaatOverseerCM, BossType::CM}, {SamarogCM, BossType::CM}, {DeimosCM, BossType::CM}, {SoullessHorrorCM, BossType::CM}, {DhuumCM, BossType::CM}, {ConjuredAmalgamateCM, BossType::CM}, {TwinLargosCM, BossType::CM}, {QadimCM, BossType::CM}, {AdinaCM, BossType::CM}, {SabirCM, BossType::CM}, {QadimThePeerlessCM, BossType::CM}, {GreerCM, BossType::CM}, {DecimaCM, BossType::CM}, {UraCM, BossType::CM}}                                                                                                                                                                                                                                                                                                                                                                                                                                                 },
-			{"Raid LMs",    "lmRaidsTable",       BossCategory::RAID_LM,       {{UraCM, BossType::LCM}}																																																																																																																																																																																																																								   },
-			{"Fractal CMs", "cmFractalsTable",    BossCategory::FRACTAL_CM,    {{MAMACM, BossType::CM}, {SiaxTheCorruptedCM, BossType::CM}, {EnsolyssOfTheEndlessTormentCM, BossType::CM}, {SkorvaldTheShatteredCM, BossType::CM}, {ArtsariivCM, BossType::CM}, {ArkkCM, BossType::CM}, {ElementalAiKeeperOfThePeakCM, BossType::CM}, {DarkAiKeeperOfThePeakCM, BossType::CM}, {ElementalAndDarkAiKeeperOfThePeakCM, BossType::CM}, {KanaxaiScytheOfHouseAurkusCM, BossType::CM}, {EparchCM, BossType::CM}, {KinfallCM, BossType::CM}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                    },
-			{"Strikes",     "normalStrikesTable", BossCategory::STRIKE_NORMAL, {{IcebroodConstruct, BossType::NORMAL}, {TheVoiceAndTheClaw, BossType::NORMAL}, {FraenirOfJormag, BossType::NORMAL}, {Boneskinner, BossType::NORMAL}, {WhisperOfJormag, BossType::NORMAL}, {Freezie, BossType::NORMAL}, {CaptainMaiTrin, BossType::NORMAL}, {Ankka, BossType::NORMAL}, {MinisterLi, BossType::NORMAL}, {VoidAmalgamate, BossType::NORMAL}, {OldLionsCourt, BossType::NORMAL}, {Dagda, BossType::NORMAL}, {Cerus, BossType::NORMAL}, {Kela, BossType::NORMAL}, {Vloxx, BossType::NORMAL}}                                                                                                                                                                                                                                                                                                                                                                                                                                              },
-			{"Strike CMs",  "cmStrikesTable",     BossCategory::STRIKE_CM,     {{CaptainMaiTrinCM, BossType::CM}, {AnkkaCM, BossType::CM}, {MinisterLiCM, BossType::CM}, {VoidAmalgamateCM, BossType::CM}, {OldLionsCourtCM, BossType::CM}, {DagdaCM, BossType::CM}, {CerusCM, BossType::CM}, {KelaCM, BossType::CM}, {VloxxCM, BossType::CM}}																																																																																																																																																																					 },
-			{"Strike LMs",  "lmStrikesTable",     BossCategory::STRIKE_LM,     {{CerusCM, BossType::LCM}, {VloxxCM, BossType::LCM}}																																																																																																																																																																																																																								 }
-	};
+	std::vector<BossGroup> groups;
+	for (const auto& tab : tabs) {
+		BossGroup group {tab.name, tab.tableName, {}, {}};
+		for (const auto& boss : AllBosses()) {
+			if (boss.content == tab.content && boss.HasWingmanMode(tab.type)) {
+				group.bosses.push_back({&boss, tab.type});
+			}
+		}
+		groups.push_back(std::move(group));
+	}
+	return groups;
 }
 
-std::string WingmanBossProvider::GetProofIdentifier(Boss boss, BossType type) const {
-	return (type == BossType::LCM)
-				   ? std::format("--{}", abs(int(boss)))
-				   : std::format("{}", int(boss));
+std::string WingmanBossProvider::GetProofIdentifier(const BossEntry& entry) const {
+	switch (entry.type) {
+		case BossType::CM:
+			return "-" + std::to_string(entry.boss->id);
+		case BossType::LCM:
+			return "--" + std::to_string(entry.boss->id);
+		default:
+			return std::to_string(entry.boss->id);
+	}
 }
 
 std::string WingmanBossProvider::GetProofIdentifier(const std::string& currency) const {
@@ -25,48 +69,26 @@ std::string WingmanBossProvider::GetProofIdentifier(const std::string& currency)
 }
 
 std::vector<ProofOption> WingmanBossProvider::GetAvailableProofs() const {
-	static const std::vector<Boss> raidNormal = {ValeGuardian, Gorseval, Sabetha, Slothasor, BanditTrio, Matthias, Escort, KeepConstruct, TwistedCastle, Xera, Cairn, MursaatOverseer, Samarog, Deimos, SoullessHorror, RiverOfSouls, BrokenKing, EaterOfSouls, Eyes, Dhuum, ConjuredAmalgamate, TwinLargos, Qadim, Adina, Sabir, QadimThePeerless, Greer, Decima, Ura};
-	static const std::vector<Boss> raidCM = {KeepConstructCM, CairnCM, MursaatOverseerCM, SamarogCM, DeimosCM, SoullessHorrorCM, DhuumCM, ConjuredAmalgamateCM, TwinLargosCM, QadimCM, AdinaCM, SabirCM, QadimThePeerlessCM, GreerCM, DecimaCM, UraCM};
-	static const std::vector<Boss> fractalCM = {MAMACM, SiaxTheCorruptedCM, EnsolyssOfTheEndlessTormentCM, SkorvaldTheShatteredCM, ArtsariivCM, ArkkCM, ElementalAiKeeperOfThePeakCM, DarkAiKeeperOfThePeakCM, ElementalAndDarkAiKeeperOfThePeakCM, KanaxaiScytheOfHouseAurkusCM, EparchCM, KinfallCM};
-	static const std::vector<Boss> strikeNormal = {IcebroodConstruct, TheVoiceAndTheClaw, FraenirOfJormag, Boneskinner, WhisperOfJormag, Freezie, CaptainMaiTrin, Ankka, MinisterLi, VoidAmalgamate, OldLionsCourt, Dagda, Cerus, Kela, Vloxx};
-	static const std::vector<Boss> strikeCM = {CaptainMaiTrinCM, AnkkaCM, MinisterLiCM, VoidAmalgamateCM, OldLionsCourtCM, DagdaCM, CerusCM, KelaCM, VloxxCM};
-
 	std::vector<ProofOption> proofs;
-
-	for (const auto& boss : raidNormal) {
-		proofs.push_back({std::to_string(int(boss)), GetBossName(boss), "Raid", "Normal", "Normal"});
+	for (const auto& tab : tabs) {
+		for (const auto& boss : AllBosses()) {
+			if (boss.content == tab.content && boss.HasWingmanMode(tab.type)) {
+				proofs.push_back({CustomTabProofId(boss, tab.type), GetBossName(boss, tab.type), tab.category, BossTypeName(tab.type)});
+			}
+		}
 	}
-	for (const auto& boss : raidCM) {
-		proofs.push_back({std::to_string(int(boss)), GetBossName(boss, BossType::CM), "Raid", "CM", "CM"});
-	}
-	proofs.push_back({std::to_string(-int(UraCM)), GetBossName(UraCM, BossType::LCM), "Raid", "LM", "LCM"});
-
-	for (const auto& boss : fractalCM) {
-		proofs.push_back({std::to_string(int(boss)), GetBossName(boss, BossType::CM), "Fractal", "CM", "CM"});
-	}
-
-	for (const auto& boss : strikeNormal) {
-		proofs.push_back({std::to_string(int(boss)), GetBossName(boss), "Strike", "Normal", "Normal"});
-	}
-	for (const auto& boss : strikeCM) {
-		proofs.push_back({std::to_string(int(boss)), GetBossName(boss, BossType::CM), "Strike", "CM", "CM"});
-	}
-	proofs.push_back({std::to_string(-int(CerusCM)), GetBossName(CerusCM, BossType::LCM), "Strike", "LM", "LCM"});
-	proofs.push_back({std::to_string(-int(VloxxCM)), GetBossName(VloxxCM, BossType::LCM), "Strike", "LM", "LCM"});
-
 	return proofs;
 }
 
 BossGroup WingmanBossProvider::CreateCustomBossGroup(const CustomTab& tab) const {
 	std::vector<BossEntry> bosses;
-	BossCategory category = BossCategory::SUMMARY;
-
 	for (const auto& proof : tab.proofs) {
-		int bossId = std::stoi(proof.proofId);
-		Boss boss = static_cast<Boss>(bossId);
-		BossType type = BossTypeFromString(proof.bossType);
-		bosses.push_back({boss, type});
+		int id = 0;
+		const auto* end = proof.proofId.data() + proof.proofId.size();
+		if (std::from_chars(proof.proofId.data(), end, id).ptr != end) continue;
+		const BossInfo* boss = FindBoss(std::abs(id));
+		if (!boss) continue;
+		bosses.push_back({boss, BossTypeFromString(proof.bossType)});
 	}
-
-	return BossGroup {tab.displayName, tab.id + "Table", category, bosses, {}};
+	return BossGroup {tab.displayName, tab.id + "Table", bosses, {}};
 }

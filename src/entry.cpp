@@ -4,7 +4,7 @@
 #include "imgui/imgui.h"
 #include "nexus/Nexus.h"
 
-#include "core/bosses.h"
+#include "core/boss_registry.h"
 #include "core/event_handlers.h"
 #include "core/player_manager.h"
 #include "core/settings.h"

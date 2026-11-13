@@ -1,10 +1,11 @@
 #ifndef BOSSES_H
 #define BOSSES_H
 
+#include <cstdint>
+#include <span>
 #include <string>
-#include <vector>
 
-#include "../nexus/Nexus.h"
+#include "../resource.h"
 
 enum class BossType {
 	NORMAL,
@@ -14,123 +15,49 @@ enum class BossType {
 
 BossType BossTypeFromString(const std::string& s);
 
-enum class BossProofType {
+enum class ProofKind {
 	KILL_PROOF,
 	TOKEN,
 	COFFER
 };
 
-enum Boss {
-	/* Raids */
-	ValeGuardian = 15438,
-	Gorseval = 15429,
-	Sabetha = 15375,
-	Slothasor = 16123,
-	BanditTrio = 16088,
-	Matthias = 16115,
-	Escort = 16253,
-	KeepConstruct = 16235,
-	KeepConstructCM = -16235,
-	TwistedCastle = 16247,
-	Xera = 16246,
-	Cairn = 17194,
-	CairnCM = -17194,
-	MursaatOverseer = 17172,
-	MursaatOverseerCM = -17172,
-	Samarog = 17188,
-	SamarogCM = -17188,
-	Deimos = 17154,
-	DeimosCM = -17154,
-	SoullessHorror = 19767,
-	SoullessHorrorCM = -19767,
-	RiverOfSouls = 19828,
-	BrokenKing = 19691,
-	EaterOfSouls = 19536,
-	Eyes = 19651,
-	Dhuum = 19450,
-	DhuumCM = -19450,
-	ConjuredAmalgamate = 43974,
-	ConjuredAmalgamateCM = -43974,
-	TwinLargos = 21105,
-	TwinLargosCM = -21105,
-	Qadim = 20934,
-	QadimCM = -20934,
-	Adina = 22006,
-	AdinaCM = -22006,
-	Sabir = 21964,
-	SabirCM = -21964,
-	QadimThePeerless = 22000,
-	QadimThePeerlessCM = -22000,
-	Greer = 26725,
-	GreerCM = -26725,
-	Decima = 26774,
-	DecimaCM = -26774,
-	Ura = 26712,
-	UraCM = -26712,
-	/* Fractals  */
-	MAMA = 17021,
-	MAMACM = -17021,
-	SiaxTheCorrupted = 17028,
-	SiaxTheCorruptedCM = -17028,
-	EnsolyssOfTheEndlessTorment = 16948,
-	EnsolyssOfTheEndlessTormentCM = -16948,
-	SkorvaldTheShattered = 17632,
-	SkorvaldTheShatteredCM = -17632,
-	Artsariiv = 17949,
-	ArtsariivCM = -17949,
-	Arkk = 17759,
-	ArkkCM = -17759,
-	ElementalAiKeeperOfThePeak = 23254,
-	ElementalAiKeeperOfThePeakCM = -23254,
-	DarkAiKeeperOfThePeak = 232542,
-	DarkAiKeeperOfThePeakCM = -232542,
-	ElementalAndDarkAiKeeperOfThePeak = 232543,
-	ElementalAndDarkAiKeeperOfThePeakCM = -232543,
-	KanaxaiScytheOfHouseAurkus = 25577,
-	KanaxaiScytheOfHouseAurkusCM = -25577,
-	CerusAndDeimos = 26257,
-	CerusAndDeimosCM = -26257,
-	Eparch = 26231,
-	EparchCM = -26231,
-	Kinfall = 27010,
-	KinfallCM = -27010,
-	/* Strikes */
-	IcebroodConstruct = 22154,
-	TheVoiceAndTheClaw = 22343,
-	FraenirOfJormag = 22492,
-	Boneskinner = 22521,
-	WhisperOfJormag = 22711,
-	Freezie = 21333,
-	CaptainMaiTrin = 24033,
-	CaptainMaiTrinCM = -24033,
-	Ankka = 23957,
-	AnkkaCM = -23957,
-	MinisterLi = 24485,
-	MinisterLiCM = -24485,
-	VoidAmalgamate = 24375,
-	VoidAmalgamateCM = -24375,
-	OldLionsCourt = 25413,
-	OldLionsCourtCM = -25413,
-	Dagda = 25705,
-	DagdaCM = -25705,
-	Cerus = 25989,
-	CerusCM = -25989,
-	Kela = 27124,
-	KelaToken = 27670,
-	KelaCM = -27124,
-	Vloxx = 28106,
-	VloxxCM = -28106,
+enum class Content {
+	RAID,
+	FRACTAL,
+	STRIKE
 };
 
+namespace WingmanModes {
+	inline constexpr uint8_t NONE = 0;
+	inline constexpr uint8_t NORMAL = 1 << 0;
+	inline constexpr uint8_t CM = 1 << 1;
+	inline constexpr uint8_t LCM = 1 << 2;
+} // namespace WingmanModes
 
+struct TextureResource {
+	const char* id;
+	int resourceId;
+};
 
-std::string GetBossName(Boss boss);
-std::string GetBossName(Boss boss, BossType type);
-std::string GetBossName(Boss boss, BossType type, BossProofType proofType);
-Texture* GetBossTexture(Boss boss);
-Texture* GetCurrencyTexture(std::string name);
+struct BossInfo {
+	// Elite Insights species id, or Wingman's synthetic id for split encounters such as the Ai phases.
+	int id;
+	const char* name;
+	TextureResource texture;
+	Content content;
+	uint8_t wingmanModes;
+	const char* kpmeToken = nullptr;
+	const char* kpmeCoffer = nullptr;
+	const char* kpmeCmCoffer = nullptr;
 
-// Initialize boss registry with providers
-void InitializeBossRegistry();
+	bool HasWingmanMode(BossType type) const;
+};
+
+// Bosses in the order they appear in tables.
+std::span<const BossInfo> AllBosses();
+const BossInfo* FindBoss(int id);
+
+std::string GetBossName(const BossInfo& boss, BossType type);
+std::string GetBossName(const BossInfo& boss, BossType type, ProofKind kind);
 
 #endif

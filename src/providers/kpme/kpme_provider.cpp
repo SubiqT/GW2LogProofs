@@ -123,11 +123,18 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 		}
 
 		// Process tokens and combine with coffers for normal raids
-		static const std::unordered_set<Boss> normalRaidBosses = {
-				ValeGuardian, Gorseval, Sabetha, Slothasor, Matthias, Escort, KeepConstruct, Xera,
-				Cairn, MursaatOverseer, Samarog, Deimos, SoullessHorror, RiverOfSouls, BrokenKing,
-				Dhuum, ConjuredAmalgamate, TwinLargos, Qadim, Adina, Sabir, QadimThePeerless,
-				Greer, Decima, Ura
+		// Raid coffers count as three of the boss's tokens.
+		auto findRaidBossByToken = [](const std::string& token) -> const BossInfo* {
+			for (const auto& boss : AllBosses()) {
+				if (boss.content == Content::RAID && boss.kpmeToken && boss.kpmeCoffer && token == boss.kpmeToken) return &boss;
+			}
+			return nullptr;
+		};
+		auto isRaidCoffer = [](const std::string& coffer) {
+			for (const auto& boss : AllBosses()) {
+				if (boss.content == Content::RAID && boss.kpmeToken && boss.kpmeCoffer && coffer == boss.kpmeCoffer) return true;
+			}
+			return false;
 		};
 
 		for (const auto& token : response.self.tokens) {
@@ -135,16 +142,12 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 			proof.identifier = token.first;
 			proof.amount = includeLinkedAccounts && response.shared.tokens.count(token.first) ? response.shared.tokens.at(token.first) : token.second;
 
-			// For normal raid tokens, add coffer value * 3
-			for (Boss boss : normalRaidBosses) {
-				if (GetKpMeBossToken(boss) == token.first) {
-					std::string cofferName = GetKpMeBossCoffer(boss);
-					if (includeLinkedAccounts && response.shared.coffers.count(cofferName)) {
-						proof.amount += response.shared.coffers.at(cofferName) * 3;
-					} else if (response.self.coffers.count(cofferName)) {
-						proof.amount += response.self.coffers.at(cofferName) * 3;
-					}
-					break;
+			if (const BossInfo* boss = findRaidBossByToken(token.first)) {
+				std::string cofferName = boss->kpmeCoffer;
+				if (includeLinkedAccounts && response.shared.coffers.count(cofferName)) {
+					proof.amount += response.shared.coffers.at(cofferName) * 3;
+				} else if (response.self.coffers.count(cofferName)) {
+					proof.amount += response.self.coffers.at(cofferName) * 3;
 				}
 			}
 
@@ -156,16 +159,7 @@ PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& ra
 
 
 		for (const auto& coffer : response.self.coffers) {
-			// Skip raid coffers as they're already combined with tokens above
-			bool isRaidCoffer = false;
-			for (Boss boss : normalRaidBosses) {
-				if (GetKpMeBossCoffer(boss) == coffer.first) {
-					isRaidCoffer = true;
-					break;
-				}
-			}
-
-			if (isRaidCoffer || data.proofs.count(coffer.first)) continue;
+			if (isRaidCoffer(coffer.first) || data.proofs.count(coffer.first)) continue;
 
 			ProofData proof;
 			proof.identifier = coffer.first;

@@ -32,7 +32,7 @@ void BossGroup::InitializeCache(const IBossProvider* provider) const {
 
 	cachedBossIds.clear();
 	for (const auto& bossEntry : bosses) {
-		cachedBossIds.push_back(provider->GetProofIdentifier(bossEntry.boss, bossEntry.type));
+		cachedBossIds.push_back(provider->GetProofIdentifier(bossEntry));
 	}
 
 	cacheInitialized = true;

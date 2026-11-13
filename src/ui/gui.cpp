@@ -6,6 +6,7 @@
 
 #include "../core/boss_registry.h"
 #include "../core/bosses.h"
+#include "../core/textures.h"
 
 #include "../core/player_manager.h"
 #include "../core/settings.h"
@@ -149,10 +150,10 @@ static void SetupTableColumns(const BossGroup& group, bool showKpmeId) {
 	}
 	for (const auto& bossEntry : group.bosses) {
 		static std::unordered_map<std::string, std::string> bossNameCache;
-		std::string key = std::to_string(int(bossEntry.boss)) + "_" + std::to_string(int(bossEntry.type));
+		std::string key = std::to_string(bossEntry.boss->id) + "_" + std::to_string(int(bossEntry.type));
 		auto it = bossNameCache.find(key);
 		if (it == bossNameCache.end()) {
-			it = bossNameCache.emplace(key, GetBossName(bossEntry.boss, bossEntry.type)).first;
+			it = bossNameCache.emplace(key, GetBossName(*bossEntry.boss, bossEntry.type)).first;
 		}
 		columnSpecs.emplace_back(it->second, Settings::ColumnSizeBosses);
 	}
@@ -198,12 +199,12 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 	for (const auto& bossEntry : group.bosses) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
-		Texture* texture = GetBossTexture(bossEntry.boss);
+		Texture* texture = GetBossTexture(*bossEntry.boss);
 		static std::unordered_map<std::string, std::string> bossNameCache;
-		std::string key = std::to_string(int(bossEntry.boss)) + "_" + std::to_string(int(bossEntry.type));
+		std::string key = std::to_string(bossEntry.boss->id) + "_" + std::to_string(int(bossEntry.type));
 		auto it = bossNameCache.find(key);
 		if (it == bossNameCache.end()) {
-			it = bossNameCache.emplace(key, GetBossName(bossEntry.boss, bossEntry.type)).first;
+			it = bossNameCache.emplace(key, GetBossName(*bossEntry.boss, bossEntry.type)).first;
 		}
 		const std::string& bossName = it->second;
 		if (texture) {

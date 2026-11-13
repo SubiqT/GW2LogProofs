@@ -10,26 +10,15 @@
 
 class IBossProvider; // Forward declaration
 
-enum class BossCategory {
-	RAID_NORMAL,
-	RAID_CM,
-	RAID_LM,
-	FRACTAL_CM,
-	STRIKE_NORMAL,
-	STRIKE_CM,
-	STRIKE_LM,
-	SUMMARY
-};
-
 struct BossEntry {
-	Boss boss;
+	const BossInfo* boss;
 	BossType type;
+	ProofKind kind = ProofKind::KILL_PROOF;
 };
 
 struct BossGroup {
 	std::string name;
 	std::string tableName;
-	BossCategory category;
 	std::vector<BossEntry> bosses;
 	std::vector<std::string> currencies; // For summary/currency groups
 
@@ -45,7 +34,7 @@ class IBossProvider {
 public:
 	virtual ~IBossProvider() = default;
 	virtual std::vector<BossGroup> GetBossGroups() const = 0;
-	virtual std::string GetProofIdentifier(Boss boss, BossType type) const = 0;
+	virtual std::string GetProofIdentifier(const BossEntry& entry) const = 0;
 	virtual std::string GetProofIdentifier(const std::string& currency) const = 0;
 
 	// Custom tab support
@@ -63,5 +52,7 @@ public:
 private:
 	std::unordered_map<std::string, std::unique_ptr<IBossProvider>> providers_;
 };
+
+void InitializeBossRegistry();
 
 #endif

@@ -37,7 +37,6 @@ struct ProofOption {
 	std::string id;
 	std::string displayName;
 	std::string category;
-	std::string subcategory;
 	std::string bossType; // "Normal", "CM", "LCM"
 };
 

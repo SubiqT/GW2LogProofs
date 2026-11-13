@@ -1,6 +1,72 @@
 #include "bosses.h"
-#include "../resource.h"
-#include "shared.h"
+
+#include <algorithm>
+
+using namespace WingmanModes;
+
+namespace {
+	constexpr BossInfo bosses[] = {
+			/* Raids */
+			{.id = 15438, .name = "Vale Guardian", .texture = {"TEX_VALE_GUARDIAN", IDB_VALE_GUARDIAN}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Vale Guardian Fragment", .kpmeCoffer = "Vale Guardian Coffer"},
+			{.id = 15429, .name = "Gorseval", .texture = {"TEX_GORSEVAL", IDB_GORSEVAL}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Gorseval Tentacle Piece", .kpmeCoffer = "Gorseval's Coffer"},
+			{.id = 15375, .name = "Sabetha", .texture = {"TEX_SABETHA", IDB_SABETHA}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Sabetha Flamethrower Fragment Piece", .kpmeCoffer = "Sabetha's Coffer"},
+			{.id = 16123, .name = "Slothasor", .texture = {"TEX_SLOTHASOR", IDB_SLOTHASOR}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Slothasor Mushroom", .kpmeCoffer = "Slothasor's Coffer"},
+			{.id = 16088, .name = "Bandit Trio", .texture = {"TEX_NARELLA", IDB_NARELLA}, .content = Content::RAID, .wingmanModes = NORMAL},
+			{.id = 16115, .name = "Matthias", .texture = {"TEX_MATTHIAS", IDB_MATTHIAS}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "White Mantle Abomination Crystal", .kpmeCoffer = "Matthias's Coffer"},
+			{.id = 16253, .name = "Escort", .texture = {"TEX_ESCORT", IDB_ESCORT}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Turret Fragment", .kpmeCoffer = "McLeod's Coffer"},
+			{.id = 16235, .name = "Keep Construct", .texture = {"TEX_KEEP_CONSTRUCT", IDB_KEEP_CONSTRUCT}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Keep Construct Rubble", .kpmeCoffer = "Keep Construct's Coffer"},
+			{.id = 16247, .name = "Twisted Castle", .texture = {"TEX_TWISTED_CASTLE", IDB_TWISTED_CASTLE}, .content = Content::RAID, .wingmanModes = NORMAL},
+			{.id = 16246, .name = "Xera", .texture = {"TEX_XERA", IDB_XERA}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Ribbon Scrap", .kpmeCoffer = "Xera's Coffer"},
+			{.id = 17194, .name = "Cairn", .texture = {"TEX_CAIRN", IDB_CAIRN}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Cairn Fragment", .kpmeCoffer = "Cairn's Coffer"},
+			{.id = 17172, .name = "Mursaat Overseer", .texture = {"TEX_MURSAAT_OVERSEER", IDB_MURSAAT_OVERSEER}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Recreation Room Floor Fragment", .kpmeCoffer = "Mursaat Overseer's Coffer"},
+			{.id = 17188, .name = "Samarog", .texture = {"TEX_SAMAROG", IDB_SAMAROG}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Impaled Prisoner Token", .kpmeCoffer = "Samarog's Coffer"},
+			{.id = 17154, .name = "Deimos", .texture = {"TEX_DEIMOS", IDB_DEIMOS}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Fragment of Saul's Burden", .kpmeCoffer = "Deimos's Coffer"},
+			{.id = 19767, .name = "Soulles Horror", .texture = {"TEX_SOULLESS_HORROR", IDB_SOULLESS_HORROR}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Desmina's Token", .kpmeCoffer = "Desmina's Coffer"},
+			{.id = 19828, .name = "River of Souls", .texture = {"TEX_RIVER_OF_SOULS", IDB_RIVER_OF_SOULS}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "River of Souls Token", .kpmeCoffer = "River of Souls Coffer"},
+			{.id = 19691, .name = "Broken King", .texture = {"TEX_BROKEN_KING", IDB_BROKEN_KING}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Statue Token", .kpmeCoffer = "Statue of Grenth Coffer"},
+			{.id = 19536, .name = "Eater of Souls", .texture = {"TEX_EATER_OF_SOULS", IDB_EATER_OF_SOULS}, .content = Content::RAID, .wingmanModes = NORMAL},
+			{.id = 19651, .name = "Eyes", .texture = {"TEX_EYES_OF_FATE", IDB_EYES_OF_FATE}, .content = Content::RAID, .wingmanModes = NORMAL},
+			{.id = 19450, .name = "Dhuum", .texture = {"TEX_DHUUM", IDB_DHUUM}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Dhuum's Token", .kpmeCoffer = "Dhuum's Coffer"},
+			{.id = 43974, .name = "Conjured Amalgamate", .texture = {"TEX_CONJURED_AMALGAMATE", IDB_CONJURED_AMALGAMATE}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Conjured Amalgamate Token", .kpmeCoffer = "Conjured Amalgamate's Coffer"},
+			{.id = 21105, .name = "Twin Largos", .texture = {"TEX_KENUTT", IDB_KENUTT}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Twin Largos Token", .kpmeCoffer = "Twin Largos' Coffer"},
+			{.id = 20934, .name = "Qadim", .texture = {"TEX_QADIM", IDB_QADIM}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Qadim's Token", .kpmeCoffer = "Qadim's Coffer"},
+			{.id = 22006, .name = "Adina", .texture = {"TEX_ADINA", IDB_ADINA}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Cardinal Adina's Token", .kpmeCoffer = "Cardinal Adina's Coffer"},
+			{.id = 21964, .name = "Sabir", .texture = {"TEX_SABIR", IDB_SABIR}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Cardinal Sabir's Token", .kpmeCoffer = "Cardinal Sabir's Coffer"},
+			{.id = 22000, .name = "Qadim the Peerless", .texture = {"TEX_QADIM_THE_PEERLESS", IDB_QADIM_THE_PEERLESS}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Ether Djinn's Token", .kpmeCoffer = "Qadim the Peerless's Coffer"},
+			{.id = 26725, .name = "Greer", .texture = {"TEX_GREER", IDB_GREER}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Greer's Token", .kpmeCoffer = "Greer's Coffer", .kpmeCmCoffer = "Greer's Magnificent Coffer"},
+			{.id = 26774, .name = "Decima", .texture = {"TEX_DECIMA", IDB_DECIMA}, .content = Content::RAID, .wingmanModes = NORMAL | CM, .kpmeToken = "Decima's Token", .kpmeCoffer = "Decima's Coffer", .kpmeCmCoffer = "Decima's Magnificent Coffer"},
+			{.id = 26712, .name = "Ura", .texture = {"TEX_URA", IDB_URA}, .content = Content::RAID, .wingmanModes = NORMAL | CM | LCM, .kpmeToken = "Ura's Token", .kpmeCoffer = "Ura's Coffer", .kpmeCmCoffer = "Ura's Magnificent Coffer"},
+			/* Fractals */
+			{.id = 17021, .name = "MAMA", .texture = {"TEX_MAMA", IDB_MAMA}, .content = Content::FRACTAL, .wingmanModes = CM},
+			{.id = 17028, .name = "Siax", .texture = {"TEX_SIAX", IDB_SIAX}, .content = Content::FRACTAL, .wingmanModes = CM},
+			{.id = 16948, .name = "Ensolyss", .texture = {"TEX_ENSOLYSS", IDB_ENSOLYSS}, .content = Content::FRACTAL, .wingmanModes = CM},
+			{.id = 17632, .name = "Skorvald", .texture = {"TEX_SKORVALD", IDB_SKORVALD}, .content = Content::FRACTAL, .wingmanModes = CM},
+			{.id = 17949, .name = "Artsariiv", .texture = {"TEX_ARTSARIIV", IDB_ARTSARIIV}, .content = Content::FRACTAL, .wingmanModes = CM},
+			{.id = 17759, .name = "Arkk", .texture = {"TEX_ARKK", IDB_ARKK}, .content = Content::FRACTAL, .wingmanModes = CM},
+			{.id = 23254, .name = "Elemental Ai", .texture = {"TEX_ELEMENTAL_AI_LIGHT", IDB_ELEMENTAL_AI_LIGHT}, .content = Content::FRACTAL, .wingmanModes = CM},
+			{.id = 232542, .name = "Dark Ai", .texture = {"TEX_ELEMENTAL_AI_DARK", IDB_ELEMENTAL_AI_DARK}, .content = Content::FRACTAL, .wingmanModes = CM},
+			{.id = 232543, .name = "Full Ai", .texture = {"TEX_ELEMENTAL_AI_LIGHT_AND_DARK", IDB_ELEMENTAL_AI_LIGHT_AND_DARK}, .content = Content::FRACTAL, .wingmanModes = CM},
+			{.id = 25577, .name = "Kanaxai", .texture = {"TEX_KANAXAI", IDB_KANAXAI}, .content = Content::FRACTAL, .wingmanModes = CM},
+			{.id = 26231, .name = "Eparch", .texture = {"TEX_EPARCH", IDB_EPARCH}, .content = Content::FRACTAL, .wingmanModes = CM},
+			{.id = 27010, .name = "Kinfall", .texture = {"TEX_KINFALL", IDB_KINFALL}, .content = Content::FRACTAL, .wingmanModes = CM},
+			/* Strikes */
+			{.id = 22154, .name = "Icebrood Construct", .texture = {"TEX_ICEBROOD_CONSTRUCT", IDB_ICEBROOD_CONSTRUCT}, .content = Content::STRIKE, .wingmanModes = NORMAL},
+			{.id = 22343, .name = "Kodans / The Voice and The Claw", .texture = {"TEX_KODANS", IDB_KODANS}, .content = Content::STRIKE, .wingmanModes = NORMAL},
+			{.id = 22492, .name = "Fraenir of Jormag", .texture = {"TEX_FRAENIR_OF_JORMAG", IDB_FRAENIR_OF_JORMAG}, .content = Content::STRIKE, .wingmanModes = NORMAL},
+			{.id = 22521, .name = "Boneskinner", .texture = {"TEX_BONESKINNER", IDB_BONESKINNER}, .content = Content::STRIKE, .wingmanModes = NORMAL},
+			{.id = 22711, .name = "Whisper of Jormag", .texture = {"TEX_WHISPER_OF_JORMAG", IDB_WHISPER_OF_JORMAG}, .content = Content::STRIKE, .wingmanModes = NORMAL},
+			{.id = 21333, .name = "Freezie", .texture = {"TEX_FREEZIE", IDB_FREEZIE}, .content = Content::STRIKE, .wingmanModes = NORMAL},
+			{.id = 24033, .name = "Captain Mai Trin", .texture = {"TEX_CAPTAIN_MAI_TRIN", IDB_CAPTAIN_MAI_TRIN}, .content = Content::STRIKE, .wingmanModes = NORMAL | CM, .kpmeCoffer = "Mai Trin's Coffer", .kpmeCmCoffer = "Mai Trin's Magnificent Coffer"},
+			{.id = 23957, .name = "Ankka", .texture = {"TEX_ANKKA", IDB_ANKKA}, .content = Content::STRIKE, .wingmanModes = NORMAL | CM, .kpmeCoffer = "Ankka's Coffer", .kpmeCmCoffer = "Ankka's Magnificent Coffer"},
+			{.id = 24485, .name = "Minister Li", .texture = {"TEX_MINISTER_LI", IDB_MINISTER_LI}, .content = Content::STRIKE, .wingmanModes = NORMAL | CM, .kpmeCoffer = "Minister Li's Coffer", .kpmeCmCoffer = "Minister Li's Magnificent Coffer"},
+			{.id = 24375, .name = "Harvest Temple / Void Amalgamate", .texture = {"TEX_HARVEST_TEMPLE", IDB_HARVEST_TEMPLE}, .content = Content::STRIKE, .wingmanModes = NORMAL | CM, .kpmeCoffer = "Void's Coffer", .kpmeCmCoffer = "Void's Magnificent Coffer"},
+			{.id = 25413, .name = "Old Lion's Court", .texture = {"TEX_WATCHKNIGHT_MARK_II", IDB_WATCHKNIGHT_MARK_II}, .content = Content::STRIKE, .wingmanModes = NORMAL | CM, .kpmeCoffer = "Assault Knights' Coffer", .kpmeCmCoffer = "Assault Knights' Magnificent Coffer"},
+			{.id = 25705, .name = "Dagda", .texture = {"TEX_DAGDA", IDB_DAGDA}, .content = Content::STRIKE, .wingmanModes = NORMAL | CM, .kpmeCoffer = "Dagda's Coffer", .kpmeCmCoffer = "Dagda's Magnificent Coffer"},
+			{.id = 25989, .name = "Cerus", .texture = {"TEX_CERUS", IDB_CERUS}, .content = Content::STRIKE, .wingmanModes = NORMAL | CM | LCM, .kpmeCoffer = "Cerus's Coffer", .kpmeCmCoffer = "Cerus's Magnificent Coffer"},
+			{.id = 27124, .name = "Kela", .texture = {"TEX_KELA", IDB_KELA}, .content = Content::STRIKE, .wingmanModes = NORMAL | CM, .kpmeToken = "Sandcastle", .kpmeCoffer = "Kela's Coffer", .kpmeCmCoffer = "Kela's Magnificent Coffer"},
+			{.id = 28106, .name = "Vloxx", .texture = {"TEX_VLOXX", IDB_VLOXX}, .content = Content::STRIKE, .wingmanModes = NORMAL | CM | LCM, .kpmeCoffer = "Vloxx's Coffer", .kpmeCmCoffer = "Vloxx's Magnificent Coffer"},
+	};
+} // namespace
 
 BossType BossTypeFromString(const std::string& s) {
 	if (s == "CM") return BossType::CM;
@@ -8,293 +74,45 @@ BossType BossTypeFromString(const std::string& s) {
 	return BossType::NORMAL;
 }
 
-std::string GetBossName(Boss boss) {
-	boss = Boss(abs(boss));
-	switch (boss) {
-		/* Raids */
-		case ValeGuardian:
-			return "Vale Guardian";
-		case Gorseval:
-			return "Gorseval";
-		case Sabetha:
-			return "Sabetha";
-		case Slothasor:
-			return "Slothasor";
-		case BanditTrio:
-			return "Bandit Trio";
-		case Matthias:
-			return "Matthias";
-		case Escort:
-			return "Escort";
-		case KeepConstruct:
-			return "Keep Construct";
-		case TwistedCastle:
-			return "Twisted Castle";
-		case Xera:
-			return "Xera";
-		case Cairn:
-			return "Cairn";
-		case MursaatOverseer:
-			return "Mursaat Overseer";
-		case Samarog:
-			return "Samarog";
-		case Deimos:
-			return "Deimos";
-		case SoullessHorror:
-			return "Soulles Horror";
-		case RiverOfSouls:
-			return "River of Souls";
-		case BrokenKing:
-			return "Broken King";
-		case EaterOfSouls:
-			return "Eater of Souls";
-		case Eyes:
-			return "Eyes";
-		case Dhuum:
-			return "Dhuum";
-		case ConjuredAmalgamate:
-			return "Conjured Amalgamate";
-		case TwinLargos:
-			return "Twin Largos";
-		case Qadim:
-			return "Qadim";
-		case Adina:
-			return "Adina";
-		case Sabir:
-			return "Sabir";
-		case QadimThePeerless:
-			return "Qadim the Peerless";
-		case Greer:
-			return "Greer";
-		case Decima:
-			return "Decima";
-		case Ura:
-			return "Ura";
-		/* Fractals */
-		case MAMA:
-			return "MAMA";
-		case SiaxTheCorrupted:
-			return "Siax";
-		case EnsolyssOfTheEndlessTorment:
-			return "Ensolyss";
-		case SkorvaldTheShattered:
-			return "Skorvald";
-		case Artsariiv:
-			return "Artsariiv";
-		case Arkk:
-			return "Arkk";
-		case ElementalAiKeeperOfThePeak:
-			return "Elemental Ai";
-		case DarkAiKeeperOfThePeak:
-			return "Dark Ai";
-		case ElementalAndDarkAiKeeperOfThePeak:
-			return "Full Ai";
-		case KanaxaiScytheOfHouseAurkus:
-			return "Kanaxai";
-		case CerusAndDeimos:
-			return "Cerus & Deimos";
-		case Eparch:
-			return "Eparch";
-		case Kinfall:
-			return "Kinfall";
-		/* Strikes */
-		case IcebroodConstruct:
-			return "Icebrood Construct";
-		case TheVoiceAndTheClaw:
-			return "Kodans / The Voice and The Claw";
-		case FraenirOfJormag:
-			return "Fraenir of Jormag";
-		case Boneskinner:
-			return "Boneskinner";
-		case WhisperOfJormag:
-			return "Whisper of Jormag";
-		case Freezie:
-			return "Freezie";
-		case CaptainMaiTrin:
-			return "Captain Mai Trin";
-		case Ankka:
-			return "Ankka";
-		case MinisterLi:
-			return "Minister Li";
-		case VoidAmalgamate:
-			return "Harvest Temple / Void Amalgamate";
-		case OldLionsCourt:
-			return "Old Lion's Court";
-		case Dagda:
-			return "Dagda";
-		case Cerus:
-			return "Cerus";
-		case Kela:
-			return "Kela";
-		case KelaToken:
-			return "Kela";
-		case Vloxx:
-			return "Vloxx";
-		default:
-			return "Unknown";
-	}
-}
-
-std::string GetBossName(Boss boss, BossType type) {
-	std::string baseName = GetBossName(boss);
+bool BossInfo::HasWingmanMode(BossType type) const {
 	switch (type) {
 		case BossType::CM:
-			return baseName + " CM";
+			return wingmanModes & WingmanModes::CM;
 		case BossType::LCM:
-			return baseName + " LCM";
+			return wingmanModes & WingmanModes::LCM;
 		default:
-			return baseName;
+			return wingmanModes & WingmanModes::NORMAL;
 	}
 }
 
-std::string GetBossName(Boss boss, BossType type, BossProofType proofType) {
+std::span<const BossInfo> AllBosses() {
+	return bosses;
+}
+
+const BossInfo* FindBoss(int id) {
+	auto it = std::find_if(std::begin(bosses), std::end(bosses), [id](const BossInfo& boss) { return boss.id == id; });
+	return it != std::end(bosses) ? &*it : nullptr;
+}
+
+std::string GetBossName(const BossInfo& boss, BossType type) {
+	switch (type) {
+		case BossType::CM:
+			return std::string(boss.name) + " CM";
+		case BossType::LCM:
+			return std::string(boss.name) + " LCM";
+		default:
+			return boss.name;
+	}
+}
+
+std::string GetBossName(const BossInfo& boss, BossType type, ProofKind kind) {
 	std::string name = GetBossName(boss, type);
-	switch (proofType) {
-		case BossProofType::TOKEN:
+	switch (kind) {
+		case ProofKind::TOKEN:
 			return name + " Token";
-		case BossProofType::COFFER:
+		case ProofKind::COFFER:
 			return name + " Coffer";
 		default:
 			return name;
 	}
-}
-
-Texture* GetBossTexture(Boss boss) {
-	boss = Boss(abs(boss));
-	switch (boss) {
-		/* Raids */
-		case ValeGuardian:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_VALE_GUARDIAN", IDB_VALE_GUARDIAN, hSelf);
-		case Gorseval:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_GORSEVAL", IDB_GORSEVAL, hSelf);
-		case Sabetha:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_SABETHA", IDB_SABETHA, hSelf);
-		case Slothasor:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_SLOTHASOR", IDB_SLOTHASOR, hSelf);
-		case BanditTrio:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_NARELLA", IDB_NARELLA, hSelf);
-		case Matthias:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_MATTHIAS", IDB_MATTHIAS, hSelf);
-		case Escort:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_ESCORT", IDB_ESCORT, hSelf);
-		case KeepConstruct:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_KEEP_CONSTRUCT", IDB_KEEP_CONSTRUCT, hSelf);
-		case TwistedCastle:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_TWISTED_CASTLE", IDB_TWISTED_CASTLE, hSelf);
-		case Xera:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_XERA", IDB_XERA, hSelf);
-		case Cairn:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_CAIRN", IDB_CAIRN, hSelf);
-		case MursaatOverseer:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_MURSAAT_OVERSEER", IDB_MURSAAT_OVERSEER, hSelf);
-		case Samarog:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_SAMAROG", IDB_SAMAROG, hSelf);
-		case Deimos:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_DEIMOS", IDB_DEIMOS, hSelf);
-		case SoullessHorror:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_SOULLESS_HORROR", IDB_SOULLESS_HORROR, hSelf);
-		case RiverOfSouls:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_RIVER_OF_SOULS", IDB_RIVER_OF_SOULS, hSelf);
-		case BrokenKing:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_BROKEN_KING", IDB_BROKEN_KING, hSelf);
-		case EaterOfSouls:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_EATER_OF_SOULS", IDB_EATER_OF_SOULS, hSelf);
-		case Eyes:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_EYES_OF_FATE", IDB_EYES_OF_FATE, hSelf);
-		case Dhuum:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_DHUUM", IDB_DHUUM, hSelf);
-		case ConjuredAmalgamate:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_CONJURED_AMALGAMATE", IDB_CONJURED_AMALGAMATE, hSelf);
-		case TwinLargos:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_KENUTT", IDB_KENUTT, hSelf);
-		case Qadim:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_QADIM", IDB_QADIM, hSelf);
-		case Adina:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_ADINA", IDB_ADINA, hSelf);
-		case Sabir:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_SABIR", IDB_SABIR, hSelf);
-		case QadimThePeerless:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_QADIM_THE_PEERLESS", IDB_QADIM_THE_PEERLESS, hSelf);
-		case Greer:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_GREER", IDB_GREER, hSelf);
-		case Decima:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_DECIMA", IDB_DECIMA, hSelf);
-		case Ura:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_URA", IDB_URA, hSelf);
-		/* Fractals */
-		case MAMA:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_MAMA", IDB_MAMA, hSelf);
-		case SiaxTheCorrupted:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_SIAX", IDB_SIAX, hSelf);
-		case EnsolyssOfTheEndlessTorment:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_ENSOLYSS", IDB_ENSOLYSS, hSelf);
-		case SkorvaldTheShattered:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_SKORVALD", IDB_SKORVALD, hSelf);
-		case Artsariiv:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_ARTSARIIV", IDB_ARTSARIIV, hSelf);
-		case Arkk:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_ARKK", IDB_ARKK, hSelf);
-		case ElementalAiKeeperOfThePeak:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_ELEMENTAL_AI_LIGHT", IDB_ELEMENTAL_AI_LIGHT, hSelf);
-		case DarkAiKeeperOfThePeak:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_ELEMENTAL_AI_DARK", IDB_ELEMENTAL_AI_DARK, hSelf);
-		case ElementalAndDarkAiKeeperOfThePeak:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_ELEMENTAL_AI_LIGHT_AND_DARK", IDB_ELEMENTAL_AI_LIGHT_AND_DARK, hSelf);
-		case KanaxaiScytheOfHouseAurkus:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_KANAXAI", IDB_KANAXAI, hSelf);
-		case CerusAndDeimos:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_CERUS_AND_DEIMOS", IDB_CERUS_AND_DEIMOS, hSelf);
-		case Eparch:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_EPARCH", IDB_EPARCH, hSelf);
-		case Kinfall:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_KINFALL", IDB_KINFALL, hSelf);
-		/* Strikes */
-		case IcebroodConstruct:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_ICEBROOD_CONSTRUCT", IDB_ICEBROOD_CONSTRUCT, hSelf);
-		case TheVoiceAndTheClaw:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_KODANS", IDB_KODANS, hSelf);
-		case FraenirOfJormag:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_FRAENIR_OF_JORMAG", IDB_FRAENIR_OF_JORMAG, hSelf);
-		case Boneskinner:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_BONESKINNER", IDB_BONESKINNER, hSelf);
-		case WhisperOfJormag:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_WHISPER_OF_JORMAG", IDB_WHISPER_OF_JORMAG, hSelf);
-		case Freezie:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_FREEZIE", IDB_FREEZIE, hSelf);
-		case CaptainMaiTrin:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_CAPTAIN_MAI_TRIN", IDB_CAPTAIN_MAI_TRIN, hSelf);
-		case Ankka:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_ANKKA", IDB_ANKKA, hSelf);
-		case MinisterLi:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_MINISTER_LI", IDB_MINISTER_LI, hSelf);
-		case VoidAmalgamate:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_HARVEST_TEMPLE", IDB_HARVEST_TEMPLE, hSelf);
-		case OldLionsCourt:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_WATCHKNIGHT_MARK_II", IDB_WATCHKNIGHT_MARK_II, hSelf);
-		case Dagda:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_DAGDA", IDB_DAGDA, hSelf);
-		case Cerus:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_CERUS", IDB_CERUS, hSelf);
-		case Kela:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_KELA", IDB_KELA, hSelf);
-		case KelaToken:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_KELA", IDB_KELA, hSelf);
-		case Vloxx:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_VLOXX", IDB_VLOXX, hSelf);
-		default:
-			return APIDefs->Textures.GetOrCreateFromResource("TEX_UNDER_CONSTRUCTION", IDB_UNDER_CONSTRUCTION, hSelf);
-	}
-}
-
-
-Texture* GetCurrencyTexture(std::string name) {
-	if (name == "Legendary Insight")
-		return APIDefs->Textures.GetOrCreateFromResource("TEX_LEGENDARY_INSIGHT", IDB_LEGENDARY_INSIGHT, hSelf);
-	if (name == "Legendary Divination")
-		return APIDefs->Textures.GetOrCreateFromResource("TEX_LEGENDARY_DIVINATION", IDB_LEGENDARY_DIVINATION, hSelf);
-	if (name == "Unstable Fractal Essence")
-		return APIDefs->Textures.GetOrCreateFromResource("TEX_UNSTABLE_FRACTAL_ESSENCE", IDB_UNSTABLE_FRACTAL_ESSENCE, hSelf);
-	if (name == "Boneskinner Ritual Vial")
-		return APIDefs->Textures.GetOrCreateFromResource("TEX_BONESKINNER_RITUAL_VIAL", IDB_BONESKINNER_RITUAL_VIAL, hSelf);
-	return APIDefs->Textures.GetOrCreateFromResource("TEX_UNDER_CONSTRUCTION", IDB_UNDER_CONSTRUCTION, hSelf);
 }
