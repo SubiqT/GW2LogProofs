@@ -10,7 +10,12 @@
 #include <utility>
 
 #include "../providers/common/provider.h"
-#include "player_data.h"
+
+enum class LoadState {
+	LOADING,
+	READY,
+	FAILED
+};
 
 struct LoadPolicy {
 	std::chrono::seconds cacheTimeout;

@@ -2,12 +2,17 @@
 #include "../providers/common/provider_registry.h"
 #include "settings.h"
 #include "shared.h"
+#include <algorithm>
 #include <format>
+#include <mutex>
 
 namespace PlayerManager {
-	std::vector<Player> players;
-	std::string selfAccountName;
-	std::mutex playerMutex;
+	namespace {
+		std::mutex mutex;
+		std::vector<std::string> accounts;
+		std::string selfAccount;
+	} // namespace
+
 	LazyLoadManager lazyLoadManager(
 			[](const std::string& account, const std::string& provider, FetchCallback callback) {
 				IProvider* source = ProviderRegistry::Instance().Find(provider);
@@ -20,46 +25,41 @@ namespace PlayerManager {
 			[] { return LoadPolicy {std::chrono::minutes(Settings::CacheTimeoutMinutes), Settings::MaxRetryAttempts}; }
 	);
 
-	static long long GetPlayerIndex(const std::string& account) {
-		for (Player& p : players)
-			if (p.account == account) return std::addressof(p) - std::addressof(players.at(0));
-		return -1;
+	void AddPlayer(const std::string& account) {
+		if (account.empty()) return;
+		std::scoped_lock lock(mutex);
+		if (std::find(accounts.begin(), accounts.end(), account) != accounts.end()) return;
+		accounts.push_back(account);
+		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player added to tracking: {}", account).c_str());
 	}
 
-	void AddPlayer(const PlayerInfo& playerInfo) {
-		std::scoped_lock lck(playerMutex);
-		for (const Player& p : players)
-			if (p.account == playerInfo.account) return;
-
-		players.push_back({playerInfo.account});
-
-		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player added to tracking: {}", playerInfo.account).c_str());
-	}
-
-	void RemovePlayer(const PlayerInfo& playerInfo) {
-		std::scoped_lock lck(playerMutex);
-		long long index = GetPlayerIndex(playerInfo.account);
-		if (index != -1) {
-			players.erase(players.begin() + index);
-			APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player removed from tracking: {}", playerInfo.account).c_str());
+	void RemovePlayer(const std::string& account) {
+		std::scoped_lock lock(mutex);
+		if (std::erase(accounts, account)) {
+			APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player removed from tracking: {}", account).c_str());
 		}
 	}
 
-	void SetSelf(const PlayerInfo& playerInfo) {
-		selfAccountName = playerInfo.account;
-		AddPlayer(playerInfo);
+	void SetSelf(const std::string& account) {
+		{
+			std::scoped_lock lock(mutex);
+			selfAccount = account;
+		}
+		AddPlayer(account);
+	}
+
+	bool IsSelf(const std::string& account) {
+		std::scoped_lock lock(mutex);
+		return account == selfAccount;
 	}
 
 	void ClearPlayers() {
-		std::scoped_lock lck(playerMutex);
-		long long index = GetPlayerIndex(selfAccountName);
-		if (index == -1) {
-			players.clear();
-		} else {
-			Player self = std::move(players[index]);
-			players.clear();
-			players.emplace_back(std::move(self));
-		}
+		std::scoped_lock lock(mutex);
+		std::erase_if(accounts, [](const std::string& account) { return account != selfAccount; });
 	}
 
+	std::vector<std::string> Accounts() {
+		std::scoped_lock lock(mutex);
+		return accounts;
+	}
 } // namespace PlayerManager

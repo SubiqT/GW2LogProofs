@@ -87,13 +87,13 @@ static void DrawSpinner() {
 	window->DrawList->PathStroke(color, false, (float) thickness);
 }
 
-static void DrawPlayerAccountName(const Player& player, const PlayerProofs* proofData) {
+static void DrawPlayerAccountName(const std::string& account, const PlayerProofs* proofData) {
 	if (proofData && !proofData->profileUrl.empty()) {
-		if (ImGui::TextURL(player.account.c_str())) {
+		if (ImGui::TextURL(account.c_str())) {
 			ShellExecuteA(0, 0, proofData->profileUrl.c_str(), 0, 0, SW_SHOW);
 		}
 	} else {
-		ImGui::Text(player.account.c_str());
+		ImGui::Text(account.c_str());
 	}
 }
 
@@ -237,10 +237,10 @@ static void DrawCountCell(const ProofCounts* counts, const std::string& proofId,
 	}
 }
 
-static void DrawPlayerRow(const Player& p, const BossGroup& group, IProvider* provider, bool showKpmeId) {
+static void DrawPlayerRow(const std::string& account, const BossGroup& group, IProvider* provider, bool showKpmeId) {
 	const std::string providerName = provider->Name();
-	PlayerManager::lazyLoadManager.RequestPlayerData(p.account, providerName);
-	auto [state, proofs] = PlayerManager::lazyLoadManager.GetPlayerLoad(p.account, providerName);
+	PlayerManager::lazyLoadManager.RequestPlayerData(account, providerName);
+	auto [state, proofs] = PlayerManager::lazyLoadManager.GetPlayerLoad(account, providerName);
 	const ProofCounts* counts = proofs ? &CountsForSelectedMode(*proofs) : nullptr;
 	const bool hasProofs = counts && !counts->empty();
 	const char* missingText = hasProofs ? "0" : "";
@@ -250,7 +250,7 @@ static void DrawPlayerRow(const Player& p, const BossGroup& group, IProvider* pr
 	}
 
 	ImGui::TableNextColumn();
-	DrawPlayerAccountName(p, proofs.get());
+	DrawPlayerAccountName(account, proofs.get());
 	if (showKpmeId) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
@@ -301,34 +301,17 @@ static void DrawGenericTab(const BossGroup& group, IProvider* provider) {
 		SetupTableColumns(group, showKpmeId);
 		DrawTableHeaders(group, showKpmeId);
 
-		static std::vector<const Player*> visiblePlayers;
-		visiblePlayers.clear();
-
-		{
-			std::scoped_lock lck(PlayerManager::playerMutex);
-			if (PlayerManager::players.empty()) {
-				ImGui::TableNextColumn();
-				ImGui::Text("No players found... ");
-				ImGui::EndTable();
-				ImGui::EndTabItem();
-				return;
-			}
-
-
-			for (const auto& p : PlayerManager::players) {
-				if (!Settings::IncludeMissingAccounts) {
-					auto [state, proofs] = PlayerManager::lazyLoadManager.GetPlayerLoad(p.account, providerName);
-					if (state == LoadState::READY && (!proofs || CountsForSelectedMode(*proofs).empty())) {
-						continue;
-					}
-				}
-				visiblePlayers.push_back(&p);
-			}
+		auto accounts = PlayerManager::Accounts();
+		if (accounts.empty()) {
+			ImGui::TableNextColumn();
+			ImGui::Text("No players found... ");
 		}
-
-
-		for (const auto* player : visiblePlayers) {
-			DrawPlayerRow(*player, group, provider, showKpmeId);
+		for (const auto& account : accounts) {
+			if (!Settings::IncludeMissingAccounts) {
+				auto [state, proofs] = PlayerManager::lazyLoadManager.GetPlayerLoad(account, providerName);
+				if (state == LoadState::READY && (!proofs || CountsForSelectedMode(*proofs).empty())) continue;
+			}
+			DrawPlayerRow(account, group, provider, showKpmeId);
 		}
 		ImGui::EndTable();
 	}

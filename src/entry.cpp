@@ -4,17 +4,14 @@
 #include "imgui/imgui.h"
 #include "nexus/Nexus.h"
 
-#include "core/event_handlers.h"
 #include "core/player_manager.h"
 #include "core/settings.h"
+#include "core/squad_events.h"
 #include "core/shared.h"
 #include "providers/common/provider_registry.h"
 #include "providers/kpme/kpme_provider.h"
 #include "providers/wingman/wingman_provider.h"
 #include "resource.h"
-#include "trackers/arcdps_tracker.h"
-#include "trackers/realtime_api_tracker.h"
-#include "trackers/unofficial_extras_tracker.h"
 #include "ui/gui.h"
 #include "utils/httpclient.h"
 #include "version.h"
@@ -60,12 +57,9 @@ void AddonLoad(AddonAPI* addonApi) {
 	ProviderRegistry::Instance().Register(std::make_unique<WingmanProvider>());
 	ProviderRegistry::Instance().Register(std::make_unique<KpmeProvider>());
 
-	trackerManager.RegisterTracker(std::make_unique<RealtimeApiTracker>());
-	trackerManager.RegisterTracker(std::make_unique<UnofficialExtrasTracker>());
-	trackerManager.RegisterTracker(std::make_unique<ArcdpsTracker>());
 
 	HTTPClient::Initialize();
-	InitializeTrackerManager();
+	SubscribeSquadEvents();
 
 	APIDefs->Renderer.Register(ERenderType_Render, AddonRender);
 	APIDefs->Renderer.Register(ERenderType_OptionsRender, AddonOptions);
@@ -85,7 +79,7 @@ void AddonUnload() {
 		DeregisterQuickAccessShortcut();
 	APIDefs->InputBinds.Deregister(KB_TOGGLE_SHOW_WINDOW_LOG_PROOFS);
 
-	ShutdownTrackerManager();
+	UnsubscribeSquadEvents();
 	HTTPClient::Shutdown();
 
 	APIDefs->Log(ELogLevel_INFO, ADDON_NAME, "Log Proofs unloaded successfully");

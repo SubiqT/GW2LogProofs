@@ -22,7 +22,7 @@
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\core\event_handlers.cpp" />
+    <ClCompile Include="src\core\squad_events.cpp" />
     <ClCompile Include="src\core\player_manager.cpp" />
     <ClCompile Include="src\core\settings.cpp" />
     <ClCompile Include="src\core\shared.cpp" />
@@ -38,10 +38,6 @@
     <ClCompile Include="src\providers\wingman\wingman_client.cpp" />
     <ClCompile Include="src\providers\kpme\kpme_provider.cpp" />
     <ClCompile Include="src\providers\kpme\kpme_client.cpp" />
-    <ClCompile Include="src\core\player_tracker_manager.cpp" />
-    <ClCompile Include="src\trackers\arcdps_tracker.cpp" />
-    <ClCompile Include="src\trackers\unofficial_extras_tracker.cpp" />
-    <ClCompile Include="src\trackers\realtime_api_tracker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ui\imgui_extensions.h" />
@@ -57,7 +53,7 @@
     <ClInclude Include="src\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\core\event_handlers.h" />
+    <ClInclude Include="src\core\squad_events.h" />
     <ClInclude Include="src\core\player_manager.h" />
     <ClInclude Include="src\nexus\Nexus.h" />
     <ClInclude Include="src\nlohmann\json.hpp" />
@@ -74,19 +70,12 @@
     <ClInclude Include="src\providers\common\provider.h" />
     <ClInclude Include="src\providers\common\provider_registry.h" />
     <ClInclude Include="src\providers\common\json_fetch.h" />
-    <ClInclude Include="src\core\player_data.h" />
     <ClInclude Include="src\providers\wingman\wingman_provider.h" />
     <ClInclude Include="src\providers\wingman\wingman_client.h" />
     <ClInclude Include="src\providers\wingman\wingman_types.h" />
     <ClInclude Include="src\providers\kpme\kpme_provider.h" />
     <ClInclude Include="src\providers\kpme\kpme_client.h" />
     <ClInclude Include="src\providers\kpme\kpme_types.h" />
-    <ClInclude Include="src\core\player_tracker.h" />
-    <ClInclude Include="src\core\player_tracker_manager.h" />
-    <ClInclude Include="src\core\player_info.h" />
-    <ClInclude Include="src\trackers\arcdps_tracker.h" />
-    <ClInclude Include="src\trackers\unofficial_extras_tracker.h" />
-    <ClInclude Include="src\trackers\realtime_api_tracker.h" />
     <ClInclude Include="src\realtime_api\RTAPI.h" />
   </ItemGroup>
   <ItemGroup>
