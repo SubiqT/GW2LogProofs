@@ -1,199 +1,58 @@
 #include "kpme_provider.h"
 #include "../../core/bosses.h"
-#include "../../core/settings.h"
-#include "../../core/shared.h"
-#include <format>
-#include <unordered_map>
-#include <unordered_set>
 
+namespace {
+	constexpr int TOKENS_PER_RAID_COFFER = 3;
 
-void KpmeProvider::LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) {
-	client_.GetKpAsync(account, [callback](const Kpme::KpmeResponse& response) {
-		PlayerProofData data = ConvertKpmeResponse(response);
-		callback(data);
-	});
-}
-
-PlayerProofData KpmeProvider::ConvertKpmeResponse(const Kpme::KpmeResponse& response) {
-	PlayerProofData data;
-	data.accountName = response.id;
-	data.profileId = response.id;
-	data.profileUrl = "https://killproof.me/proof/" + response.id;
-	data.rawData = response;
-
-	// Pre-compute based on current linked account mode
-	bool includeLinked = (Settings::LinkedAccountsMode == COMBINE_LINKED);
-
-	// Add killproofs
-	for (const auto& [id, amount] : response.self.killproofs) {
-		int finalAmount = includeLinked && response.shared.killproofs.count(id) ? response.shared.killproofs.at(id) : amount;
-		data.proofs.emplace(id, ProofData {id, finalAmount});
-	}
-	if (includeLinked) {
-		for (const auto& [id, amount] : response.shared.killproofs) {
-			if (!response.self.killproofs.count(id)) {
-				data.proofs.emplace(id, ProofData {id, amount});
-			}
+	void AddMissing(ProofCounts& counts, const std::map<std::string, int>& source) {
+		for (const auto& [name, amount] : source) {
+			counts.try_emplace(name, amount);
 		}
 	}
 
-	// Add tokens
-	for (const auto& [id, amount] : response.self.tokens) {
-		int finalAmount = includeLinked && response.shared.tokens.count(id) ? response.shared.tokens.at(id) : amount;
-		data.proofs.emplace(id, ProofData {id, finalAmount});
+	// Counts as shown in the tables: Legendary Divination counts towards Legendary Insight and each
+	// raid coffer counts as three of that boss's tokens.
+	ProofCounts ToDisplayCounts(const Kpme::KpSummary& summary) {
+		ProofCounts counts;
+		AddMissing(counts, summary.killproofs);
+		AddMissing(counts, summary.tokens);
+		AddMissing(counts, summary.coffers);
+
+		if (auto divination = summary.killproofs.find("Legendary Divination"); divination != summary.killproofs.end()) {
+			counts["Legendary Insight"] += divination->second;
+		}
+		for (const auto& boss : AllBosses()) {
+			if (boss.content != Content::RAID || !boss.kpmeToken || !boss.kpmeCoffer) continue;
+			if (auto coffers = summary.coffers.find(boss.kpmeCoffer); coffers != summary.coffers.end()) {
+				counts[boss.kpmeToken] += coffers->second * TOKENS_PER_RAID_COFFER;
+			}
+		}
+		return counts;
 	}
 
-	// Add coffers
-	for (const auto& [id, amount] : response.self.coffers) {
-		int finalAmount = includeLinked && response.shared.coffers.count(id) ? response.shared.coffers.at(id) : amount;
-		data.proofs.emplace(id, ProofData {id, finalAmount});
+	Kpme::KpSummary Combine(const Kpme::KpSummary& own, const Kpme::KpSummary& linkedTotals) {
+		auto overlay = [](std::map<std::string, int> base, const std::map<std::string, int>& totals) {
+			for (const auto& [name, amount] : totals) base[name] = amount;
+			return base;
+		};
+		return {overlay(own.killproofs, linkedTotals.killproofs), overlay(own.tokens, linkedTotals.tokens), overlay(own.coffers, linkedTotals.coffers)};
 	}
 
-	// Add linked accounts for SPLIT_LINKED mode
-	if (Settings::LinkedAccountsMode == SPLIT_LINKED && !response.linked_accounts.empty()) {
+	std::shared_ptr<const PlayerProofs> Convert(const Kpme::KpmeResponse& response) {
+		auto proofs = std::make_shared<PlayerProofs>();
+		proofs->profileId = response.id;
+		proofs->profileUrl = "https://killproof.me/proof/" + response.id;
+		proofs->own = ToDisplayCounts(response.self);
+		proofs->combined = ToDisplayCounts(Combine(response.self, response.shared));
 		for (const auto& linkedAccount : response.linked_accounts) {
-			LinkedAccountData linkedData;
-			linkedData.accountName = linkedAccount.name;
-
-			for (const auto& [id, amount] : linkedAccount.data.killproofs) {
-				linkedData.proofs.emplace(id, ProofData {id, amount});
-			}
-			for (const auto& [id, amount] : linkedAccount.data.tokens) {
-				linkedData.proofs.emplace(id, ProofData {id, amount});
-			}
-			for (const auto& [id, amount] : linkedAccount.data.coffers) {
-				linkedData.proofs.emplace(id, ProofData {id, amount});
-			}
-
-			data.linkedAccounts.push_back(linkedData);
+			proofs->linkedAccounts.push_back({linkedAccount.name, ToDisplayCounts(linkedAccount.data)});
 		}
+		return proofs;
 	}
+} // namespace
 
-	return data;
-}
-
-PlayerProofData KpmeProvider::ComputeProofsFromRawData(const PlayerProofData& rawData, bool includeLinkedAccounts) const {
-	// Cache computed data per account and mode
-	static std::unordered_map<std::string, std::array<std::unique_ptr<PlayerProofData>, 3>> computeCache;
-	int modeIndex = includeLinkedAccounts ? 1 : (Settings::LinkedAccountsMode == SPLIT_LINKED ? 2 : 0);
-
-	auto& playerCache = computeCache[rawData.accountName];
-	if (playerCache[modeIndex]) {
-		return *playerCache[modeIndex];
-	}
-
-	PlayerProofData data = rawData;
-	data.proofs.clear();
-	data.linkedAccounts.clear();
-
-	try {
-		const auto& response = std::any_cast<const Kpme::KpmeResponse&>(rawData.rawData);
-
-		for (const auto& kp : response.self.killproofs) {
-			ProofData proof;
-			proof.identifier = kp.first;
-			proof.amount = includeLinkedAccounts && response.shared.killproofs.count(kp.first) ? response.shared.killproofs.at(kp.first) : kp.second;
-
-			// Combine Legendary Divination with Legendary Insight
-			if (kp.first == "Legendary Insight") {
-				int divination = includeLinkedAccounts && response.shared.killproofs.count("Legendary Divination") ? response.shared.killproofs.at("Legendary Divination") : (response.self.killproofs.count("Legendary Divination") ? response.self.killproofs.at("Legendary Divination") : 0);
-				proof.amount += divination;
-			}
-
-			data.proofs[kp.first] = proof;
-		}
-
-		if (includeLinkedAccounts) {
-			for (const auto& kp : response.shared.killproofs) {
-				if (!response.self.killproofs.count(kp.first) && kp.first != "Legendary Divination") { // Skip Legendary Divination as it's combined with Legendary Insight
-					ProofData proof;
-					proof.identifier = kp.first;
-					proof.amount = kp.second;
-					data.proofs[kp.first] = proof;
-				}
-			}
-		}
-
-		// Process tokens and combine with coffers for normal raids
-		// Raid coffers count as three of the boss's tokens.
-		auto findRaidBossByToken = [](const std::string& token) -> const BossInfo* {
-			for (const auto& boss : AllBosses()) {
-				if (boss.content == Content::RAID && boss.kpmeToken && boss.kpmeCoffer && token == boss.kpmeToken) return &boss;
-			}
-			return nullptr;
-		};
-		auto isRaidCoffer = [](const std::string& coffer) {
-			for (const auto& boss : AllBosses()) {
-				if (boss.content == Content::RAID && boss.kpmeToken && boss.kpmeCoffer && coffer == boss.kpmeCoffer) return true;
-			}
-			return false;
-		};
-
-		for (const auto& token : response.self.tokens) {
-			ProofData proof;
-			proof.identifier = token.first;
-			proof.amount = includeLinkedAccounts && response.shared.tokens.count(token.first) ? response.shared.tokens.at(token.first) : token.second;
-
-			if (const BossInfo* boss = findRaidBossByToken(token.first)) {
-				std::string cofferName = boss->kpmeCoffer;
-				if (includeLinkedAccounts && response.shared.coffers.count(cofferName)) {
-					proof.amount += response.shared.coffers.at(cofferName) * 3;
-				} else if (response.self.coffers.count(cofferName)) {
-					proof.amount += response.self.coffers.at(cofferName) * 3;
-				}
-			}
-
-			data.proofs[token.first] = proof;
-		}
-
-
-		for (const auto& coffer : response.self.coffers) {
-			if (isRaidCoffer(coffer.first) || data.proofs.count(coffer.first)) continue;
-
-			ProofData proof;
-			proof.identifier = coffer.first;
-			proof.amount = includeLinkedAccounts && response.shared.coffers.count(coffer.first) ? response.shared.coffers.at(coffer.first) : coffer.second;
-			data.proofs[coffer.first] = proof;
-		}
-
-		// Populate individual linked accounts when showing separately
-		if (Settings::LinkedAccountsMode == SPLIT_LINKED && !response.linked_accounts.empty()) {
-			for (const auto& linkedAccount : response.linked_accounts) {
-				LinkedAccountData linkedData;
-				linkedData.accountName = linkedAccount.name;
-
-
-				for (const auto& kp : linkedAccount.data.killproofs) {
-					ProofData proof;
-					proof.identifier = kp.first;
-					proof.amount = kp.second;
-					linkedData.proofs[kp.first] = proof;
-				}
-
-
-				for (const auto& token : linkedAccount.data.tokens) {
-					ProofData proof;
-					proof.identifier = token.first;
-					proof.amount = token.second;
-					linkedData.proofs[token.first] = proof;
-				}
-
-
-				for (const auto& coffer : linkedAccount.data.coffers) {
-					ProofData proof;
-					proof.identifier = coffer.first;
-					proof.amount = coffer.second;
-					linkedData.proofs[coffer.first] = proof;
-				}
-
-				data.linkedAccounts.push_back(linkedData);
-			}
-		}
-	} catch (const std::bad_any_cast& e) {
-		APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to cast raw data for {}: {}", rawData.accountName, e.what()).c_str());
-	}
-
-
-	computeCache[rawData.accountName][modeIndex] = std::make_unique<PlayerProofData>(data);
-	return data;
+void KpmeProvider::LoadPlayerDataAsync(const std::string& account, PlayerProofsCallback callback) {
+	client_.GetKpAsync(account, [callback](const Kpme::KpmeResponse& response) {
+		callback(Convert(response));
+	});
 }

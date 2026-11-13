@@ -10,7 +10,6 @@ namespace Kpme {
 		std::map<std::string, int> killproofs;
 		std::map<std::string, int> tokens;
 		std::map<std::string, int> coffers;
-		std::map<std::string, std::string> titles;
 	};
 
 	struct LinkedAccount {

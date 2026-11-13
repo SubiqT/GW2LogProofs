@@ -1,8 +1,7 @@
 #ifndef PLAYER_DATA_H
 #define PLAYER_DATA_H
 
-#include "../providers/common/provider.h"
-#include <memory>
+#include <string>
 
 enum class LoadState {
 	LOADING = 0,
@@ -11,11 +10,7 @@ enum class LoadState {
 };
 
 struct Player {
-	uintptr_t id;
 	std::string account;
-	LoadState state;
-	std::unique_ptr<PlayerProofData> proofData;
-	std::string providerName;
 };
 
 #endif

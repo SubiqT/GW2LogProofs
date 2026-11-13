@@ -9,7 +9,7 @@ public:
 	WingmanProvider();
 
 	const char* Name() const override { return "Wingman"; }
-	void LoadPlayerDataAsync(const std::string& account, std::function<void(const PlayerProofData&)> callback) override;
+	void LoadPlayerDataAsync(const std::string& account, PlayerProofsCallback callback) override;
 
 	const std::vector<BossGroup>& GetBossGroups() const override { return bossGroups_; }
 	std::vector<ProofOption> GetAvailableProofs() const override;

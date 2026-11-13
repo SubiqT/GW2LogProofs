@@ -58,20 +58,6 @@ namespace Kpme {
 			}
 		}
 
-			if (j.contains("titles")) {
-				if (j.at("titles").is_array()) {
-					for (const auto& item : j.at("titles")) {
-						if (item.is_object()) {
-							if (item.contains("name") && item.contains("mode")) {
-								if (item.at("name").is_string() && item.at("mode").is_number_integer()) {
-									r.self.titles[item.at("name")] = item.at("mode");
-								}
-							}
-						}
-					}
-				}
-			}
-
 		if (j.contains("linked_totals")) {
 			if (j.at("linked_totals").is_object()) {
 				if (j.at("linked_totals").contains("killproofs")) {
@@ -116,19 +102,6 @@ namespace Kpme {
 					}
 				}
 
-					if (j.at("linked_totals").contains("titles")) {
-						if (j.at("linked_totals").at("titles").is_array()) {
-							for (const auto& item : j.at("linked_totals").at("titles")) {
-								if (item.is_object()) {
-									if (item.contains("name") && item.contains("mode")) {
-										if (item.at("name").is_string() && item.at("mode").is_number_integer()) {
-											r.shared.titles[item.at("name")] = item.at("mode");
-										}
-									}
-								}
-							}
-						}
-					}
 				}
 			}
 

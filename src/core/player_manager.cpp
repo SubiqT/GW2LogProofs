@@ -23,12 +23,7 @@ namespace PlayerManager {
 		for (const Player& p : players)
 			if (p.account == playerInfo.account) return;
 
-		players.emplace_back();
-		players.back().id = playerInfo.id;
-		players.back().account = playerInfo.account;
-		players.back().state = ::LoadState::LOADING;
-		players.back().proofData = nullptr;
-		players.back().providerName = "";
+		players.push_back({playerInfo.account});
 
 		APIDefs->Log(ELogLevel_DEBUG, ADDON_NAME, std::format("Player added to tracking: {}", playerInfo.account).c_str());
 

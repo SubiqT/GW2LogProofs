@@ -87,7 +87,7 @@ static void DrawSpinner() {
 	window->DrawList->PathStroke(color, false, (float) thickness);
 }
 
-static void DrawPlayerAccountName(const Player& player, const auto* proofData) {
+static void DrawPlayerAccountName(const Player& player, const PlayerProofs* proofData) {
 	if (proofData && !proofData->profileUrl.empty()) {
 		if (ImGui::TextURL(player.account.c_str())) {
 			ShellExecuteA(0, 0, proofData->profileUrl.c_str(), 0, 0, SW_SHOW);
@@ -97,7 +97,7 @@ static void DrawPlayerAccountName(const Player& player, const auto* proofData) {
 	}
 }
 
-static void DrawKpmeId(const Player& aPlayer, const auto* proofData) {
+static void DrawKpmeId(const PlayerProofs* proofData) {
 	if (proofData && !proofData->profileId.empty()) {
 		if (ImGui::TextURL(proofData->profileId.c_str())) {
 			ImGui::SetClipboardText(proofData->profileId.c_str());
@@ -220,100 +220,75 @@ static void DrawTableHeaders(const BossGroup& group, bool showKpmeId) {
 	}
 }
 
+static const ProofCounts& CountsForSelectedMode(const PlayerProofs& proofs) {
+	return Settings::LinkedAccountsMode == COMBINE_LINKED ? proofs.combined : proofs.own;
+}
+
+static void DrawCountCell(const ProofCounts* counts, const std::string& proofId, LoadState state, const char* missingText) {
+	ImGui::TableNextColumn();
+	HighlightColumnOnHover();
+	if (counts) {
+		auto it = counts->find(proofId);
+		ImGui::Text(it != counts->end() ? std::to_string(it->second).c_str() : missingText);
+	} else if (state == LoadState::LOADING) {
+		DrawSpinner();
+	} else {
+		ImGui::Text(missingText);
+	}
+}
+
 static void DrawPlayerRow(const Player& p, const BossGroup& group, IProvider* provider, bool showKpmeId) {
 	const std::string providerName = provider->Name();
+	auto state = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
+	auto proofs = state == LoadState::READY ? PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName) : nullptr;
+	const ProofCounts* counts = proofs ? &CountsForSelectedMode(*proofs) : nullptr;
+	const bool hasProofs = counts && !counts->empty();
+	const char* missingText = hasProofs ? "0" : "";
 
-	auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
-	auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
-	const auto* rawProofData = (lazyState == LoadState::READY && lazyData) ? lazyData.get() : nullptr;
-
-
-	std::unique_ptr<PlayerProofData> computedData;
-	if (rawProofData && rawProofData->rawData.has_value()) {
-		bool includeLinked = (Settings::LinkedAccountsMode == COMBINE_LINKED);
-		computedData = std::make_unique<PlayerProofData>(provider->ComputeProofsFromRawData(*rawProofData, includeLinked));
-	}
-	const auto* proofData = computedData ? computedData.get() : rawProofData;
-
-	if (!proofData || proofData->proofs.empty()) {
+	if (!hasProofs) {
 		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
 	}
 
 	ImGui::TableNextColumn();
-	DrawPlayerAccountName(p, proofData);
+	DrawPlayerAccountName(p, proofs.get());
 	if (showKpmeId) {
 		ImGui::TableNextColumn();
 		HighlightColumnOnHover();
-		DrawKpmeId(p, proofData);
+		DrawKpmeId(proofs.get());
+	}
+	for (const auto& currency : group.currencies) {
+		DrawCountCell(counts, currency, state, missingText);
+	}
+	for (const auto& boss : group.bosses) {
+		DrawCountCell(counts, boss.proofId, state, missingText);
 	}
 
-	bool isDisabled = !proofData || proofData->proofs.empty();
-
-	for (size_t i = 0; i < group.currencies.size(); ++i) {
-		ImGui::TableNextColumn();
-		HighlightColumnOnHover();
-		if (proofData) {
-			auto it = proofData->proofs.find(group.currencies[i]);
-			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : (isDisabled ? "" : "0"));
-		} else {
-			if (lazyState == LoadState::LOADING) {
-				DrawSpinner();
-			} else {
-				ImGui::Text(isDisabled ? "" : "0");
-			}
-		}
-	}
-	for (size_t i = 0; i < group.bosses.size(); ++i) {
-		ImGui::TableNextColumn();
-		HighlightColumnOnHover();
-		if (proofData) {
-			auto it = proofData->proofs.find(group.bosses[i].proofId);
-			ImGui::Text(it != proofData->proofs.end() ? std::to_string(it->second.amount).c_str() : (isDisabled ? "" : "0"));
-		} else {
-			if (lazyState == LoadState::LOADING) {
-				DrawSpinner();
-			} else {
-				ImGui::Text(isDisabled ? "" : "0");
-			}
-		}
-	}
-
-	if (!proofData || proofData->proofs.empty()) {
+	if (!hasProofs) {
 		ImGui::PopStyleColor();
 	}
 
 	HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 
+	if (Settings::LinkedAccountsMode != SPLIT_LINKED || !proofs) return;
+	for (const auto& linkedAccount : proofs->linkedAccounts) {
+		ImGui::TableNextColumn();
+		ImGui::Indent(20.0f);
+		ImGui::Text(linkedAccount.accountName.c_str());
+		ImGui::Unindent(20.0f);
 
-	if (Settings::LinkedAccountsMode == SPLIT_LINKED && proofData && !proofData->linkedAccounts.empty()) {
-		for (const auto& linkedAccount : proofData->linkedAccounts) {
+		if (showKpmeId) {
 			ImGui::TableNextColumn();
-			ImGui::Indent(20.0f);
-			ImGui::Text(linkedAccount.accountName.c_str());
-			ImGui::Unindent(20.0f);
-
-			if (showKpmeId) {
-				ImGui::TableNextColumn();
-				HighlightColumnOnHover();
-				ImGui::Text("-");
-			}
-
-			for (size_t i = 0; i < group.currencies.size(); ++i) {
-				ImGui::TableNextColumn();
-				HighlightColumnOnHover();
-				auto it = linkedAccount.proofs.find(group.currencies[i]);
-				ImGui::Text(it != linkedAccount.proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
-			}
-
-			for (size_t i = 0; i < group.bosses.size(); ++i) {
-				ImGui::TableNextColumn();
-				HighlightColumnOnHover();
-				auto it = linkedAccount.proofs.find(group.bosses[i].proofId);
-				ImGui::Text(it != linkedAccount.proofs.end() ? std::to_string(it->second.amount).c_str() : "0");
-			}
-
-			HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
+			HighlightColumnOnHover();
+			ImGui::Text("-");
 		}
+		for (const auto& currency : group.currencies) {
+			DrawCountCell(&linkedAccount.proofs, currency, LoadState::READY, "0");
+		}
+		for (const auto& boss : group.bosses) {
+			DrawCountCell(&linkedAccount.proofs, boss.proofId, LoadState::READY, "0");
+		}
+
+		HighlightRowOnHover(ImGui::GetCurrentContext()->CurrentTable);
 	}
 }
 
@@ -344,8 +319,8 @@ static void DrawGenericTab(const BossGroup& group, IProvider* provider) {
 				if (!Settings::IncludeMissingAccounts) {
 					auto lazyState = PlayerManager::lazyLoadManager.GetPlayerState(p.account, providerName);
 					if (lazyState == LoadState::READY) {
-						auto lazyData = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
-						if (!lazyData || lazyData->proofs.empty()) {
+						auto proofs = PlayerManager::lazyLoadManager.GetPlayerData(p.account, providerName);
+						if (!proofs || CountsForSelectedMode(*proofs).empty()) {
 							continue;
 						}
 					}

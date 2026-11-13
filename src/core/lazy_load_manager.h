@@ -17,7 +17,7 @@
 class ProofCache {
 private:
 	struct CacheEntry {
-		std::unique_ptr<PlayerProofData> data;
+		std::shared_ptr<const PlayerProofs> data;
 		std::chrono::steady_clock::time_point loadTime;
 		int retryCount = 0;
 		std::chrono::steady_clock::time_point nextRetryTime;
@@ -34,8 +34,8 @@ private:
 
 public:
 	bool HasValidEntry(const std::string& key);
-	std::unique_ptr<PlayerProofData> GetEntry(const std::string& key);
-	void SetEntry(const std::string& key, std::unique_ptr<PlayerProofData> data);
+	std::shared_ptr<const PlayerProofs> GetEntry(const std::string& key);
+	void SetEntry(const std::string& key, std::shared_ptr<const PlayerProofs> data);
 	void MarkFailure(const std::string& key);
 	bool ShouldRetry(const std::string& key);
 	std::vector<std::string> CleanExpiredEntries();
@@ -59,10 +59,10 @@ public:
 	void OnWindowStateChanged(bool isOpen);
 	void RequestPlayerData(const std::string& account, const std::string& provider);
 	LoadState GetPlayerState(const std::string& account, const std::string& provider);
-	std::unique_ptr<PlayerProofData> GetPlayerData(const std::string& account, const std::string& provider);
+	std::shared_ptr<const PlayerProofs> GetPlayerData(const std::string& account, const std::string& provider);
 	void CleanupExpiredEntries();
 	void SetLoadFunction(void (*func)(const std::string&, const std::string&, const std::string&));
-	void OnLoadComplete(const std::string& key, std::unique_ptr<PlayerProofData> data);
+	void OnLoadComplete(const std::string& key, std::shared_ptr<const PlayerProofs> data);
 	void OnLoadFailed(const std::string& key);
 
 private:

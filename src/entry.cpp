@@ -31,8 +31,8 @@ static void LoadPlayerDataWrapper(const std::string& account, const std::string&
 			return;
 		}
 
-		providerInstance->LoadPlayerDataAsync(account, [key](const PlayerProofData& data) {
-			PlayerManager::lazyLoadManager.OnLoadComplete(key, std::make_unique<PlayerProofData>(data));
+		providerInstance->LoadPlayerDataAsync(account, [key](std::shared_ptr<const PlayerProofs> proofs) {
+			PlayerManager::lazyLoadManager.OnLoadComplete(key, std::move(proofs));
 		});
 	} catch (const std::exception& e) {
 		APIDefs->Log(ELogLevel_WARNING, ADDON_NAME, std::format("Failed to load {} data for {}: {}", provider, account, e.what()).c_str());

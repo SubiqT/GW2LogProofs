@@ -10,16 +10,16 @@ bool ProofCache::HasValidEntry(const std::string& key) {
 	return it != cache.end() && !IsExpired(it->second) && !it->second.permanentFailure;
 }
 
-std::unique_ptr<PlayerProofData> ProofCache::GetEntry(const std::string& key) {
+std::shared_ptr<const PlayerProofs> ProofCache::GetEntry(const std::string& key) {
 	std::scoped_lock lock(cacheMutex);
 	auto it = cache.find(key);
 	if (it != cache.end() && !IsExpired(it->second) && it->second.data) {
-		return std::make_unique<PlayerProofData>(*it->second.data);
+		return it->second.data;
 	}
 	return nullptr;
 }
 
-void ProofCache::SetEntry(const std::string& key, std::unique_ptr<PlayerProofData> data) {
+void ProofCache::SetEntry(const std::string& key, std::shared_ptr<const PlayerProofs> data) {
 	std::scoped_lock lock(cacheMutex);
 	auto& entry = cache[key];
 	entry.data = std::move(data);
@@ -154,7 +154,7 @@ LoadState LazyLoadManager::GetPlayerState(const std::string& account, const std:
 	return LoadState::FAILED;
 }
 
-std::unique_ptr<PlayerProofData> LazyLoadManager::GetPlayerData(const std::string& account, const std::string& provider) {
+std::shared_ptr<const PlayerProofs> LazyLoadManager::GetPlayerData(const std::string& account, const std::string& provider) {
 	std::string key = MakeKey(account, provider);
 	return cache.GetEntry(key);
 }
@@ -188,7 +188,7 @@ void LazyLoadManager::SetLoadFunction(void (*func)(const std::string&, const std
 	loadFunction = func;
 }
 
-void LazyLoadManager::OnLoadComplete(const std::string& key, std::unique_ptr<PlayerProofData> data) {
+void LazyLoadManager::OnLoadComplete(const std::string& key, std::shared_ptr<const PlayerProofs> data) {
 	cache.SetEntry(key, std::move(data));
 	std::scoped_lock lock(pendingMutex);
 	pendingLoads.erase(key);
