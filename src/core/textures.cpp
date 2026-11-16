@@ -16,3 +16,7 @@ Texture* GetCurrencyTexture(const std::string& name) {
 		return APIDefs->Textures.GetOrCreateFromResource("TEX_BONESKINNER_RITUAL_VIAL", IDB_BONESKINNER_RITUAL_VIAL, hSelf);
 	return APIDefs->Textures.GetOrCreateFromResource("TEX_UNDER_CONSTRUCTION", IDB_UNDER_CONSTRUCTION, hSelf);
 }
+
+Texture* GetCommanderTexture() {
+	return APIDefs->Textures.GetOrCreateFromResource("TEX_COMMANDER_TAG", IDB_COMMANDER_TAG, hSelf);
+}

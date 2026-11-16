@@ -130,7 +130,6 @@ static void DrawHeaderCell(const char* id, const std::string& name, Texture* tex
 	}
 }
 
-static const ImVec4 COMMANDER_COLOUR {0.35f, 0.65f, 1.0f, 1.0f};
 constexpr float LINKED_ACCOUNT_INDENT = 20.0f;
 constexpr float LOOKUP_INPUT_WIDTH = 200.0f;
 constexpr const char* FAILED_TEXT = "?";
@@ -218,8 +217,18 @@ static const char* MissingDataReason(const PlayerLoad& load, const IProvider& pr
 	return provider.MissingDataDescription();
 }
 
+static void DrawCommanderIcon() {
+	Texture* texture = GetCommanderTexture();
+	if (!texture) return;
+	float height = ImGui::GetTextLineHeight();
+	// The wiki tag is 70x74, so keep its aspect ratio at text height.
+	ImGui::Image((void*) texture->Resource, ImVec2(height * texture->Width / texture->Height, height));
+	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Commander");
+	ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+}
+
 static void DrawAccountName(const SquadMember& member, const PlayerProofs* proofs, const char* missingReason) {
-	if (member.commander) ImGui::PushStyleColor(ImGuiCol_Text, COMMANDER_COLOUR);
+	if (member.commander) DrawCommanderIcon();
 	if (proofs && !proofs->profileUrl.empty()) {
 		if (ImGui::TextURL(member.account.c_str())) {
 			ShellExecuteA(0, 0, proofs->profileUrl.c_str(), 0, 0, SW_SHOW);
@@ -227,11 +236,9 @@ static void DrawAccountName(const SquadMember& member, const PlayerProofs* proof
 	} else {
 		ImGui::TextUnformatted(member.account.c_str());
 	}
-	if (member.commander) ImGui::PopStyleColor();
-	if (ImGui::IsItemHovered() && (member.commander || member.addedManually || missingReason)) {
+	if (ImGui::IsItemHovered() && (member.addedManually || missingReason)) {
 		ImGui::BeginTooltip();
 		if (missingReason) ImGui::TextUnformatted(missingReason);
-		if (member.commander) ImGui::TextUnformatted("Commander");
 		if (member.addedManually) ImGui::TextUnformatted(member.inSquad ? "Looked up manually" : "Looked up manually, not in your squad");
 		ImGui::EndTooltip();
 	}

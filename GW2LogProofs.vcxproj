@@ -210,6 +210,7 @@
     <Image Include="src\resources\Ura.png" />
     <Image Include="src\resources\Vale_Guardian.png" />
     <Image Include="src\resources\Vloxx.png" />
+    <Image Include="src\resources\Commander_Tag.png" />
     <Image Include="src\resources\Watchknight_Mark_II.png" />
     <Image Include="src\resources\Whisper_of_Jormag.png" />
     <Image Include="src\resources\Xera.png" />

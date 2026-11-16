@@ -530,6 +530,9 @@
     <Image Include="src\resources\Vloxx.png">
       <Filter>resources</Filter>
     </Image>
+    <Image Include="src\resources\Commander_Tag.png">
+      <Filter>resources</Filter>
+    </Image>
     <Image Include="src\resources\Greer.png">
       <Filter>resources</Filter>
     </Image>

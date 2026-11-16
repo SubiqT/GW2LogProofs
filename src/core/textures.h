@@ -8,5 +8,6 @@
 
 Texture* GetBossTexture(const BossInfo& boss);
 Texture* GetCurrencyTexture(const std::string& name);
+Texture* GetCommanderTexture();
 
 #endif
