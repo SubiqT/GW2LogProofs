@@ -8,6 +8,7 @@ namespace {
 	constexpr BossInfo bosses[] = {
 			/* Raids */
 			{.id = 15438, .name = "Vale Guardian", .texture = {"TEX_VALE_GUARDIAN", IDB_VALE_GUARDIAN}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Vale Guardian Fragment", .kpmeCoffer = "Vale Guardian Coffer"},
+			{.id = 15415, .name = "Spirit Woods", .texture = {"TEX_SPIRIT_WOODS", IDB_SPIRIT_WOODS}, .content = Content::RAID, .wingmanModes = NORMAL},
 			{.id = 15429, .name = "Gorseval", .texture = {"TEX_GORSEVAL", IDB_GORSEVAL}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Gorseval Tentacle Piece", .kpmeCoffer = "Gorseval's Coffer"},
 			{.id = 15375, .name = "Sabetha", .texture = {"TEX_SABETHA", IDB_SABETHA}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Sabetha Flamethrower Fragment Piece", .kpmeCoffer = "Sabetha's Coffer"},
 			{.id = 16123, .name = "Slothasor", .texture = {"TEX_SLOTHASOR", IDB_SLOTHASOR}, .content = Content::RAID, .wingmanModes = NORMAL, .kpmeToken = "Slothasor Mushroom", .kpmeCoffer = "Slothasor's Coffer"},
