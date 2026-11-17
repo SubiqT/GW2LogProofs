@@ -177,7 +177,8 @@ static void SetupTableColumns(const std::vector<Column>& columns) {
 				ImGui::TableSetupColumn(column.name.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, Settings::ColumnSizeAccount);
 				break;
 			case ColumnKind::CHARACTER:
-				ImGui::TableSetupColumn(column.name.c_str(), ImGuiTableColumnFlags_WidthFixed, Settings::ColumnSizeAccount);
+				// No width given, so ImGui fits the column to the longest character name.
+				ImGui::TableSetupColumn(column.name.c_str(), ImGuiTableColumnFlags_WidthFixed);
 				break;
 			case ColumnKind::SUBGROUP:
 				ImGui::TableSetupColumn(column.name.c_str(), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_DefaultHide);
