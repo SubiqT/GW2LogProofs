@@ -400,6 +400,22 @@ static void DrawGeneralSettings() {
 
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
+		ImGui::Text("Show Character Names");
+		ImGui::TableNextColumn();
+		if (ImGui::Checkbox("##ShowCharacterNames", &Settings::ShowCharacterNames)) {
+			Settings::Save();
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Show Commander Tag");
+		ImGui::TableNextColumn();
+		if (ImGui::Checkbox("##ShowCommanderTag", &Settings::ShowCommanderTag)) {
+			Settings::Save();
+		}
+
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
 		ImGui::Text("Visibility Mode");
 		ImGui::TableNextColumn();
 		const char* visibilityModes[] = {"Show all accounts", "Hide accounts with no data"};

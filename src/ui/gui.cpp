@@ -155,11 +155,9 @@ struct PlayerRow {
 };
 
 static std::vector<Column> BuildColumns(const BossGroup& group, bool showProfileId) {
-	std::vector<Column> columns {
-			{ColumnKind::ACCOUNT,   "Account"  },
-			{ColumnKind::CHARACTER, "Character"},
-			{ColumnKind::SUBGROUP,  "Group"    },
-	};
+	std::vector<Column> columns {{ColumnKind::ACCOUNT, "Account"}};
+	if (Settings::ShowCharacterNames) columns.push_back({ColumnKind::CHARACTER, "Character"});
+	columns.push_back({ColumnKind::SUBGROUP, "Group"});
 	if (showProfileId) columns.push_back({ColumnKind::PROFILE_ID, "Id"});
 	for (const auto& currency : group.currencies) {
 		columns.push_back({ColumnKind::PROOF, currency, currency, GetCurrencyTexture(currency)});
@@ -229,7 +227,7 @@ static void DrawCommanderIcon() {
 }
 
 static void DrawAccountName(const SquadMember& member, const PlayerProofs* proofs, const char* missingReason) {
-	if (member.commander) DrawCommanderIcon();
+	if (member.commander && Settings::ShowCommanderTag) DrawCommanderIcon();
 	if (proofs && !proofs->profileUrl.empty()) {
 		if (ImGui::TextURL(member.account.c_str())) {
 			ShellExecuteA(0, 0, proofs->profileUrl.c_str(), 0, 0, SW_SHOW);
@@ -359,7 +357,9 @@ static void DrawGenericTab(const BossGroup& group, IProvider* provider) {
 	if (!ImGui::BeginTabItem(group.name.c_str())) return;
 	const std::string providerName = provider->Name();
 	const auto columns = BuildColumns(group, provider->ShowsProfileId());
-	if (ImGui::BeginTable(group.tableName.c_str(), static_cast<int>(columns.size()), tableFlags)) {
+	// ImGui keys saved column widths, order and sorting by table ID, so each column layout gets its own ID.
+	const std::string tableId = Settings::ShowCharacterNames ? group.tableName : group.tableName + "NoCharacter";
+	if (ImGui::BeginTable(tableId.c_str(), static_cast<int>(columns.size()), tableFlags)) {
 		SetupTableColumns(columns);
 		DrawTableHeaders(columns);
 

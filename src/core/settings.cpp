@@ -27,6 +27,8 @@ namespace {
 	constexpr const char* SELECTED_DATA_SOURCE = "SelectedDataSource";
 	constexpr const char* LINKED_ACCOUNTS_MODE = "LinkedAccountsMode";
 	constexpr const char* INCLUDE_MISSING_ACCOUNTS = "IncludeMissingAccounts";
+	constexpr const char* SHOW_CHARACTER_NAMES = "ShowCharacterNames";
+	constexpr const char* SHOW_COMMANDER_TAG = "ShowCommanderTag";
 	constexpr const char* TOKENS_PER_COFFER = "TokensPerCoffer";
 	constexpr const char* UNAVAILABLE_TEXT = "UnavailableText";
 	constexpr const char* HOVER_ENABLED = "HoverEnabled";
@@ -88,6 +90,8 @@ namespace Settings {
 	DataSource SelectedDataSource = WINGMAN;
 	LinkedAccountMode LinkedAccountsMode = HIDE_LINKED;
 	bool IncludeMissingAccounts = true;
+	bool ShowCharacterNames = true;
+	bool ShowCommanderTag = true;
 	int TokensPerCoffer = 3;
 	std::string UnavailableText = "-";
 
@@ -130,6 +134,8 @@ namespace Settings {
 		ReadEnum(window, SELECTED_DATA_SOURCE, SelectedDataSource, KPME);
 		ReadEnum(window, LINKED_ACCOUNTS_MODE, LinkedAccountsMode, SPLIT_LINKED);
 		Read(window, INCLUDE_MISSING_ACCOUNTS, IncludeMissingAccounts);
+		Read(window, SHOW_CHARACTER_NAMES, ShowCharacterNames);
+		Read(window, SHOW_COMMANDER_TAG, ShowCommanderTag);
 		ReadClamped(window, TOKENS_PER_COFFER, TokensPerCoffer, TOKENS_PER_COFFER_RANGE);
 		Read(window, UNAVAILABLE_TEXT, UnavailableText);
 		UnavailableText.resize((std::min)(UnavailableText.size(), MAX_UNAVAILABLE_TEXT_LENGTH));
@@ -164,6 +170,8 @@ namespace Settings {
 		window[SELECTED_DATA_SOURCE] = SelectedDataSource;
 		window[LINKED_ACCOUNTS_MODE] = LinkedAccountsMode;
 		window[INCLUDE_MISSING_ACCOUNTS] = IncludeMissingAccounts;
+		window[SHOW_CHARACTER_NAMES] = ShowCharacterNames;
+		window[SHOW_COMMANDER_TAG] = ShowCommanderTag;
 		window[TOKENS_PER_COFFER] = TokensPerCoffer;
 		window[UNAVAILABLE_TEXT] = UnavailableText;
 		window[HOVER_ENABLED] = hoverEnabled;

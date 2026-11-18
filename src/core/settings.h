@@ -56,6 +56,8 @@ namespace Settings {
 	extern DataSource SelectedDataSource;
 	extern LinkedAccountMode LinkedAccountsMode;
 	extern bool IncludeMissingAccounts;
+	extern bool ShowCharacterNames;
+	extern bool ShowCommanderTag;
 	// Raid tokens each unopened boss coffer counts as. A coffer drops 1-5 tokens, so the default is the average.
 	extern int TokensPerCoffer;
 	// Shown in proof cells for accounts the provider has no data for.
