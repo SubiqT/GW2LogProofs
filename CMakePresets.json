@@ -1,0 +1,27 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "windows",
+      "displayName": "Windows (Visual Studio 2022)",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/windows",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+    },
+    {
+      "name": "cross",
+      "displayName": "Cross-compile with clang-cl and xwin",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build/cross",
+      "toolchainFile": "${sourceDir}/cmake/clang-cl-xwin.cmake",
+      "condition": { "type": "notEquals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "windows-release", "displayName": "Release", "configurePreset": "windows", "configuration": "Release" },
+    { "name": "windows-debug", "displayName": "Debug", "configurePreset": "windows", "configuration": "Debug" },
+    { "name": "cross-release", "displayName": "Release", "configurePreset": "cross", "configuration": "Release" }
+  ]
+}

@@ -22,19 +22,32 @@ Alternatively, you can install manually:
 2. Place it in your addons folder (e.g. `C:\Program Files\Guild Wars 2\addons`).
 3. Log Proofs should be automatically detected and loaded by Nexus.
 
-## Building on macOS
+## Building
 
-The Makefile cross-compiles the Windows DLL with `clang-cl` and the MSVC CRT and Windows SDK downloaded by [xwin](https://github.com/Jake-Shadle/xwin). Running `xwin` requires accepting the Microsoft licence terms.
+Log Proofs builds with CMake 3.21 or newer. Clone with submodules, or run `git submodule update --init`.
+
+**Windows:** open the repository folder in Visual Studio 2022 (**File > Open > Folder**), choose the **Windows (Visual Studio 2022)** configuration and build. From a developer prompt:
 
 ```sh
-brew install llvm lld
-cargo install xwin
-xwin --accept-license splat --output ~/Library/Caches/cargo-xwin/xwin
-git submodule update --init
-make
+cmake --preset windows
+cmake --build --preset windows-release
 ```
 
-The DLL is written to `x64/Release/nexus_log_proofs.dll`. Set `XWIN` or `LLVM` to override the SDK or toolchain location.
+The DLL is written to `build/windows/Release/nexus_log_proofs.dll`.
+
+**macOS and Linux:** the `cross` preset cross-compiles the Windows DLL with `clang-cl` and the MSVC CRT and Windows SDK downloaded by [xwin](https://github.com/Jake-Shadle/xwin). Running `xwin` requires accepting the Microsoft licence terms.
+
+```sh
+brew install llvm lld cmake ninja
+cargo install xwin
+xwin --accept-license splat --output ~/Library/Caches/cargo-xwin/xwin
+cmake --preset cross
+cmake --build --preset cross-release
+```
+
+The DLL is written to `build/cross/Release/nexus_log_proofs.dll`. Set `XWIN` or `LLVM` to override the SDK or toolchain location.
+
+The version is the configure date and time in UTC, so reconfigure (`cmake --preset ...`) before building a release.
 
 ## Issues
 

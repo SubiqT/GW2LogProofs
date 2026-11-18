@@ -1,0 +1,33 @@
+name: Build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Configure
+      run: cmake --preset windows
+
+    - name: Build
+      run: cmake --build --preset windows-release
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nexus_log_proofs
+        path: |
+          build/windows/Release/nexus_log_proofs.dll
+          build/windows/Release/nexus_log_proofs.pdb

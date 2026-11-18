@@ -1,9 +1,7 @@
 .vs
-x64
-/src/version.h
+/build
 .vscode
 .kiro
 *.aps
-*.vcxproj.user
 src/RC[a-z][0-9]*
 src/RD[a-z][0-9]*
