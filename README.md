@@ -26,7 +26,7 @@ Alternatively, you can install manually:
 
 Log Proofs builds with CMake 3.21 or newer. Clone with submodules, or run `git submodule update --init`.
 
-**Windows:** open the repository folder in Visual Studio 2022 (**File > Open > Folder**), choose the **Windows (Visual Studio 2022)** configuration and build. From a developer prompt:
+**Windows:** open the repository folder in Visual Studio 2022 or newer (**File > Open > Folder**), choose the **Windows (Visual Studio)** configuration and build. The preset uses the newest Visual Studio installed. From a developer prompt:
 
 ```sh
 cmake --preset windows
